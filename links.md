@@ -11,5 +11,8 @@ https://curl.se/libcurl/c/easy_getinfo_options.html
 # examples
 https://curl.se/libcurl/c/example.html
 
-# Everything curl
+# curl_easy_recv
+https://curl.se/libcurl/c/curl_easy_recv.html
+
+# everything curl
 https://everything.curl.dev/index.html
