@@ -1,6 +1,10 @@
 package org.example;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -10,14 +14,20 @@ public class Main {
         // System.load("/opt/homebrew/opt/curl/lib/libcurl.dylib");
         System.load("/Users/ivan/work/curltest/curltest.dylib");
         System.out.println(curlInit());
-        System.out.println(foobar());
     }
 
     static native int curlInit();
 
-    static native int foobar();
+    static native int foobar(OutputStream out);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+
+        var baos = new ByteArrayOutputStream();
+        System.out.println(foobar(baos));
+
+        // Thread.sleep(1000);
+
+        // System.out.println(Arrays.toString(baos.toByteArray()));
 
         // final ByteBuffer bb = ByteBuffer.allocateDirect(32000);
 

@@ -18,10 +18,10 @@ JNIEXPORT jint JNICALL Java_org_example_Main_curlInit
 /*
  * Class:     org_example_Main
  * Method:    foobar
- * Signature: ()I
+ * Signature: (Ljava/io/OutputStream;)I
  */
 JNIEXPORT jint JNICALL Java_org_example_Main_foobar
-  (JNIEnv *, jclass);
+  (JNIEnv *, jclass, jobject);
 
 #ifdef __cplusplus
 }
