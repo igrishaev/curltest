@@ -20,10 +20,15 @@ public class Main {
 
     static native int foobar(OutputStream out);
 
+    static native int test1();
+
     public static void main(String[] args) throws InterruptedException {
 
         var baos = new ByteArrayOutputStream();
         System.out.println(foobar(baos));
+        System.out.println(new String(baos.toByteArray()).substring(0, 100));
+
+        // System.out.println(test1());
 
         // Thread.sleep(1000);
 

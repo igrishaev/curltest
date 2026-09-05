@@ -23,6 +23,14 @@ JNIEXPORT jint JNICALL Java_org_example_Main_curlInit
 JNIEXPORT jint JNICALL Java_org_example_Main_foobar
   (JNIEnv *, jclass, jobject);
 
+/*
+ * Class:     org_example_Main
+ * Method:    test1
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_example_Main_test1
+  (JNIEnv *, jclass);
+
 #ifdef __cplusplus
 }
 #endif
