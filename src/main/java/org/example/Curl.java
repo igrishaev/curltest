@@ -54,15 +54,31 @@ public record Curl(long ptr) implements AutoCloseable {
         Native.curl_easy_cleanup(ptr);
     }
 
-    public static void main(final String... args) {
+    private static void test(final Curl curl, final int i) {
         final long t1 = System.currentTimeMillis();
+//        try(Curl curl = Curl.init()) {
+//            curl.curlOptFollowLocation(1);
+//            curl.curlOptUtl("https://habr.com");
+//            curl.curlOptWriteData("foobar" + i + ".html");
+//            curl.perform();
+//        }
+        curl.curlOptWriteData("foobar" + i + ".html");
+        curl.perform();
+        final long t2 = System.currentTimeMillis();
+        System.out.println(t2 - t1);
+    }
+
+    public static void main(final String... args) {
+        final Runtime runtime = Runtime.getRuntime();
+        long m1 = runtime.totalMemory() - runtime.freeMemory();
         try(Curl curl = Curl.init()) {
             curl.curlOptFollowLocation(1);
             curl.curlOptUtl("https://habr.com");
-            curl.curlOptWriteData("foobar.html");
-            curl.perform();
+            for (int i = 0; i < 10; i++) {
+                test(curl, i);
+            }
         }
-        final long t2 = System.currentTimeMillis();
-        System.out.println(t2 - t1);
+        long m2 = runtime.totalMemory() - runtime.freeMemory();
+        System.out.println("Memory increased: " + (m2 - m1) / 1000000);
     }
 }
