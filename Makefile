@@ -1,4 +1,6 @@
 
+all: clear headers compile
+
 headers:
 	javac -h . src/main/java/org/example/Main.java src/main/java/org/example/Native.java
 
@@ -11,3 +13,7 @@ OBJ = org_example_Native
 compile:
 	gcc -Wall -ansi -pedantic -fPIC ${JAVA_INC} -c ${OBJ}.c -o ${OBJ}.o
 	gcc -Wall -ansi -pedantic -fPIC -shared ${OBJ}.o -lcurl -o curltest.dylib
+
+clear:
+	rm -f *.html
+	rm -f *.log

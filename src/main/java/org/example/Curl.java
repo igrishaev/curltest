@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
@@ -7,7 +9,7 @@ public record Curl(long ptr) implements AutoCloseable {
 
     private void checkResult(final long result, final String message) {
         if (result != 0) {
-            Err.error("cURL operation has failed, code: %s, message: %s", message);
+            Err.error("cURL operation has failed, code: %s, message: %s", result, message);
         }
     }
 
@@ -36,6 +38,10 @@ public record Curl(long ptr) implements AutoCloseable {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA(ptr, file.ptr()), "CURLOPT_WRITEDATA");
     }
 
+    public void curlOptWriteData(final WriteDataOut wdOut) {
+        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_OUT(ptr, wdOut.ptr()), "CURLOPT_WRITEDATA");
+    }
+
     public void perform() {
         checkResult(Native.curl_easy_perform(ptr), "curl_easy_perform");
     }
@@ -61,20 +67,31 @@ public record Curl(long ptr) implements AutoCloseable {
         System.out.println(t2 - t1);
     }
 
-    public static void main(final String... args) {
+    public static void main(final String... args) throws IOException {
 //        try (FILE f = FILE.open("/SSSS")) {
 //            System.out.println(f);
 //        }
-        final Runtime runtime = Runtime.getRuntime();
-        long m1 = runtime.totalMemory() - runtime.freeMemory();
-        try(Curl curl = Curl.init()) {
+
+        try (Curl curl = Curl.init()) {
             curl.curlOptFollowLocation(1);
             curl.curlOptUtl("https://habr.com");
-            for (int i = 0; i < 10; i++) {
-                test(curl, i);
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream(32);
+                WriteDataOut writeDataOut = WriteDataOut.allocate(out)) {
+                curl.curlOptWriteData(writeDataOut);
+                curl.perform();
             }
         }
-        long m2 = runtime.totalMemory() - runtime.freeMemory();
-        System.out.println("Memory increased: " + (m2 - m1) / 1000000);
+
+//        final Runtime runtime = Runtime.getRuntime();
+//        long m1 = runtime.totalMemory() - runtime.freeMemory();
+//        try (Curl curl = Curl.init()) {
+//            curl.curlOptFollowLocation(1);
+//            curl.curlOptUtl("https://habr.com");
+//            for (int i = 0; i < 10; i++) {
+//                test(curl, i);
+//            }
+//        }
+//        long m2 = runtime.totalMemory() - runtime.freeMemory();
+//        System.out.println("Memory increased: " + (m2 - m1) / 1000000);
     }
 }
