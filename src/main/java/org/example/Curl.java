@@ -5,10 +5,6 @@ import java.net.URL;
 
 public record Curl(long ptr) implements AutoCloseable {
 
-    private void error(final String message) {
-        throw new RuntimeException(message);
-    }
-
     private void checkResult(final long result, final String message) {
         if (result != 0) {
             Err.error("cURL operation has failed, code: %s, message: %s", message);

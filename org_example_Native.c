@@ -38,6 +38,10 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
 (JNIEnv *env, jclass jcls, jlong jcurl, jstring jfile) {
     CURL *curl = (CURL *) jcurl;
     FILE *fp = (FILE *) jfile;
+    CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
+    if (result != CURLE_OK) {
+        return result;
+    }
     return curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 }
 
