@@ -13,4 +13,6 @@ public class Native {
     static native void curl_easy_cleanup(final long curl);
     static native long curl_easy_perform(final long curl);
     static native long curl_easy_setopt_CURLOPT_WRITEDATA(final long curl, final String path);
+    static native long fopen(final String path);
+    static native void fclose(final long ptr);
 }

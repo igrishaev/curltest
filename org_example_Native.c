@@ -53,3 +53,16 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
 
     return curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 }
+
+JNIEXPORT jlong JNICALL Java_org_example_Native_fopen
+(JNIEnv *env, jclass jcls, jstring jpath) {
+    const char *path = (*env)->GetStringUTFChars(env, jpath, NULL);
+    FILE *fp = fopen(path, "wb");
+    return (jlong) fp;
+}
+
+JNIEXPORT void JNICALL Java_org_example_Native_fclose
+(JNIEnv *env, jclass jcls, jlong jptr) {
+    FILE *fp = (FILE *) jptr;
+    fclose(fp);
+}
