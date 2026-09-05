@@ -1,0 +1,15 @@
+
+(let [m1 (getmem)]
+  (dotimes [x 10]
+    (time
+     (let [res (clj-http.client/get "https://habr.com" {:as :stream})]
+     (with-open [in (:body res)
+                 out (clojure.java.io/output-stream "foo.html")]
+       (.transferTo in out)
+       )
+     )))
+    (println (quot (- (getmem) m1) 1000000)))
+
+(defn getmem []
+  (let [rt (Runtime/getRuntime)]
+    (- (.totalMemory rt) (.freeMemory rt))))
