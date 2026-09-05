@@ -70,20 +70,20 @@ static size_t write_callback_out(char *data, size_t size, size_t nmemb, void *us
     printf("aaa\n");
 
     jmethodID constructor = (*env)->GetMethodID(env, jOutputStream, "<init>", "()V");
-    jobject jout = (*env)->NewObject(env, jOutputStream, constructor);
+    /* jobject jout = (*env)->NewObject(env, jOutputStream, constructor); */
 
-    /* jobject jout = wd->jout; */
+    jobject jout = wd->jout;
 
     printf("bbb\n");
 
-    (*env)->SetByteArrayRegion(env, jbuf, 0, wd->total, (jbyte *) data);
+    (*env)->SetByteArrayRegion(env, jbuf, 0, total, (jbyte *) data);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
         return -1;
     }
 
-    (*env)->CallVoidMethod(env, jout, wd->jwrite, wd->jbuf, 0, total);
+    (*env)->CallVoidMethod(env, jout, jwrite, jbuf, 0, total);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
@@ -139,11 +139,13 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
         printf("writeMethod is null");
     }
 
+    jobject jout_blobal = (*env)->NewGlobalRef(env, jout);
+
     struct write_data_out *wd = malloc(sizeof(struct write_data_out));
     wd->i = 0;
     wd->total = 0;
     wd->env = env;
-    wd->jout = jout;
+    wd->jout = jout_blobal;
     wd->jwrite = jwrite;
     wd->jbuf = (*env)->NewByteArray(env, 32000); // TODO free
     return (jlong) wd;
