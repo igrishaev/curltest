@@ -50,10 +50,10 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1perform
 /*
  * Class:     org_example_Native
  * Method:    curl_easy_setopt_CURLOPT_WRITEDATA
- * Signature: (JLjava/lang/String;)J
+ * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA
-  (JNIEnv *, jclass, jlong, jstring);
+  (JNIEnv *, jclass, jlong, jlong);
 
 /*
  * Class:     org_example_Native

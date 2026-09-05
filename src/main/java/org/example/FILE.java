@@ -2,8 +2,11 @@ package org.example;
 
 public record FILE(long ptr, String path) implements AutoCloseable {
 
-    public FILE open(final String path) {
+    public static FILE open(final String path) {
         final long ptr = Native.fopen(path);
+        if (ptr == Native.NULL) {
+            Err.error("fopen failed: %s", path);
+        }
         return new FILE(ptr, path);
     }
 

@@ -35,22 +35,9 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1perform
 }
 
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA
-(JNIEnv *env, jclass jcls, jlong jptr, jstring jpath) {
-    CURL *curl = (CURL *) jptr;
-
-    const char *path = (*env)->GetStringUTFChars(env, jpath, NULL);
-    FILE *fp = fopen(path, "wb");
-
-    if (path == NULL) {
-        return CURLE_BAD_FUNCTION_ARGUMENT;
-    }
-    /* TODO */
-    if (fp == NULL) {
-        return CURLE_BAD_FUNCTION_ARGUMENT;
-    }
-
-    /* fclose(fp); */
-
+(JNIEnv *env, jclass jcls, jlong jcurl, jstring jfile) {
+    CURL *curl = (CURL *) jcurl;
+    FILE *fp = (FILE *) jfile;
     return curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 }
 

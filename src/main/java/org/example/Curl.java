@@ -1,6 +1,5 @@
 package org.example;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URL;
 
@@ -10,13 +9,9 @@ public record Curl(long ptr) implements AutoCloseable {
         throw new RuntimeException(message);
     }
 
-    private void error(final String template, final Object... args) {
-        throw new RuntimeException(String.format(template, args));
-    }
-
     private void checkResult(final long result, final String message) {
         if (result != 0) {
-            error("cURL operation has failed, code: %s, message: %s", message);
+            Err.error("cURL operation has failed, code: %s, message: %s", message);
         }
     }
 
@@ -41,8 +36,8 @@ public record Curl(long ptr) implements AutoCloseable {
         curlOptUtl(uri.toString());
     }
 
-    public void curlOptWriteData(final String path) {
-        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA(ptr, path), "CURLOPT_WRITEDATA");
+    public void curlOptWriteData(final FILE file) {
+        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA(ptr, file.ptr()), "CURLOPT_WRITEDATA");
     }
 
     public void perform() {
@@ -62,13 +57,18 @@ public record Curl(long ptr) implements AutoCloseable {
 //            curl.curlOptWriteData("foobar" + i + ".html");
 //            curl.perform();
 //        }
-        curl.curlOptWriteData("foobar" + i + ".html");
-        curl.perform();
+        try (FILE f = FILE.open("foobar" + i + ".html") ) {
+            curl.curlOptWriteData(f);
+            curl.perform();
+        }
         final long t2 = System.currentTimeMillis();
         System.out.println(t2 - t1);
     }
 
     public static void main(final String... args) {
+//        try (FILE f = FILE.open("/SSSS")) {
+//            System.out.println(f);
+//        }
         final Runtime runtime = Runtime.getRuntime();
         long m1 = runtime.totalMemory() - runtime.freeMemory();
         try(Curl curl = Curl.init()) {
