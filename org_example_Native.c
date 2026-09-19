@@ -17,7 +17,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         os_write_ba_i_i = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
 
         jcls = (*env)->FindClass(env, "org/example/IWriteFunction");
-        wf_handle_ba_i_i = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
+        wf_handle_ba_i_i = (*env)->GetMethodID(env, jcls, "handle", "([BII)V");
 
         return JNI_VERSION_1_8;
     }

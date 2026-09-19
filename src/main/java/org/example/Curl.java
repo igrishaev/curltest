@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 
-public record Curl(long ptr) implements AutoCloseable {
+public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 
     private void checkResult(final long result, final String message) {
         if (result != 0) {
@@ -15,7 +15,8 @@ public record Curl(long ptr) implements AutoCloseable {
 
     public static Curl init() {
         final long ptr = Native.curl_easy_init();
-        return new Curl(ptr);
+        final byte[] buf = new byte[32000];
+        return new Curl(ptr, buf);
     }
 
     public void curlOptFollowLocation(final int code) {
