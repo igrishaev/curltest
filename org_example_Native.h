@@ -95,6 +95,14 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
 JNIEXPORT void JNICALL Java_org_example_Native_free
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_example_Native
+ * Method:    curl_easy_setopt_CURLOPT_WRITEFUNCTION
+ * Signature: (JLorg/example/IWriteFunction;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEFUNCTION
+  (JNIEnv *, jclass, jlong, jobject);
+
 #ifdef __cplusplus
 }
 #endif

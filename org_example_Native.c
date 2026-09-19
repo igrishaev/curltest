@@ -2,6 +2,27 @@
 #include <jni.h>
 #include <curl/curl.h>
 
+
+static jmethodID os_write_ba_i_i;
+static jmethodID wf_handle_ba_i_i;
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+    JNIEnv* env;
+    if ((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_8) != JNI_OK) {
+        return JNI_ERR;
+    } else {
+        jclass jcls;
+
+        jcls = (*env)->FindClass(env, "java/io/OutputStream");
+        os_write_ba_i_i = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
+
+        jcls = (*env)->FindClass(env, "org/example/IWriteFunction");
+        wf_handle_ba_i_i = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
+
+        return JNI_VERSION_1_8;
+    }
+}
+
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1init
   (JNIEnv *env, jclass jcls) {
     return (jlong) curl_easy_init();
@@ -62,7 +83,7 @@ static size_t write_callback_out(char *data, size_t size, size_t nmemb, void *us
     struct write_data_out * wd = (struct write_data_out *) userdata;
     JNIEnv *env = wd->env;
 
-    jbyteArray jbuf = (*env)->NewByteArray(env, 32000); // TODO free
+    jbyteArray jbuf = (*env)->NewByteArray(env, 32000); /* TODO free */
 
     jclass jOutputStream = (*env)->FindClass(env, "java/io/ByteArrayOutputStream");
     jmethodID jwrite = (*env)->GetMethodID(env, jOutputStream, "write", "([BII)V");
@@ -83,7 +104,7 @@ static size_t write_callback_out(char *data, size_t size, size_t nmemb, void *us
         return -1;
     }
 
-    (*env)->CallVoidMethod(env, jout, jwrite, jbuf, 0, total);
+    (*env)->CallVoidMethod(env, jout, os_write_ba_i_i, jbuf, 0, total);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
@@ -139,15 +160,15 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
         printf("writeMethod is null");
     }
 
-    jobject jout_blobal = (*env)->NewGlobalRef(env, jout);
+    jobject jout_global = (*env)->NewGlobalRef(env, jout);
 
     struct write_data_out *wd = malloc(sizeof(struct write_data_out));
     wd->i = 0;
     wd->total = 0;
     wd->env = env;
-    wd->jout = jout_blobal;
+    wd->jout = jout_global;
     wd->jwrite = jwrite;
-    wd->jbuf = (*env)->NewByteArray(env, 32000); // TODO free
+    wd->jbuf = (*env)->NewByteArray(env, 32000); /* TODO free */
     return (jlong) wd;
 }
 
