@@ -23,6 +23,13 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     }
 }
 
+struct write_data {
+    size_t i;
+    size_t total;
+    JNIEnv *env;
+    jbyteArray jbuf;
+};
+
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1init
   (JNIEnv *env, jclass jcls) {
     return (jlong) curl_easy_init();
@@ -67,49 +74,20 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
     return curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 }
 
-struct write_data_out {
-    size_t i;
-    size_t total;
-    JNIEnv *env;
-    jobject jout;
-    jmethodID jwrite;
-    jbyteArray jbuf;
-};
-
-
-static size_t write_callback_out(char *data, size_t size, size_t nmemb, void *userdata)
+static size_t write_callback(char *data, size_t size, size_t nmemb, void *userdata)
 {
     size_t total = size * nmemb;
-    struct write_data_out * wd = (struct write_data_out *) userdata;
+    struct write_data *wd = (struct write_data *) userdata;
     JNIEnv *env = wd->env;
 
-    jbyteArray jbuf = (*env)->NewByteArray(env, 32000); /* TODO free */
+    printf("write_callback: %lu, %lu\n", size, nmemb);
 
-    jclass jOutputStream = (*env)->FindClass(env, "java/io/ByteArrayOutputStream");
-    jmethodID jwrite = (*env)->GetMethodID(env, jOutputStream, "write", "([BII)V");
-
-    printf("aaa\n");
-
-    jmethodID constructor = (*env)->GetMethodID(env, jOutputStream, "<init>", "()V");
-    /* jobject jout = (*env)->NewObject(env, jOutputStream, constructor); */
-
-    jobject jout = wd->jout;
-
-    printf("bbb\n");
-
-    (*env)->SetByteArrayRegion(env, jbuf, 0, total, (jbyte *) data);
-    if ((*env)->ExceptionCheck(env)) {
-        (*env)->ExceptionDescribe(env);
-        (*env)->ExceptionClear(env);
-        return -1;
-    }
-
-    (*env)->CallVoidMethod(env, jout, os_write_ba_i_i, jbuf, 0, total);
-    if ((*env)->ExceptionCheck(env)) {
-        (*env)->ExceptionDescribe(env);
-        (*env)->ExceptionClear(env);
-        return -1;
-    }
+    /* (*env)->SetByteArrayRegion(env, wd->jbuf, 0, total, (jbyte *) data); */
+    /* if ((*env)->ExceptionCheck(env)) { */
+    /*     (*env)->ExceptionDescribe(env); */
+    /*     (*env)->ExceptionClear(env); */
+    /*     return -1; */
+    /* } */
 
     wd->i++;
     wd->total += total;
@@ -123,9 +101,16 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jwdout) {
 
     CURL *curl = (CURL *) jcurl;
-    struct write_data_out *wd = (struct write_data_out *) jwdout;
 
-    CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_out);
+    jbyteArray jbuf = (*env)->NewByteArray(env, 32000);
+
+    struct write_data *wd = malloc(sizeof(struct write_data));
+    wd->i = 0;
+    wd->total = 0;
+    wd->env = env;
+    wd->jbuf = jbuf;
+
+    CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     if (result != CURLE_OK) {
         return result;
     }
@@ -162,14 +147,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
 
     jobject jout_global = (*env)->NewGlobalRef(env, jout);
 
-    struct write_data_out *wd = malloc(sizeof(struct write_data_out));
-    wd->i = 0;
-    wd->total = 0;
-    wd->env = env;
-    wd->jout = jout_global;
-    wd->jwrite = jwrite;
-    wd->jbuf = (*env)->NewByteArray(env, 32000); /* TODO free */
-    return (jlong) wd;
+    return 1;
 }
 
 JNIEXPORT void JNICALL Java_org_example_Native_free
