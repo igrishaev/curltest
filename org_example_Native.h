@@ -89,10 +89,10 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
 
 /*
  * Class:     org_example_Native
- * Method:    free
+ * Method:    close_write_data_out
  * Signature: (J)V
  */
-JNIEXPORT void JNICALL Java_org_example_Native_free
+JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1out
   (JNIEnv *, jclass, jlong);
 
 /*

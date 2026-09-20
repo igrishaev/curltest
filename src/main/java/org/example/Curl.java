@@ -39,7 +39,7 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA(ptr, file.ptr()), "CURLOPT_WRITEDATA");
     }
 
-    public void curlOptWriteData(final WriteDataOut wdOut) {
+    public void curlOptWriteData(final WriteDataStream wdOut) {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_OUT(ptr, wdOut.ptr()), "CURLOPT_WRITEDATA");
     }
 
@@ -77,9 +77,11 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
             curl.curlOptFollowLocation(1);
             curl.curlOptUtl("https://habr.com");
             try (ByteArrayOutputStream out = new ByteArrayOutputStream(32);
-                WriteDataOut writeDataOut = WriteDataOut.allocate(out)) {
-                curl.curlOptWriteData(writeDataOut);
+                WriteDataStream writeDataStream = WriteDataStream.wrap(out)) {
+                curl.curlOptWriteData(writeDataStream);
                 curl.perform();
+
+                System.out.println(out);
             }
         }
 

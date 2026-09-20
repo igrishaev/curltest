@@ -22,6 +22,6 @@ public class Native {
     static native long fopen(final String path);
     static native void fclose(final long ptr);
     static native long init_write_data_out(final OutputStream out);
-    static native void free(final long ptr);
+    static native void close_write_data_out(final long ptr);
     static native long curl_easy_setopt_CURLOPT_WRITEFUNCTION(final long ptr, IWriteFunction callback);
 }
