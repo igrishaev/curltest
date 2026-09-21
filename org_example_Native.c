@@ -94,6 +94,7 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 
     printf("write_callback: %lu, %lu\n", size, nmemb);
 
+    /* TODO: write bytes in a cycle? */
     (*env)->SetByteArrayRegion(env, wd->jbuf, 0, total, (jbyte *) data);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
@@ -101,6 +102,7 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
         return -1;
     }
 
+    /* TODO: check exception */
     (*env)->CallVoidMethod(env, wd->joutput_stream, output_stream_write_ba_i_i, wd->jbuf, 0, total);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
