@@ -3,25 +3,27 @@
 #include <curl/curl.h>
 
 
-static jmethodID output_stream_write_ba_i_i;
-static jmethodID wf_handle_ba_i_i;
+static jmethodID meth_OS_write_BaII;
+static jmethodID meth_WDF_handle_BaII;
+
+static int _JVM_VER = JNI_VERSION_1_8;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     JNIEnv* env;
-    if ((*vm)->GetEnv(vm, (void **) &env, JNI_VERSION_1_8) != JNI_OK) {
+    if ((*vm)->GetEnv(vm, (void **) &env, _JVM_VER) != JNI_OK) {
         return JNI_ERR;
     } else {
         jclass jcls;
 
         jcls = (*env)->FindClass(env, "java/io/OutputStream");
         /* TODO check NULL */
-        output_stream_write_ba_i_i = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
+        meth_OS_write_BaII = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
 
-        jcls = (*env)->FindClass(env, "org/example/IWriteFunction");
+        jcls = (*env)->FindClass(env, "org/example/IWriteDataFunction");
         /* TODO check NULL */
-        wf_handle_ba_i_i = (*env)->GetMethodID(env, jcls, "handle", "([BII)V");
+        meth_WDF_handle_BaII = (*env)->GetMethodID(env, jcls, "handle", "([BII)V");
 
-        return JNI_VERSION_1_8;
+        return _JVM_VER;
     }
 }
 
@@ -76,7 +78,7 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
     (*env)->SetByteArrayRegion(env, wd->jbuf, 0, total, (jbyte *) data);
 
     /* TODO: check exception */
-    (*env)->CallVoidMethod(env, wd->joutput_stream, output_stream_write_ba_i_i, wd->jbuf, 0, total);
+    (*env)->CallVoidMethod(env, wd->joutput_stream, meth_OS_write_BaII, wd->jbuf, 0, total);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
@@ -89,16 +91,25 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA_1stream
-  (JNIEnv *env, jclass jcls, jlong jcurl, jlong write_data) {
-
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA_1file
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong fp) {
     CURL *curl = (CURL *) jcurl;
+    CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
+    if (result != CURLE_OK) {
+        return result;
+    }
+    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+}
 
+
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA_1stream
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong wd_ptr) {
+    CURL *curl = (CURL *) jcurl;
     CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_stream);
     if (result != CURLE_OK) {
         return result;
     }
-    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, write_data);
+    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, wd_ptr);
 }
 
 

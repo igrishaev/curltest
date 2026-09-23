@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -23,24 +24,24 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         checkResult(Native.curl_easy_setopt_CURLOPT_FOLLOWLOCATION(ptr, code), "CURLOPT_FOLLOWLOCATION");
     }
 
-    public void curlOptUtl(final String url) {
+    public void curlOptURL(final String url) {
         checkResult(Native.curl_easy_setopt_CURLOPT_URL(ptr, url), "CURLOPT_URL");
     }
 
-    public void curlOptUtl(final URL url) {
-        curlOptUtl(url.toString());
+    public void curlOptURL(final URL url) {
+        curlOptURL(url.toString());
     }
 
-    public void curlOptUtl(final URI uri) {
-        curlOptUtl(uri.toString());
+    public void curlOptURL(final URI uri) {
+        curlOptURL(uri.toString());
     }
 
     public void curlOptWriteData(final FILE file) {
-        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA(ptr, file.ptr()), "CURLOPT_WRITEDATA");
+        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_file(ptr, file.fd()), "CURLOPT_WRITEDATA");
     }
 
-    public void curlOptWriteData(final WriteStream writeStream) {
-        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_stream(ptr, writeStream.ptr()), "CURLOPT_WRITEDATA");
+    public void curlOptWriteData(final WriteDataStream writeDataStream) {
+        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_stream(ptr, writeDataStream.ptr()), "CURLOPT_WRITEDATA");
     }
 
     public void perform() {
@@ -75,14 +76,18 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 
         try (Curl curl = Curl.init()) {
             curl.curlOptFollowLocation(1);
-            curl.curlOptUtl("https://habr.com");
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
-                WriteStream writeStream = WriteStream.wrap(baos)) {
-                curl.curlOptWriteData(writeStream);
+            curl.curlOptURL("https://habr.com");
+            try (FILE f = FILE.open("foobar.txt")) {
+                curl.curlOptWriteData(f);
                 curl.perform();
 
-                System.out.println(baos);
             }
+//            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
+//                WriteDataStream writeDataStream = WriteDataStream.wrap(baos)) {
+//                curl.curlOptWriteData(writeDataStream);
+//                curl.perform();
+//                System.out.println(baos);
+//            }
         }
 
 //        final Runtime runtime = Runtime.getRuntime();
