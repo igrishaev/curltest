@@ -1,7 +1,6 @@
 
 - write support callback
 - write file: pass mode (enum)
-- write file: File, Path support
 - write: share global byte buffer
 - write: null support
 - read: file support
