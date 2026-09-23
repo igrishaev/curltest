@@ -39,8 +39,8 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA(ptr, file.ptr()), "CURLOPT_WRITEDATA");
     }
 
-    public void curlOptWriteData(final WriteDataStream wdOut) {
-        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_OUT(ptr, wdOut.ptr()), "CURLOPT_WRITEDATA");
+    public void curlOptWriteData(final WriteStream writeStream) {
+        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_stream(ptr, writeStream.ptr()), "CURLOPT_WRITEDATA");
     }
 
     public void perform() {
@@ -76,12 +76,12 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         try (Curl curl = Curl.init()) {
             curl.curlOptFollowLocation(1);
             curl.curlOptUtl("https://habr.com");
-            try (ByteArrayOutputStream out = new ByteArrayOutputStream(32);
-                WriteDataStream writeDataStream = WriteDataStream.wrap(out)) {
-                curl.curlOptWriteData(writeDataStream);
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
+                WriteStream writeStream = WriteStream.wrap(baos)) {
+                curl.curlOptWriteData(writeStream);
                 curl.perform();
 
-                System.out.println(out);
+                System.out.println(baos);
             }
         }
 

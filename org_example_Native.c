@@ -66,17 +66,6 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1perform
     return curl_easy_perform(curl);
 }
 
-JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA__JJ
-  (JNIEnv *env, jclass jcls, jlong jcurl, jstring jfile) {
-    CURL *curl = (CURL *) jcurl;
-    FILE *fp = (FILE *) jfile;
-    CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
-    if (result != CURLE_OK) {
-        return result;
-    }
-    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-}
-
 static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userdata)
 {
     size_t total = size * nmemb;
@@ -100,8 +89,8 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA_1OUT
-  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jwdout) {
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA_1stream
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong write_data) {
 
     CURL *curl = (CURL *) jcurl;
 
@@ -109,7 +98,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
     if (result != CURLE_OK) {
         return result;
     }
-    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, jwdout);
+    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, write_data);
 }
 
 
@@ -126,7 +115,7 @@ JNIEXPORT void JNICALL Java_org_example_Native_fclose
     fclose(fp);
 }
 
-JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
+JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1stream
   (JNIEnv *env, jclass jcls, jobject jout) {
 
     jbyteArray jbuf = (*env)->NewByteArray(env, CURL_MAX_WRITE_SIZE);
@@ -141,7 +130,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1out
     return (jlong) wd;
 }
 
-JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1out
+JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1stream
   (JNIEnv *env, jclass jcls, jlong jptr) {
     struct write_data *wd = (struct write_data *) jptr;
     (*env)->DeleteGlobalRef(env, wd->joutput_stream);
