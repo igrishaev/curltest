@@ -1,6 +1,6 @@
 package org.example;
 
 @FunctionalInterface
-public interface IWriteDataFunction {
+public interface IWriteHandler {
     void handle(byte[] buf, int len, int off);
 }
