@@ -1,10 +1,9 @@
 package org.example;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 
@@ -44,6 +43,10 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_stream(ptr, writeDataStream.ptr()), "CURLOPT_WRITEDATA");
     }
 
+    public void curlOptWriteDataFunction(final WriteFunction writeFunction) {
+        checkResult(Native.curl_easy_setopt_CURLOPT_WRITEFUNCTION(ptr, writeFunction.ptr()), "CURLOPT_WRITEFUNCTION");
+    }
+
     public void perform() {
         checkResult(Native.curl_easy_perform(ptr), "curl_easy_perform");
     }
@@ -77,17 +80,32 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         try (Curl curl = Curl.init()) {
             curl.curlOptFollowLocation(1);
             curl.curlOptURL("https://habr.com");
-            try (FILE f = FILE.open("foobar.txt")) {
-                curl.curlOptWriteData(f);
-                curl.perform();
 
-            }
-//            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
-//                WriteDataStream writeDataStream = WriteDataStream.wrap(baos)) {
-//                curl.curlOptWriteData(writeDataStream);
+            /* file */
+//            try (FILE f = FILE.open("foobar.txt")) {
+//                curl.curlOptWriteData(f);
 //                curl.perform();
-//                System.out.println(baos);
 //            }
+
+            /* stream /*
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream(32);
+                 WriteDataStream writeDataStream = WriteDataStream.wrap(baos)) {
+                curl.curlOptWriteData(writeDataStream);
+                curl.perform();
+                System.out.println(baos);
+            }
+
+            /* callback */
+            AtomicInteger c = new AtomicInteger(0);
+            try (final WriteFunction writeFunction = WriteFunction.wrap((buf, off, len) -> {
+                System.out.println(buf.length);
+                c.getAndIncrement();
+            })) {
+                curl.curlOptWriteDataFunction(writeFunction);
+                curl.perform();
+                System.out.println(c.get());
+                System.out.println("end");
+            }
         }
 
 //        final Runtime runtime = Runtime.getRuntime();

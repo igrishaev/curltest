@@ -65,6 +65,14 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
 
 /*
  * Class:     org_example_Native
+ * Method:    curl_easy_setopt_CURLOPT_WRITEFUNCTION
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEFUNCTION
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_Native
  * Method:    fopen
  * Signature: (Ljava/lang/String;)J
  */
@@ -93,6 +101,22 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1stream
  * Signature: (J)V
  */
 JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1stream
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_Native
+ * Method:    init_write_data_handler
+ * Signature: (Lorg/example/IWriteHandler;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1handler
+  (JNIEnv *, jclass, jobject);
+
+/*
+ * Class:     org_example_Native
+ * Method:    close_write_data_handler
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1handler
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
