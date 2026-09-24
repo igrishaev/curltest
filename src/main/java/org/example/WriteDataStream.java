@@ -21,7 +21,7 @@ public record WriteDataStream(long ptr, OutputStream out) implements AutoCloseab
 
     @Override
     public void close() throws IOException {
-        Native.close_write_data_stream(ptr);
+        Native.close_user_data(ptr);
         out.close();
     }
 

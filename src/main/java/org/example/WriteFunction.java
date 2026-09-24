@@ -9,6 +9,6 @@ public record WriteFunction(long ptr, IWriteHandler handler) implements AutoClos
 
     @Override
     public void close() {
-        Native.close_write_data_handler(ptr);
+        Native.close_user_data(ptr);
     }
 }

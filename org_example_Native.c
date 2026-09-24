@@ -46,7 +46,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 }
 
 
-struct write_data {
+struct user_data {
     size_t i;
     size_t total;
     JNIEnv *env;
@@ -55,23 +55,23 @@ struct write_data {
 };
 
 
-struct write_data * make_write_data(JNIEnv *env, jobject jobj) {
+struct user_data * make_user_data(JNIEnv *env, jobject jobj) {
     jbyteArray jbuf = (*env)->NewByteArray(env, CURL_MAX_WRITE_SIZE);
 
-    struct write_data * wd = malloc(sizeof(struct write_data));
-    wd->i = 0;
-    wd->total = 0;
-    wd->env = env;
-    wd->jbuf = jbuf;
-    wd->jobj = (*env)->NewGlobalRef(env, jobj);
+    struct user_data * ud = malloc(sizeof(struct user_data));
+    ud->i = 0;
+    ud->total = 0;
+    ud->env = env;
+    ud->jbuf = jbuf;
+    ud->jobj = (*env)->NewGlobalRef(env, jobj);
 
-    return wd;
+    return ud;
 }
 
 
-void clear_write_data(JNIEnv * env, struct write_data * wd) {
-    (*env)->DeleteGlobalRef(env, wd->jobj);
-    free(wd);
+void clear_user_data(JNIEnv * env, struct user_data * ud) {
+    (*env)->DeleteGlobalRef(env, ud->jobj);
+    free(ud);
 }
 
 
@@ -114,20 +114,20 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1perform
 static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userdata)
 {
     size_t total = size * nmemb;
-    struct write_data *wd = (struct write_data *) userdata;
-    JNIEnv *env = wd->env;
+    struct user_data *ud = (struct user_data *) userdata;
+    JNIEnv *env = ud->env;
 
-    (*env)->SetByteArrayRegion(env, wd->jbuf, 0, total, (jbyte *) data);
+    (*env)->SetByteArrayRegion(env, ud->jbuf, 0, total, (jbyte *) data);
 
-    (*env)->CallVoidMethod(env, wd->jobj, meth_OS_write_BaII, wd->jbuf, 0, total);
+    (*env)->CallVoidMethod(env, ud->jobj, meth_OS_write_BaII, ud->jbuf, 0, total);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
         return CURL_WRITEFUNC_ERROR;
     }
 
-    wd->i++;
-    wd->total += total;
+    ud->i++;
+    ud->total += total;
     return total;
 }
 
@@ -135,20 +135,20 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 static size_t write_callback_handler(char *data, size_t size, size_t nmemb, void *userdata)
 {
     size_t total = size * nmemb;
-    struct write_data *wd = (struct write_data *) userdata;
-    JNIEnv *env = wd->env;
+    struct user_data *ud = (struct user_data *) userdata;
+    JNIEnv *env = ud->env;
 
-    (*env)->SetByteArrayRegion(env, wd->jbuf, 0, total, (jbyte *) data);
+    (*env)->SetByteArrayRegion(env, ud->jbuf, 0, total, (jbyte *) data);
 
-    (*env)->CallVoidMethod(env, wd->jobj, meth_WF_handle_BaII, wd->jbuf, 0, total);
+    (*env)->CallVoidMethod(env, ud->jobj, meth_WF_handle_BaII, ud->jbuf, 0, total);
     if ((*env)->ExceptionCheck(env)) {
         (*env)->ExceptionDescribe(env);
         (*env)->ExceptionClear(env);
         return CURL_WRITEFUNC_ERROR;
     }
 
-    wd->i++;
-    wd->total += total;
+    ud->i++;
+    ud->total += total;
     return total;
 }
 
@@ -164,25 +164,36 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
 }
 
 
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1READDATA_1file
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong fp) {
+    CURL *curl = (CURL *) jcurl;
+    CURLcode result = curl_easy_setopt(curl, CURLOPT_READFUNCTION, NULL); /* NULL=fread */
+    if (result != CURLE_OK) {
+        return result;
+    }
+    return curl_easy_setopt(curl, CURLOPT_READDATA, fp);
+}
+
+
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEDATA_1stream
-  (JNIEnv *env, jclass jcls, jlong jcurl, jlong wd_ptr) {
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong ud_ptr) {
     CURL *curl = (CURL *) jcurl;
     CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_stream);
     if (result != CURLE_OK) {
         return result;
     }
-    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, wd_ptr);
+    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, ud_ptr);
 }
 
 
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEFUNCTION
-  (JNIEnv *env, jclass jcls, jlong jcurl, jlong wd_ptr) {
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong ud_ptr) {
     CURL *curl = (CURL *) jcurl;
     CURLcode result = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_handler);
     if (result != CURLE_OK) {
         return result;
     }
-    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, wd_ptr);
+    return curl_easy_setopt(curl, CURLOPT_WRITEDATA, ud_ptr);
 }
 
 
@@ -203,25 +214,18 @@ JNIEXPORT void JNICALL Java_org_example_Native_fclose
 
 JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1stream
   (JNIEnv *env, jclass jcls, jobject joutput_stream) {
-    return (jlong) make_write_data(env, joutput_stream);
+    return (jlong) make_user_data(env, joutput_stream);
 }
 
 
-JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1stream
+JNIEXPORT void JNICALL Java_org_example_Native_close_1user_1data
   (JNIEnv *env, jclass jcls, jlong jptr) {
-    struct write_data *wd = (struct write_data *) jptr;
-    clear_write_data(env, wd);
+    struct user_data *ud = (struct user_data *) jptr;
+    clear_user_data(env, ud);
 }
 
 
 JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1handler
   (JNIEnv *env, jclass jcls, jobject jhandler) {
-    return (jlong) make_write_data(env, jhandler);
-}
-
-
-JNIEXPORT void JNICALL Java_org_example_Native_close_1write_1data_1handler
-  (JNIEnv *env, jclass jcls, jlong jptr) {
-    struct write_data *wd = (struct write_data *) jptr;
-    clear_write_data(env, wd);
+    return (jlong) make_user_data(env, jhandler);
 }

@@ -39,6 +39,10 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_file(ptr, file.fd()), "CURLOPT_WRITEDATA");
     }
 
+    public void curlOptReadData(final FILE file) {
+        checkResult(Native.curl_easy_setopt_CURLOPT_READDATA_file(ptr, file.fd()), "CURLOPT_READDATA");
+    }
+
     public void curlOptWriteData(final WriteDataStream writeDataStream) {
         checkResult(Native.curl_easy_setopt_CURLOPT_WRITEDATA_stream(ptr, writeDataStream.ptr()), "CURLOPT_WRITEDATA");
     }
