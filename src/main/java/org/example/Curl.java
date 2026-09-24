@@ -98,8 +98,10 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
             /* callback */
             AtomicInteger c = new AtomicInteger(0);
             try (final WriteFunction writeFunction = WriteFunction.wrap((buf, off, len) -> {
-                System.out.println(buf.length);
-                c.getAndIncrement();
+                System.out.println(c);
+                if (c.getAndIncrement() == 10) {
+                    throw new RuntimeException("aaa");
+                }
             })) {
                 curl.curlOptWriteDataFunction(writeFunction);
                 curl.perform();

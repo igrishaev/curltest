@@ -7,3 +7,5 @@
 - read: InputStream support
 - read: String byte[] support
 - rename the package
+
+- write bytes in a cycle?
