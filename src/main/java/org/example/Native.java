@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 public class Native {
@@ -19,11 +20,13 @@ public class Native {
     static native long curl_easy_perform(final long curl);
     static native long curl_easy_setopt_CURLOPT_WRITEDATA_file(final long curl, final long fp);
     static native long curl_easy_setopt_CURLOPT_READDATA_file(final long curl, final long fp);
-    static native long curl_easy_setopt_CURLOPT_WRITEDATA_stream(final long curl, final long wdPtr);
-    static native long curl_easy_setopt_CURLOPT_WRITEFUNCTION(final long curl, final long wdPtr);
+    static native long curl_easy_setopt_CURLOPT_WRITEDATA_stream(final long curl, final long ptr);
+    static native long curl_easy_setopt_CURLOPT_READDATA_stream(final long curl, final long ptr);
+    static native long curl_easy_setopt_CURLOPT_WRITEFUNCTION(final long curl, final long ptr);
     static native long fopen(final String path);
     static native void fclose(final long fd);
     static native long init_write_data_stream(final OutputStream out);
     static native long init_write_data_handler(final IWriteHandler handler);
+    static native long init_read_data_stream(final InputStream in);
     static native void close_user_data(final long ptr);
 }

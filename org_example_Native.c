@@ -3,6 +3,7 @@
 #include <curl/curl.h>
 
 static jmethodID meth_OS_write_BaII;
+static jmethodID meth_IS_read_BaII;
 static jmethodID meth_WF_handle_BaII;
 
 static int _CURL_JVM_VER = JNI_VERSION_1_8;
@@ -26,6 +27,18 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
             return JNI_ERR;
         } else {
             meth_OS_write_BaII = jmeth;
+        }
+
+        /* InputStream */
+        jcls = (*env)->FindClass(env, "java/io/InputStream");
+        if (jcls == NULL) {
+            return JNI_ERR;
+        }
+        jmeth = (*env)->GetMethodID(env, jcls, "read", "([BII)I");
+        if (jmeth == NULL) {
+            return JNI_ERR;
+        } else {
+            meth_IS_read_BaII = jmeth;
         }
 
         /* IWriteHandler */
@@ -186,6 +199,55 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRI
 }
 
 
+
+static size_t read_callback_stream(char *data, size_t size, size_t nmemb, void *userdata) {
+
+    size_t total = size * nmemb;
+    struct user_data *ud = (struct user_data *) userdata;
+    JNIEnv *env = ud->env;
+
+    // TODO: buf size?
+    jint jlen = (*env)->CallIntMethod(env, ud->jobj, meth_IS_read_BaII, ud->jbuf, 0, total);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        return CURL_READFUNC_ABORT;
+    }
+
+    // (*env)->SetByteArrayRegion(env, ud->jbuf, 0, jlen, (jbyte *) data);
+    // memcpy?
+
+    ud->i++;
+    ud->total += jlen;
+    return total;
+
+
+  /* FILE *readhere = (FILE *)userdata; */
+  /* curl_off_t nread; */
+
+  /* /\* copy as much data as possible into the 'ptr' buffer, but no more than */
+  /*    'size' * 'nmemb' bytes. *\/ */
+  /* size_t retcode = fread(ptr, size, nmemb, readhere); */
+
+  /* nread = (curl_off_t)retcode; */
+
+  /* fprintf(stderr, "*** We read %" CURL_FORMAT_CURL_OFF_T */
+  /*         " bytes from file\n", nread); */
+  /* return retcode; */
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1READDATA_1stream
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong ud_ptr) {
+    CURL *curl = (CURL *) jcurl;
+    CURLcode result = curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_callback_stream);
+    if (result != CURLE_OK) {
+        return result;
+    }
+    return curl_easy_setopt(curl, CURLOPT_READDATA, ud_ptr);
+}
+
+
 JNIEXPORT jlong JNICALL Java_org_example_Native_curl_1easy_1setopt_1CURLOPT_1WRITEFUNCTION
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong ud_ptr) {
     CURL *curl = (CURL *) jcurl;
@@ -215,6 +277,12 @@ JNIEXPORT void JNICALL Java_org_example_Native_fclose
 JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1stream
   (JNIEnv *env, jclass jcls, jobject joutput_stream) {
     return (jlong) make_user_data(env, joutput_stream);
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_Native_init_1read_1data_1stream
+  (JNIEnv *env, jclass jcls, jobject jinput_stream) {
+    return (jlong) make_user_data(env, jinput_stream);
 }
 
 
