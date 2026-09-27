@@ -135,6 +135,14 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1read_1data_1stream
 JNIEXPORT void JNICALL Java_org_example_Native_close_1user_1data
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_example_Native
+ * Method:    read_curl_constants
+ * Signature: (J)V
+ */
+JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif

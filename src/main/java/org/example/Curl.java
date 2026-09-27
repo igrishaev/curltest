@@ -85,6 +85,15 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 //            System.out.println(f);
 //        }
 
+
+        final Arena a = Arena.of(64);
+        System.out.println(a.ptr());
+        Native.read_curl_constants(a.ptr());
+        a.debug(64);
+
+        System.exit(0);
+
+
         try (Curl curl = Curl.init()) {
             curl.curlOptFollowLocation(1);
             curl.curlOptURL("https://habr.com");

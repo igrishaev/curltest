@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <jni.h>
 #include <curl/curl.h>
+#include <string.h>
+#include <stdio.h>
 
 static jmethodID meth_OS_write_BaII;
 static jmethodID meth_IS_read_BaII;
@@ -296,4 +298,33 @@ JNIEXPORT void JNICALL Java_org_example_Native_close_1user_1data
 JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1handler
   (JNIEnv *env, jclass jcls, jobject jhandler) {
     return (jlong) make_user_data(env, jhandler);
+}
+
+
+char * put_byte(char *bb, char value) {
+    memcpy(bb, &value, sizeof value);
+    return bb += sizeof value;
+}
+
+char * put_int(char *bb, int value) {
+    memcpy(bb, &value, sizeof value);
+    return bb += sizeof value;
+}
+
+char * put_long(char* bb, long value) {
+    memcpy(bb, &value, sizeof value);
+    return bb += sizeof value;
+}
+
+
+JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
+  (JNIEnv *env, jclass jcls, jlong jbb) {
+
+    char *bb = (char *) jbb;
+
+    printf("bb: %lu", jbb);
+
+    bb = put_long(bb, CURLOPT_URL);
+    bb = put_long(bb, CURLOPT_FOLLOWLOCATION);
+
 }

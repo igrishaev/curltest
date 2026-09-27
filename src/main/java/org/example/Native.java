@@ -29,4 +29,6 @@ public class Native {
     static native long init_write_data_handler(final IWriteHandler handler);
     static native long init_read_data_stream(final InputStream in);
     static native void close_user_data(final long ptr);
+    static native void read_curl_constants(final long ptr);
+
 }
