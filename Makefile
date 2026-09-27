@@ -13,7 +13,6 @@ JAVA_INC = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin -I${JAVA_HOME}/i
 OBJ = org_example_Native
 OUT = curltest
 
-# doesn't need curl
 # OBJ = org_example_Arena
 # OUT = arena
 
@@ -23,4 +22,4 @@ clear:
 
 compile:
 	gcc -Wall -ansi -pedantic -fPIC ${JAVA_INC} -c ${OBJ}.c -o ${OBJ}.o
-	gcc -Wall -ansi -pedantic -fPIC -shared ${OBJ}.o -lcurl -o ${OUT}.dylib
+	gcc -Wall -ansi -pedantic -fPIC -shared ${OBJ}.o -o ${OUT}.dylib -lcurl # todo

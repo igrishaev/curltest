@@ -301,17 +301,17 @@ JNIEXPORT jlong JNICALL Java_org_example_Native_init_1write_1data_1handler
 }
 
 
-char * put_byte(char *bb, char value) {
+static char * put_byte(char *bb, char value) {
     memcpy(bb, &value, sizeof value);
     return bb += sizeof value;
 }
 
-char * put_int(char *bb, int value) {
+static char * put_int(char *bb, int value) {
     memcpy(bb, &value, sizeof value);
     return bb += sizeof value;
 }
 
-char * put_long(char* bb, long value) {
+static char * put_long(char* bb, long value) {
     memcpy(bb, &value, sizeof value);
     return bb += sizeof value;
 }
@@ -319,12 +319,11 @@ char * put_long(char* bb, long value) {
 
 JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
   (JNIEnv *env, jclass jcls, jlong jbb) {
-
     char *bb = (char *) jbb;
 
-    printf("bb: %lu", jbb);
-
-    bb = put_long(bb, CURLOPT_URL);
-    bb = put_long(bb, CURLOPT_FOLLOWLOCATION);
-
+    bb = put_int(bb, CURLOPT_URL);
+    bb = put_int(bb, CURLOPT_FOLLOWLOCATION);
+    bb = put_int(bb, CURLOPT_ACCEPTTIMEOUT_MS);
+    bb = put_int(bb, CURLOPT_ACCEPT_ENCODING);
+    bb = put_int(bb, CURLOPT_CONNECTTIMEOUT);
 }

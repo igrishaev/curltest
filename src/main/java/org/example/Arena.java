@@ -43,14 +43,15 @@ public class Arena {
         if (initStatus != 0) {
             throw new RuntimeException("failed to init byte buffer, code: " + initStatus);
         }
-        // TODO: hardcode!
+
         final ByteOrder BO_JVM = ByteOrder.BIG_ENDIAN;
 
-        // lead byte to detect byte order
+        // byte order
         final byte lead = bb.get();
         final ByteOrder BO_JNI = (lead == 1) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
-        bb.order(BO_JNI);
 
+        // other fields
+        bb.order(BO_JNI);
         final long NULL = bb.getLong();
         final long ptr = bb.getLong();
 

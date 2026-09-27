@@ -1,17 +1,19 @@
 #include <jni.h>
 #include <string.h>
 
-char * put_byte(char *bb, char value) {
+static char * put_byte(char *bb, char value) {
     memcpy(bb, &value, sizeof value);
     return bb += sizeof value;
 }
 
-char * put_int(char *bb, int value) {
+/*
+static char * put_int(char *bb, int value) {
     memcpy(bb, &value, sizeof value);
     return bb += sizeof value;
 }
+*/
 
-char * put_long(char* bb, long value) {
+static char * put_long(char* bb, long value) {
     memcpy(bb, &value, sizeof value);
     return bb += sizeof value;
 }
@@ -20,16 +22,16 @@ char * put_long(char* bb, long value) {
 JNIEXPORT jint JNICALL Java_org_example_Arena_initByteBuffer
   (JNIEnv *env, jclass jcls, jobject jbb) {
 
-    char *bb = (char *) (*env)->GetDirectBufferAddress(env, jbb);
-    if (bb == NULL) {
+    void *addr = (*env)->GetDirectBufferAddress(env, jbb);
+    char *bb = (char *) addr;
+
+    if (addr == NULL) {
         return -1;
     }
 
-    /* TODO: correct 1 */
-
     bb = put_byte(bb, 1);
     bb = put_long(bb, (long) NULL);
-    bb = put_long(bb, (long) bb);
+    bb = put_long(bb, (long) addr);
 
     return 0;
 }

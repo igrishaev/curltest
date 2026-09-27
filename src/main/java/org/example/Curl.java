@@ -7,6 +7,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 
+    public static final int CURLOPT_URL;
+    public static final int CURLOPT_FOLLOWLOCATION;
+    public static final int CURLOPT_ACCEPTTIMEOUT_MS;
+    public static final int CURLOPT_ACCEPT_ENCODING;
+    public static final int CURLOPT_CONNECTTIMEOUT;
+
+    static {
+
+        final Arena arena = Arena.of(128);
+        System.out.println(arena.ptr());
+        Native.read_curl_constants(arena.ptr());
+
+        arena.orderJNI();
+        arena.rewind();
+
+        CURLOPT_URL = arena.getInt();
+        CURLOPT_FOLLOWLOCATION = arena.getInt();
+        CURLOPT_ACCEPTTIMEOUT_MS = arena.getInt();
+        CURLOPT_ACCEPT_ENCODING = arena.getInt();
+        CURLOPT_CONNECTTIMEOUT = arena.getInt();
+
+        arena.debug(64);
+
+    }
+
     private void checkResult(final long result, final String message) {
         if (result != 0) {
             Err.error("cURL operation has failed, code: %s, message: %s", result, message);
@@ -86,10 +111,11 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 //        }
 
 
-        final Arena a = Arena.of(64);
-        System.out.println(a.ptr());
-        Native.read_curl_constants(a.ptr());
-        a.debug(64);
+        System.out.println(CURLOPT_URL);
+        System.out.println(CURLOPT_FOLLOWLOCATION);
+        System.out.println(CURLOPT_ACCEPTTIMEOUT_MS);
+        System.out.println(CURLOPT_ACCEPT_ENCODING);
+        System.out.println(CURLOPT_CONNECTTIMEOUT);
 
         System.exit(0);
 
