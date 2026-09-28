@@ -21,5 +21,5 @@ clear:
 	rm -f *.log
 
 compile:
-	gcc -Wall -ansi -pedantic -fPIC ${JAVA_INC} -c ${OBJ}.c -o ${OBJ}.o
-	gcc -Wall -ansi -pedantic -fPIC -shared ${OBJ}.o -o ${OUT}.dylib -lcurl # todo
+	gcc -Wall -ansi -pedantic -fPIC ${JAVA_INC} -c ${OBJ}.c -o ${OBJ}.o -I/opt/homebrew/opt/curl/include/curl -L/opt/homebrew/opt/curl/lib
+	gcc -Wall -ansi -pedantic -fPIC -shared ${OBJ}.o -o ${OUT}.dylib -L/opt/homebrew/opt/curl/lib -lcurl

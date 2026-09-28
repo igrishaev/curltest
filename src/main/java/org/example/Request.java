@@ -2,7 +2,8 @@ package org.example;
 
 public record Request(
         String url,
-        CURLOPT_FOLLOWLOCATION followlocation
+        CURLOPT_FOLLOWLOCATION followlocation,
+        HTTPMethod httpMethod
 ) {
     public static Builder builder() {
         return new Builder();
@@ -12,6 +13,7 @@ public record Request(
 
         private String url = null;
         private CURLOPT_FOLLOWLOCATION followlocation = CURLOPT_FOLLOWLOCATION.DEFAULT;
+        private HTTPMethod httpMethod;
 
         public Builder url(final String url) {
             this.url = url;
@@ -23,8 +25,17 @@ public record Request(
             return this;
         }
 
+        public Builder httpMethod(final HTTPMethod httpMethod) {
+            this.httpMethod = httpMethod;
+            return this;
+        }
+
         public Request build() {
-            return new Request(url, followlocation);
+            return new Request(
+                    url,
+                    followlocation,
+                    httpMethod
+            );
         }
     }
 }
