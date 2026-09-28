@@ -15,5 +15,4 @@ public enum CURLOPT_FOLLOWLOCATION {
         this.code = code;
     }
 
-
 }

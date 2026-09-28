@@ -19,12 +19,22 @@ public class Arena {
         return ptr;
     }
 
+    public void putNULL() {
+        bb.putLong(NULL);
+    }
+
+    public void putNULL(final int index) {
+        bb.putLong(index, NULL);
+    }
+
     static {
         final String libPath = new File("arena.dylib").getAbsolutePath();
         System.load(libPath);
     }
 
     private static native int initByteBuffer(final ByteBuffer bb);
+
+    private final static byte TERM = 0;
 
     private Arena(final int bbLen, final ByteBuffer bb, final long ptr, final ByteOrder BO_JVM,
                   final ByteOrder BO_JNI, final long NULL) {
@@ -39,15 +49,21 @@ public class Arena {
     public static Arena of(final int size) {
         // TODO: check min size
         final ByteBuffer bb = ByteBuffer.allocateDirect(size);
+        byte lead;
+
+        // byte order for JVM
+        bb.putLong(1);
+        lead = bb.get(0);
+        final ByteOrder BO_JVM = (lead == 1) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
+
         final int initStatus = initByteBuffer(bb);
         if (initStatus != 0) {
             throw new RuntimeException("failed to init byte buffer, code: " + initStatus);
         }
+        bb.rewind();
 
-        final ByteOrder BO_JVM = ByteOrder.BIG_ENDIAN;
-
-        // byte order
-        final byte lead = bb.get();
+        // byte order for JNI
+        lead = bb.get();
         final ByteOrder BO_JNI = (lead == 1) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 
         // other fields
@@ -55,7 +71,28 @@ public class Arena {
         final long NULL = bb.getLong();
         final long ptr = bb.getLong();
 
+        // TODO
+        bb.rewind();
+        bb.putLong(0);
+        bb.putLong(0);
+        bb.putLong(0);
+        bb.rewind();
+
         return new Arena(size, bb, ptr, BO_JVM, BO_JNI, NULL);
+    }
+
+    public int putCString(final String s) {
+        final byte[] buf = s.getBytes(StandardCharsets.UTF_8);
+        bb.put(buf);
+        bb.put(TERM);
+        return buf.length + 1;
+    }
+
+    public int putCString(final int index, final String s) {
+        final byte[] buf = s.getBytes(StandardCharsets.UTF_8);
+        bb.put(index, buf);
+        bb.put(index + buf.length, TERM);
+        return buf.length + 1;
     }
 
     public void rewind() {
@@ -86,6 +123,10 @@ public class Arena {
         bb.putInt(index, i);
     }
 
+    public void putLong(final long l) {
+        bb.putLong(l);
+    }
+
     public void putLong(final int index, final long l) {
         bb.putLong(index, l);
     }
@@ -99,27 +140,8 @@ public class Arena {
         bb.position(pos + len);
     }
 
-    public String getLenString() {
-        final int len = bb.getInt();
-        final byte[] ba = new byte[len];
-        bb.get(ba);
-        return new String(ba, StandardCharsets.UTF_8);
-    }
-
     public void get(final byte[] ba) {
         bb.get(ba);
-    }
-
-    public String getString(final int len) {
-        final byte[] ba = new byte[len];
-        bb.get(ba);
-        return new String(ba, StandardCharsets.UTF_8);
-    }
-
-    public String getString(final int index, final int len) {
-        final byte[] ba = new byte[len];
-        bb.get(index, ba);
-        return new String(ba, StandardCharsets.UTF_8);
     }
 
     @SuppressWarnings("unused")
@@ -132,8 +154,8 @@ public class Arena {
     public static void main(final String... args) {
         final Arena a = Arena.of(64);
         a.debug(64);
-        System.out.println(a.BO_JNI);
         System.out.println(a.BO_JVM);
+        System.out.println(a.BO_JNI);
         System.out.println(a.bbLen);
         System.out.println(a.ptr);
         System.out.println(a.NULL);

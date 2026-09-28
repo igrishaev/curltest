@@ -327,3 +327,41 @@ JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
     bb = put_int(bb, CURLOPT_ACCEPT_ENCODING);
     bb = put_int(bb, CURLOPT_CONNECTTIMEOUT);
 }
+
+JNIEXPORT jint JNICALL Java_org_example_Native_perform
+  (JNIEnv *env, jclass jcls, jlong jbb) {
+
+    size_t *bb = (size_t *) jbb;
+
+    CURL *curl = curl_easy_init();
+    size_t counter = bb[0];
+    size_t opt;
+    size_t val;
+    CURLcode res;
+    int i;
+
+    fprintf(stdout, "counter: %lu \n", counter);
+
+    for (i = 0; i < counter; i++) {
+        opt = bb[1 + i * 2];
+        val = bb[1 + i * 2 + 1];
+
+        fprintf(stdout, "opt: %lu, val: %lu \n", opt, val);
+
+        res = curl_easy_setopt(curl, opt, val);
+        if (res != CURLE_OK) {
+            fprintf(stderr, "curl_easy_setopt() failed: %s\n", curl_easy_strerror(res));
+            return res;
+        }
+    }
+
+    res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK) {
+        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+    }
+
+    curl_easy_cleanup(curl);
+
+    return res;
+}

@@ -1,44 +1,74 @@
 package org.example;
 
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-
 public record Curl2() {
 
-    final static int CURLOPT_URL = 10001;
-    final static int CURLOPT_FOLLOWLOCATION = 10002;
-    final static int NULL = 0;
-    final static byte TERM = 0;
-
-    public void foo(final Request request, final Arena arena) {
+    public static int request(final Request request, final Arena arena) {
 
         arena.orderJNI();
 
         // allocate counter
-        int counter = 0;
-        arena.putInt(counter);
+        long counter = 0;
+        arena.putLong(counter);
 
         int dataOffset = 1024;
 
         // CURLOPT_URL
-        arena.putInt(CURLOPT_URL);
-        if (request.url() == null) {
-            arena.putInt(NULL);
+        arena.putLong(CURLOPT.URL);
+        final String url = request.url();
+        System.out.println(url);
+        if (url == null) {
+            arena.putNULL();
         } else {
-            byte[] url = request.url().getBytes(StandardCharsets.UTF_8);
-//            arena.put(dataOffset, url);
-//            arena.put(dataOffset + url.length, TERM);
-            dataOffset += url.length + 1;
-            arena.putInt(dataOffset);
+            arena.putLong(arena.ptr() + dataOffset);
+            final int len = arena.putCString(dataOffset, url);
+            dataOffset += len;
         }
         counter++;
 
         // CURLOPT_FOLLOWLOCATION
-        arena.putInt(CURLOPT_FOLLOWLOCATION);
-        arena.putInt(request.followlocation().code);
+        arena.putLong(CURLOPT.FOLLOWLOCATION);
+        arena.putLong(request.followlocation().code);
+        counter++;
 
         // set the final
-        arena.putInt(0, counter);
+        arena.putLong(0, counter);
+
+        // arena.debug(64);
+        // debug
+
+        arena.rewind();
+
+        arena.debug(64);
+        arena.rewind();
+
+
+        System.out.println(arena.getLong());
+        System.out.println(arena.getLong());
+        System.out.println(arena.getLong());
+        System.out.println(arena.getLong());
+        System.out.println(arena.getLong());
+        System.out.println("-----------------");
+
+        // arena.orderJVM();
+        // final long c = arena.getLong();
+        // System.out.println(c);
+//        for (int i = 0; i < c; i++) {
+//            System.out.println(arena.getLong());
+//            System.out.println(arena.getLong());
+//        }
+
+        // return 0;
+        return Native.perform(arena.ptr());
+    }
+
+    public static void main(final String... args) {
+        final Arena arena = Arena.of(32000);
+        final Request request = Request.builder()
+                .url("https://habr.ru")
+                .followlocation(CURLOPT_FOLLOWLOCATION.CURLFOLLOW_ALL)
+                .build();
+        final int code = request(request, arena);
+        System.out.println(code);
     }
 
 }

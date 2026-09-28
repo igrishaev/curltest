@@ -7,6 +7,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef org_example_Arena_TERM
+#define org_example_Arena_TERM 0L
 /*
  * Class:     org_example_Arena
  * Method:    initByteBuffer
