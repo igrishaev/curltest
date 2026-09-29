@@ -97,10 +97,10 @@ public record Curl(long ptr, byte[] buf) implements AutoCloseable {
 //            curl.curlOptWriteData("foobar" + i + ".html");
 //            curl.perform();
 //        }
-        try (FILE f = FILE.open("foobar" + i + ".html") ) {
-            curl.curlOptWriteData(f);
-            curl.perform();
-        }
+//        try (FILE f = FILE.open("foobar" + i + ".html") ) {
+//            curl.curlOptWriteData(f);
+//            curl.perform();
+//        }
         final long t2 = System.currentTimeMillis();
         System.out.println(t2 - t1);
     }

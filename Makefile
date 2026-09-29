@@ -12,6 +12,7 @@ JAVAFILES = \
 MODULES = \
 	org_example_Arena.c \
 	org_example_Native.c \
+	org_example_FILE.c \
 
 OBJECTS = $(MODULES:.c=.o)
 
