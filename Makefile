@@ -1,5 +1,5 @@
 
-all: clear headers compile
+SHARED_LIB = curltest.dylib
 
 SRC_PATH = src/main/java/org/example
 
@@ -12,10 +12,7 @@ MODULES = \
 	org_example_Arena.c \
 	org_example_Native.c \
 
-OUTPUTS = $(MODULES:.c=.dylib)
-
-headers:
-	javac -h . $(JAVAFILES)
+OBJECTS = $(MODULES:.c=.o)
 
 JAVA_HOME ?= $(error Please specify JAVA_HOME)
 
@@ -30,15 +27,18 @@ CURL_HOME = /opt/homebrew/opt/curl
 CC = gcc
 CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include/curl -L${CURL_HOME}/lib
 
-org_example_Native.dylib: CFLAGS += -lcurl
+LIBS = -lcurl
+
+all: clear headers $(SHARED_LIB)
+
+headers:
+	javac -h . $(JAVAFILES)
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $*.c
 
-%.dylib: %.o
-	$(CC) $(CFLAGS) -shared -o $@ $*.o
-
-compile: $(OUTPUTS)
+$(SHARED_LIB): $(OBJECTS)
+	$(CC) $(CFLAGS) $(LIBS) -shared -o $(SHARED_LIB) $(OBJECTS)
 
 clear:
 	rm -f *.html

@@ -641,6 +641,11 @@ JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
     bb = put_int(bb, CURLOPT_XFERINFODATA);
     bb = put_int(bb, CURLOPT_XFERINFOFUNCTION);
     bb = put_int(bb, CURLOPT_XOAUTH2_BEARER);
+
+    bb = put_int(bb, CURLFOLLOW_ALL);
+    bb = put_int(bb, CURLFOLLOW_OBEYCODE);
+    bb = put_int(bb, CURLFOLLOW_FIRSTONLY);
+
 }
 
 JNIEXPORT jint JNICALL Java_org_example_Native_perform

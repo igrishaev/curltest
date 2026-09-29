@@ -28,7 +28,7 @@ public class Arena {
     }
 
     static {
-        final String libPath = new File("org_example_Arena.dylib").getAbsolutePath();
+        final String libPath = new File("curltest.dylib").getAbsolutePath();
         System.load(libPath);
     }
 

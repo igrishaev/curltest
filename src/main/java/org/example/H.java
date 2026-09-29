@@ -316,6 +316,10 @@ public class H {
     public final static int CURLOPT_XFERINFOFUNCTION;
     public final static int CURLOPT_XOAUTH2_BEARER;
 
+    public final static int CURLFOLLOW_ALL;
+    public final static int CURLFOLLOW_OBEYCODE;
+    public final static int CURLFOLLOW_FIRSTONLY;
+
     static {
 
         // TODO size;
@@ -639,7 +643,8 @@ public class H {
         CURLOPT_XFERINFOFUNCTION           = arena.getInt();
         CURLOPT_XOAUTH2_BEARER             = arena.getInt();
 
-
-
+        CURLFOLLOW_ALL       = arena.getInt();
+        CURLFOLLOW_OBEYCODE  = arena.getInt();
+        CURLFOLLOW_FIRSTONLY = arena.getInt();
     }
 }

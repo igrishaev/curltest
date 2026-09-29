@@ -1,5 +1,8 @@
 package org.example;
 
+import java.net.URI;
+import java.net.URL;
+
 public record Request(
         String url,
         CURLOPT_FOLLOWLOCATION followlocation,
@@ -17,6 +20,16 @@ public record Request(
 
         public Builder url(final String url) {
             this.url = url;
+            return this;
+        }
+
+        public Builder url(final URL url) {
+            this.url = url.toString();
+            return this;
+        }
+
+        public Builder url(final URI uri) {
+            this.url = uri.toString();
             return this;
         }
 

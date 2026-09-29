@@ -9,7 +9,7 @@ public class Native {
     static long NULL = 0;
 
     static {
-        final String libPath = new File("org_example_Native.dylib").getAbsolutePath();
+        final String libPath = new File("curltest.dylib").getAbsolutePath();
         System.load(libPath);
     }
 
