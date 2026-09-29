@@ -5,7 +5,7 @@ import java.net.URL;
 
 public record Request(
         String url,
-        CURLOPT_FOLLOWLOCATION followlocation,
+        FollowLocation followLocation,
         HTTPMethod httpMethod
 ) {
     public static Builder builder() {
@@ -15,7 +15,7 @@ public record Request(
     public static class Builder {
 
         private String url = null;
-        private CURLOPT_FOLLOWLOCATION followlocation = CURLOPT_FOLLOWLOCATION.DEFAULT;
+        private FollowLocation followLocation = FollowLocation.DEFAULT;
         private HTTPMethod httpMethod;
 
         public Builder url(final String url) {
@@ -33,8 +33,8 @@ public record Request(
             return this;
         }
 
-        public Builder followlocation(final CURLOPT_FOLLOWLOCATION followlocation) {
-            this.followlocation = followlocation;
+        public Builder followLocation(final FollowLocation followLocation) {
+            this.followLocation = followLocation;
             return this;
         }
 
@@ -46,7 +46,7 @@ public record Request(
         public Request build() {
             return new Request(
                     url,
-                    followlocation,
+                    followLocation,
                     httpMethod
             );
         }

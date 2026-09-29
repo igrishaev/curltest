@@ -27,7 +27,7 @@ public record Curl2() {
 
         // follow location
         arena.putLong(H.CURLOPT_FOLLOWLOCATION);
-        arena.putLong(request.followlocation().code);
+        arena.putLong(request.followLocation().code);
         counter++;
 
         // http method
@@ -87,7 +87,7 @@ public record Curl2() {
         final Arena arena = Arena.of(32000);
         final Request request = Request.builder()
                 .url("https://google.com")
-                .followlocation(CURLOPT_FOLLOWLOCATION.CURLFOLLOW_ALL)
+                .followLocation(FollowLocation.ALL)
                 .build();
         final int code = request(request, arena);
         System.out.println(code);

@@ -6,6 +6,7 @@ SRC_PATH = src/main/java/org/example
 JAVAFILES = \
 	$(SRC_PATH)/Arena.java \
 	$(SRC_PATH)/Native.java \
+	$(SRC_PATH)/FILE.java \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
