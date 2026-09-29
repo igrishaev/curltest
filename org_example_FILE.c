@@ -5,6 +5,7 @@ JNIEXPORT jlong JNICALL Java_org_example_FILE_fopen
   (JNIEnv *env, jclass jcls, jstring jpath, jstring jmode) {
 
     /* TODO: use error codes */
+    /* TODO: free chars */
 
     const char *path = (*env)->GetStringUTFChars(env, jpath, NULL);
     if (path == NULL) {
@@ -15,6 +16,9 @@ JNIEXPORT jlong JNICALL Java_org_example_FILE_fopen
     if (path == NULL) {
         return -2;
     }
+
+    /* TODO */
+    /* (*env)->ReleaseStringUTFChars(env, jpath, path) */
 
     FILE *fp = fopen(path, mode);
     if (fp == NULL) {

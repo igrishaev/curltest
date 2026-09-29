@@ -26,12 +26,11 @@ public class FILE implements AutoCloseable {
         return String.format("<FILE %s %s>", mode, path);
     }
 
-    public static FILE open(final String path) {
-        final String mode = "rw";
+    public static FILE open(final String path, final String mode) {
         final long fd = fopen(path, mode);
-        if (fd < 0) { // TODO
-            Err.error("fopen failed: %s", path); // TODO
-        }
+//        if (fd < 0) { // TODO
+//            Err.error("fopen failed: %s", path); // TODO
+//        }
         return new FILE(fd, path, mode, false);
     }
 
