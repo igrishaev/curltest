@@ -151,6 +151,14 @@ JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
 JNIEXPORT jint JNICALL Java_org_example_Native_perform
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_example_Native
+ * Method:    foobar
+ * Signature: ([J[J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_Native_foobar
+  (JNIEnv *, jclass, jlongArray, jlongArray);
+
 #ifdef __cplusplus
 }
 #endif

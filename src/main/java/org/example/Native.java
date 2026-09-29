@@ -31,6 +31,7 @@ public class Native {
     static native void close_user_data(final long ptr);
     static native void read_curl_constants(final long ptr);
     static native int perform(final long bbPtr);
+    static native long foobar(final long[] opts, final long[] vals);
 
 
 }
