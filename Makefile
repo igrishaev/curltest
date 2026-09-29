@@ -1,25 +1,47 @@
 
 all: clear headers compile
 
+SRC_PATH = src/main/java/org/example
+
+JAVAFILES = \
+	$(SRC_PATH)/Arena.java \
+	$(SRC_PATH)/Native.java \
+	$(SRC_PATH)/IWriteHandler.java
+
+MODULES = \
+	org_example_Arena.c \
+	org_example_Native.c \
+
+OUTPUTS = $(MODULES:.c=.dylib)
+
 headers:
-	javac -h . \
-	src/main/java/org/example/Arena.java \
-	src/main/java/org/example/Native.java \
-	src/main/java/org/example/IWriteHandler.java
+	javac -h . $(JAVAFILES)
 
-JAVA_HOME := $(shell echo $${JAVA_HOME%/})
-JAVA_INC = -I${JAVA_HOME}/include -I${JAVA_HOME}/include/darwin -I${JAVA_HOME}/include/win32 -I${JAVA_HOME}/include/linux
+JAVA_HOME ?= $(error Please specify JAVA_HOME)
 
-OBJ = org_example_Native
-OUT = curltest
+JAVA_INC = \
+	-I${JAVA_HOME}/include \
+	-I${JAVA_HOME}/include/darwin \
+	-I${JAVA_HOME}/include/win32 \
+	-I${JAVA_HOME}/include/linux
 
-# OBJ = org_example_Arena
-# OUT = arena
+CURL_HOME = /opt/homebrew/opt/curl
+
+CC = gcc
+CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include/curl -L${CURL_HOME}/lib
+
+org_example_Native.dylib: CFLAGS += -lcurl
+
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c -o $@ $*.c
+
+%.dylib: %.o
+	$(CC) $(CFLAGS) -shared -o $@ $*.o
+
+compile: $(OUTPUTS)
 
 clear:
 	rm -f *.html
 	rm -f *.log
-
-compile:
-	gcc -Wall -ansi -pedantic -fPIC ${JAVA_INC} -c ${OBJ}.c -o ${OBJ}.o -I/opt/homebrew/opt/curl/include/curl -L/opt/homebrew/opt/curl/lib
-	gcc -Wall -ansi -pedantic -fPIC -shared ${OBJ}.o -o ${OUT}.dylib -L/opt/homebrew/opt/curl/lib -lcurl
+	rm -f *.o
+	rm -f *.dylib
