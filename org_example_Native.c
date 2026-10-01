@@ -648,107 +648,10 @@ JNIEXPORT void JNICALL Java_org_example_Native_read_1curl_1constants
 
 }
 
-/* opts */
-/* vals */
-
-/* file_read */
-/* file_write */
-
-/* stream_read */
-/* stream_write */
-
-/* handler_read */
-/* handler_write */
-
-/* perform(url, follow_redirects, is_get, is_post, is_put, method, timeout, headers, */
-/*         post_body, file_read, file_write, stream_read, stream_write, callback_read, callback_write */
-/* ) { */
-
-/* } */
 
 JNIEXPORT jlong JNICALL Java_org_example_Native_foobar
   (JNIEnv *env, jclass jcls, jlongArray jopts, jlongArray jvals) {
-
-    jurl
-
-    char *url = NULL;
-
-    CURL *curl = NULL;
-    int err = 0;
-    CURLcode res = 0;
-    struct write_data *wd = NULL;
-    FILE *file_write = NULL;
-    FILE *file_read = NULL;
-
-    /* curl_easy_strerror(res) */
-
-    curl = curl_easy_init();
-
-    res = curl_easy_setopt(curl, opt, val);
-    if (res != CURLE_OK) goto _cleanup;
-
-    jstream_write;
-
-    if (jurl) {
-
-        url = (*env)->GetStringUTFChars(env, jurl, NULL);
-        if (!url) {
-            res = -1;
-            goto _cleanup;
-        }
-
-    }
-
-    if (jstream_write) {
-        wd = ...
-
-        res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, wd);
-        if (res != CURLE_OK) goto _cleanup;
-
-        res = curl_easy_setopt(curl, CURLOPT_WRITEFUNTION, write_function_stream);
-        if (res != CURLE_OK) goto _cleanup;
-    }
-
-    if (jhandler_write) {
-        wd = ...
-
-        res = curl_easy_setopt(curl, CURLOPT_WRITEDATA, wd);
-        if (res != CURLE_OK) goto _cleanup;
-
-        res = curl_easy_setopt(curl, CURLOPT_WRITEFUNTION, write_function_handler);
-        if (res != CURLE_OK) goto _cleanup;
-    }
-
-    jfile_write
-
-    if (jfile_write) {
-
-        file_write = fopen(...)
-        if (!file_write) {
-            err = -123;
-            goto _cleanup;
-        }
-
-    }
-
-    res = curl_easy_perform(curl);
-    if (res != CURLE_OK) {
-        goto _cleanup;
-    }
-
-    /* if (jfile_write_path && jfile_write_mode) { */
-    /*     file_write_path = (*env)->GetStringUTFChars(env, jpath, NULL); */
-    /* } */
-
-
-_cleanup:
-
-    if (curl)       curl_easy_cleanup(curl);
-    if (file_write) fclose(file_write);
-    if (file_read)  fclose(file_read);
-    if (url)        (*env)->ReleaseStringUTFChars(env, jurl, url);
-
-    return res;
+    return 0;
 }
 
 

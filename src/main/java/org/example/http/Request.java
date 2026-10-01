@@ -22,10 +22,7 @@ public record Request (String method, String[] headers, String[] bodyParts) {
             Object writeHandler,
             InputStream readStream,
             String readFile,
-            Object readHandler,
-
-
-
+            Object readHandler
     ) {
 
     }
