@@ -1,4 +1,5 @@
 #include <jni.h>
+#include <stdio.h>
 #include "curl.h"
 
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
@@ -7,14 +8,12 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     jstring jurl,
     jint jmethod,
     jint jfollowLocation,
-    jobjectArray jheaders
+    jobjectArray jheaders,
+    jstring jwriteFile
 )
 {
     int i;
     long code;
-    char *header;
-    jstring jheader;
-    struct curl_slist *headers = NULL;
 
     CURL *curl = curl_easy_init();
 
@@ -26,9 +25,8 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     }
 
     code = curl_easy_setopt(curl, CURLOPT_URL, url);
-    if (code != CURLE_OK) goto exit;
-
     (*env)->ReleaseStringUTFChars(env, jurl, url);
+    if (code != CURLE_OK) goto exit;
 
     /* method */
     switch (jmethod) {
@@ -48,40 +46,73 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         }
     }
 
-    /* follow location */
+    /* FOLLOW LOCATION */
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jfollowLocation);
     if (code != CURLE_OK) goto exit;
 
-    /* headers */
-    jsize headerLen = (*env)->GetArrayLength(env, jheaders);
-    for (i = 0; i < headerLen; i++) {
+    /* HEADERS */
+    struct curl_slist *headers = NULL;
+    if (jheaders != NULL) {
+        char *header;
+        jstring jheader;
+        jsize headerLen = (*env)->GetArrayLength(env, jheaders);
+        for (i = 0; i < headerLen; i++) {
 
-        jheader = (jstring) (*env)->GetObjectArrayElement(env, jheaders, i);
-        if (jheader == NULL) {
-            continue;
+            jheader = (jstring) (*env)->GetObjectArrayElement(env, jheaders, i);
+            if (jheader == NULL) {
+                continue;
+            }
+
+            header = (*env)->GetStringUTFChars(env, jheader, NULL);
+            if (!header) {
+                code = -3;
+                goto exit;
+            }
+
+            headers = curl_slist_append(headers, header);
+            (*env)->ReleaseStringUTFChars(env, jheader, header);
+
+            (*env)->DeleteLocalRef(env, jheader);
         }
-
-        header = (*env)->GetStringUTFChars(env, jheader, NULL);
-        if (!header) {
-            code = -3;
-            goto exit;
-        }
-
-        headers = curl_slist_append(headers, header);
-
-        (*env)->ReleaseStringUTFChars(env, jheader, header);
-        (*env)->DeleteLocalRef(env, jheader);
     }
-
     code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     if (code != CURLE_OK) goto exit;
 
-    /* perform */
+    /* WRITE FILE */
+    FILE *writeFile = stdout;
+    void *writeFunction = NULL;
+    if (jwriteFile != NULL) {
+
+        const char *path = (*env)->GetStringUTFChars(env, jwriteFile, NULL);
+        if (!path) {
+            code = -5;
+            goto exit;
+        }
+
+        writeFile = fopen(path, "wb");
+        (*env)->ReleaseStringUTFChars(env, jwriteFile, path);
+        if (!writeFile) {
+            code = -4;
+            goto exit;
+        }
+
+        writeFunction = fwrite;
+    }
+
+    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeFile);
+    if (code != CURLE_OK) goto exit;
+
+    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
+    if (code != CURLE_OK) goto exit;
+
+    /* PERFORM */
     code = curl_easy_perform(curl);
     if (code != CURLE_OK) goto exit;
 
 exit:
+    if (curl)      curl_easy_cleanup(curl);
+    if (headers)   curl_slist_free_all(headers);
+    if (writeFile) fclose(writeFile);
 
-    if (curl) curl_easy_cleanup(curl);
     return code;
 }

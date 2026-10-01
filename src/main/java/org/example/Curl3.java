@@ -13,7 +13,8 @@ public class Curl3 {
             final String url,
             final int method,
             final int followLocation,
-            final String[] headers
+            final String[] headers,
+            final String writeFile
     );
 
     public static void main(final String... args) {
@@ -21,7 +22,8 @@ public class Curl3 {
                 "https://habr.com",
                 1,
                 3,
-                new String[]{"foo: bar"}
+                new String[]{"foo: bar"},
+                "foo.html"
         );
         System.out.println(code);
     }
