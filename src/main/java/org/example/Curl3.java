@@ -26,9 +26,9 @@ public class Curl3 {
                 "https://habr.com",
                 1,
                 3,
-                new String[]{"foo: bar"},
-                null, // "foo.html"
-                out
+                null, //new String[]{"foo: bar"},
+                "foo.html",
+                null
         );
         System.out.println(out.toString().substring(0, 50));
     }

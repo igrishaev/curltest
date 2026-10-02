@@ -108,6 +108,39 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 }
 
 
+static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *headers) {
+    int i;
+    long code;
+    char *header;
+    jstring jheader;
+
+    if (jheaders == NULL) return 0;
+
+    jsize headerLen = (*env)->GetArrayLength(env, jheaders);
+
+    for (i = 0; i < headerLen; i++) {
+
+        jheader = (jstring) (*env)->GetObjectArrayElement(env, jheaders, i);
+        if (jheader == NULL) {
+            continue;
+        }
+
+        header = (*env)->GetStringUTFChars(env, jheader, NULL);
+        if (header) {
+            curl_slist_append(headers, header);
+            (*env)->ReleaseStringUTFChars(env, jheader, header);
+            (*env)->DeleteLocalRef(env, jheader);
+        } else {
+            code = -3;
+            goto exit;
+        }
+    }
+
+exit:
+    return code;
+}
+
+
 
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     JNIEnv *env,
@@ -160,31 +193,10 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
     /* HEADERS */
     struct curl_slist *headers = NULL;
-    if (jheaders != NULL) {
-        char *header;
-        jstring jheader;
-        jsize headerLen = (*env)->GetArrayLength(env, jheaders);
-        for (i = 0; i < headerLen; i++) {
-
-            jheader = (jstring) (*env)->GetObjectArrayElement(env, jheaders, i);
-            if (jheader == NULL) {
-                continue;
-            }
-
-            header = (*env)->GetStringUTFChars(env, jheader, NULL);
-            if (!header) {
-                code = -3;
-                goto exit;
-            }
-
-            headers = curl_slist_append(headers, header);
-            (*env)->ReleaseStringUTFChars(env, jheader, header);
-
-            (*env)->DeleteLocalRef(env, jheader);
-        }
-    }
-    code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    if (code != CURLE_OK) goto exit;
+    /* code = _set_headers(env, jheaders, headers); */
+    /* if (code != CURLE_OK) goto exit; */
+    /* code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); */
+    /* if (code != CURLE_OK) goto exit; */
 
 
     /* WRITING */
