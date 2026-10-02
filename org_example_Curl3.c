@@ -81,6 +81,8 @@ struct user_data * make_user_data(JNIEnv *env, jobject jobj) {
 
 void clear_user_data(struct user_data * ud) {
     if (ud == NULL) return;
+    JNIEnv *env = ud->env;
+    (*env)->DeleteLocalRef(env, ud->jbuf);
     free(ud);
 }
 
@@ -309,12 +311,12 @@ exit:
         }
     }
 
-    /* close read string */
+    /* release read string */
     if (readString) {
         (*env)->ReleaseStringUTFChars(env, jreadString, readString);
     }
 
-    /* close read bytes */
+    /* release read bytes */
     if (readBytes) {
         (*env)->ReleasePrimitiveArrayCritical(env, jreadBytes, readBytes, JNI_ABORT);
     }

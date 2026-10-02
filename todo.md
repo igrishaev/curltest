@@ -1,11 +1,32 @@
-
-- write support callback
-- write file: pass mode (enum)
-- write: share global byte buffer
-- write: null support
-- read: file support
-- read: InputStream support
-- read: String byte[] support
+- write callback
+- read file
+- read callback
+- read stream
+- global error codes
+- local http server
+- auth option
+- proxy option
 - rename the package
-
-- write bytes in a cycle?
+- delete unused files
+- request class
+- multi support
+- reuse curl pointer
+- accept encoding
+- AWS signature
+- conn timeout
+- cookies
+- cookie file
+- cookie jar
+- custom HTTP methods
+- custom dns
+- fail on 4xx
+- proxy tunnel
+- max redirects
+- post mime
+- socks proxy
+- referer
+- http keep alive
+- tcp no delay
+- timeout
+- user-agent
+- verbose
