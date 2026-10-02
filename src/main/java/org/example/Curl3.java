@@ -30,6 +30,6 @@ public class Curl3 {
                 null, // "foo.html"
                 out
         );
-        System.out.println(code);
+        System.out.println(out.toString().substring(0, 50));
     }
 }

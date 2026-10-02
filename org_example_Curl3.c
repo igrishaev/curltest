@@ -1,9 +1,12 @@
 #include <jni.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "curl/curl.h"
 
-static jmethodID meth_OS_write_BaII;
-static jmethodID meth_IS_read_BaII;
+
+static jmethodID OS_write_BaII;
+static jmethodID OS_close;
+static jmethodID IS_read_BaII;
 
 static int JVM_VER = JNI_VERSION_1_8;
 
@@ -25,11 +28,19 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         if (jcls == NULL) {
             return JNI_ERR;
         }
+        /* write */
         jmeth = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
         if (jmeth == NULL) {
             return JNI_ERR;
         } else {
-            meth_OS_write_BaII = jmeth;
+            OS_write_BaII = jmeth;
+        }
+        /* close */
+        jmeth = (*env)->GetMethodID(env, jcls, "close", "()V");
+        if (jmeth == NULL) {
+            return JNI_ERR;
+        } else {
+            OS_close = jmeth;
         }
 
         /* InputStream */
@@ -41,13 +52,61 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         if (jmeth == NULL) {
             return JNI_ERR;
         } else {
-            meth_IS_read_BaII = jmeth;
+            IS_read_BaII = jmeth;
         }
 
         /* OK */
         return JVM_VER;
     }
 }
+
+struct user_data {
+    size_t i;
+    size_t total;
+    JNIEnv *env;
+    jbyteArray jbuf;
+    jobject jobj;
+};
+
+struct user_data * make_user_data(JNIEnv *env, jobject jobj) {
+    jbyteArray jbuf = (*env)->NewByteArray(env, CURL_MAX_WRITE_SIZE);
+    struct user_data * ud = malloc(sizeof(struct user_data));
+    ud->i = 0;
+    ud->total = 0;
+    ud->env = env;
+    ud->jbuf = jbuf;
+    ud->jobj = jobj;
+    return ud;
+}
+
+void clear_user_data(struct user_data * ud) {
+    if (ud == NULL) return;
+    free(ud);
+}
+
+
+static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userdata)
+{
+    size_t total = size * nmemb;
+    struct user_data *ud = (struct user_data *) userdata;
+    JNIEnv *env = ud->env;
+
+    printf("callback: %lu \n", total);
+
+    (*env)->SetByteArrayRegion(env, ud->jbuf, 0, total, (jbyte *) data);
+
+    (*env)->CallVoidMethod(env, ud->jobj, OS_write_BaII, ud->jbuf, 0, total);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env); // TODO: better handling
+        (*env)->ExceptionClear(env);
+        return CURL_WRITEFUNC_ERROR;
+    }
+
+    ud->i++;
+    ud->total += total;
+    return total;
+}
+
 
 
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
@@ -69,7 +128,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     /* URL */
     const char *url = (*env)->GetStringUTFChars(env, jurl, NULL);
     if (!url) {
-        code = -1;
+        code = -1; // TODO use enumb
         goto exit;
     }
 
@@ -79,7 +138,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
     /* method */
     switch (jmethod) {
-        case 1: {
+        case 1: { // TODO use enumb
             code = curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
             if (code != CURLE_OK) goto exit;
             break;
@@ -129,10 +188,11 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
 
     /* WRITING */
-    FILE *writeFile = stdout;
+    void *writeData = NULL;
     void *writeFunction = NULL;
 
     /* WRITE FILE */
+    FILE *writeFile = NULL;
     if (jwriteFile != NULL) {
 
         const char *path = (*env)->GetStringUTFChars(env, jwriteFile, NULL);
@@ -148,28 +208,49 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
             goto exit;
         }
 
+        writeData = writeFile;
         writeFunction = fwrite;
     }
 
     /* WRITE STREAM */
+    struct user_data * ud;
     if (jwriteStream != NULL) {
-
+        // TODO: allocate on stack?
+        ud = make_user_data(env, jwriteStream);
+        writeData = ud;
+        writeFunction = write_callback_stream;
+        // TODO: close stream?
     }
 
-    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeFile);
-    if (code != CURLE_OK) goto exit;
+    if (writeData) {
+        code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeData);
+        if (code != CURLE_OK) goto exit;
+    }
 
-    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
-    if (code != CURLE_OK) goto exit;
+    if (writeFunction) {
+        code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
+        if (code != CURLE_OK) goto exit;
+    }
 
     /* PERFORM */
     code = curl_easy_perform(curl);
     if (code != CURLE_OK) goto exit;
 
 exit:
+
     if (curl)      curl_easy_cleanup(curl);
     if (headers)   curl_slist_free_all(headers);
     if (writeFile) fclose(writeFile);
+    if (ud)        clear_user_data(ud);
+
+    // close output stream
+    if (jwriteStream != NULL) {
+        (*env)->CallVoidMethod(env, jwriteStream, OS_close);
+        if ((*env)->ExceptionCheck(env)) {
+            (*env)->ExceptionDescribe(env); // TODO: better handling
+            (*env)->ExceptionClear(env);
+        }
+    }
 
     return code;
 }
