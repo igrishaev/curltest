@@ -2,6 +2,53 @@
 #include <stdio.h>
 #include "curl/curl.h"
 
+static jmethodID meth_OS_write_BaII;
+static jmethodID meth_IS_read_BaII;
+
+static int JVM_VER = JNI_VERSION_1_8;
+
+jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+
+    JNIEnv* env;
+    if ((*vm)->GetEnv(vm, (void **) &env, JVM_VER) != JNI_OK) {
+        return JNI_ERR;
+    } else {
+
+        char * version = curl_version();
+        printf("curl version: %s \n", version);
+
+        jclass jcls;
+        jmethodID jmeth;
+
+        /* OutputStream */
+        jcls = (*env)->FindClass(env, "java/io/OutputStream");
+        if (jcls == NULL) {
+            return JNI_ERR;
+        }
+        jmeth = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
+        if (jmeth == NULL) {
+            return JNI_ERR;
+        } else {
+            meth_OS_write_BaII = jmeth;
+        }
+
+        /* InputStream */
+        jcls = (*env)->FindClass(env, "java/io/InputStream");
+        if (jcls == NULL) {
+            return JNI_ERR;
+        }
+        jmeth = (*env)->GetMethodID(env, jcls, "read", "([BII)I");
+        if (jmeth == NULL) {
+            return JNI_ERR;
+        } else {
+            meth_IS_read_BaII = jmeth;
+        }
+
+        /* OK */
+        return JVM_VER;
+    }
+}
+
 
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     JNIEnv *env,
@@ -102,6 +149,11 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         }
 
         writeFunction = fwrite;
+    }
+
+    /* WRITE STREAM */
+    if (jwriteStream != NULL) {
+
     }
 
     code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeFile);
