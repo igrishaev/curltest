@@ -17,7 +17,9 @@ public class Curl3 {
             final int followLocation,
             final String[] headers,
             final String writeFile,
-            final OutputStream writeStream
+            final OutputStream writeStream,
+            final String readString,
+            final byte[] readBytes
             );
 
     public static void main(final String... args) {
@@ -28,7 +30,9 @@ public class Curl3 {
                 3,
                 new String[]{"foo: bar"},
                 null, // "foo2.html",
-                out
+                out,
+                null, // "data to send",
+                new byte[] {1, 2, 0, 4, 5}
         );
         System.out.println(out.toString().substring(0, 10));
     }

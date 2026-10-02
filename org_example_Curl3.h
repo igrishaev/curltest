@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     org_example_Curl3
  * Method:    perform
- * Signature: (Ljava/lang/String;II[Ljava/lang/String;Ljava/lang/String;Ljava/io/OutputStream;)J
+ * Signature: (Ljava/lang/String;II[Ljava/lang/String;Ljava/lang/String;Ljava/io/OutputStream;Ljava/lang/String;[B)J
  */
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform
-  (JNIEnv *, jclass, jstring, jint, jint, jobjectArray, jstring, jobject);
+  (JNIEnv *, jclass, jstring, jint, jint, jobjectArray, jstring, jobject, jstring, jbyteArray);
 
 #ifdef __cplusplus
 }
