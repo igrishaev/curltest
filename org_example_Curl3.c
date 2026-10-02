@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <stdio.h>
-#include "curl.h"
+#include "curl/curl.h"
+
 
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     JNIEnv *env,
@@ -9,7 +10,8 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     jint jmethod,
     jint jfollowLocation,
     jobjectArray jheaders,
-    jstring jwriteFile
+    jstring jwriteFile,
+    jobject jwriteStream
 )
 {
     int i;
@@ -78,9 +80,12 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     if (code != CURLE_OK) goto exit;
 
-    /* WRITE FILE */
+
+    /* WRITING */
     FILE *writeFile = stdout;
     void *writeFunction = NULL;
+
+    /* WRITE FILE */
     if (jwriteFile != NULL) {
 
         const char *path = (*env)->GetStringUTFChars(env, jwriteFile, NULL);

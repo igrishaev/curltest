@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "curl.h"
+#include "curl/curl.h"
 
 static jmethodID meth_OS_write_BaII;
 static jmethodID meth_IS_read_BaII;
