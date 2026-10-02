@@ -26,10 +26,10 @@ public class Curl3 {
                 "https://habr.com",
                 1,
                 3,
-                null, //new String[]{"foo: bar"},
-                "foo.html",
-                null
+                new String[]{"foo: bar"},
+                null, // "foo2.html",
+                out
         );
-        System.out.println(out.toString().substring(0, 50));
+        System.out.println(out.toString().substring(0, 10));
     }
 }

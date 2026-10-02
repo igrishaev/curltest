@@ -109,10 +109,10 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 
 
 static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *headers) {
-    int i;
-    long code;
-    char *header;
-    jstring jheader;
+    int i = 0;
+    long code = 0;
+    char *header = NULL;
+    jstring jheader = NULL;
 
     if (jheaders == NULL) return 0;
 
@@ -128,7 +128,7 @@ static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *
         header = (*env)->GetStringUTFChars(env, jheader, NULL);
         if (header) {
             curl_slist_append(headers, header);
-            (*env)->ReleaseStringUTFChars(env, jheader, header);
+            (*env)->ReleaseStringUTFChars(env, jheader, header); // TODO
             (*env)->DeleteLocalRef(env, jheader);
         } else {
             code = -3;
@@ -139,7 +139,6 @@ static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *
 exit:
     return code;
 }
-
 
 
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
@@ -153,13 +152,19 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     jobject jwriteStream
 )
 {
-    int i;
-    long code;
+    int i = 0;
+    long code = 0;
+    struct user_data * ud      = NULL;
+    struct curl_slist *headers = NULL;
+    const char *url            = NULL;
+    void *writeData            = NULL;
+    void *writeFunction        = NULL;
+    FILE *writeFile            = NULL;
 
     CURL *curl = curl_easy_init();
 
     /* URL */
-    const char *url = (*env)->GetStringUTFChars(env, jurl, NULL);
+    url = (*env)->GetStringUTFChars(env, jurl, NULL);
     if (!url) {
         code = -1; // TODO use enumb
         goto exit;
@@ -192,19 +197,12 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     if (code != CURLE_OK) goto exit;
 
     /* HEADERS */
-    struct curl_slist *headers = NULL;
-    /* code = _set_headers(env, jheaders, headers); */
-    /* if (code != CURLE_OK) goto exit; */
-    /* code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); */
-    /* if (code != CURLE_OK) goto exit; */
-
-
-    /* WRITING */
-    void *writeData = NULL;
-    void *writeFunction = NULL;
+    code = _set_headers(env, jheaders, headers);
+    if (code != CURLE_OK) goto exit;
+    code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+    if (code != CURLE_OK) goto exit;
 
     /* WRITE FILE */
-    FILE *writeFile = NULL;
     if (jwriteFile != NULL) {
 
         const char *path = (*env)->GetStringUTFChars(env, jwriteFile, NULL);
@@ -225,8 +223,9 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     }
 
     /* WRITE STREAM */
-    struct user_data * ud;
     if (jwriteStream != NULL) {
+
+        printf("jwriteStream\n");
         // TODO: allocate on stack?
         ud = make_user_data(env, jwriteStream);
         writeData = ud;
@@ -255,7 +254,7 @@ exit:
     if (writeFile) fclose(writeFile);
     if (ud)        clear_user_data(ud);
 
-    // close output stream
+    /* close output stream */
     if (jwriteStream != NULL) {
         (*env)->CallVoidMethod(env, jwriteStream, OS_close);
         if ((*env)->ExceptionCheck(env)) {
