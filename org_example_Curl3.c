@@ -3,14 +3,31 @@
 #include <stdlib.h>
 #include "curl/curl.h"
 
+#define DEBUG(fmt, ...) \
+    do { \
+        fprintf(stderr, "[DEBUG] %s:%d:%s(): " fmt "\n", \
+                __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+    } while (0)
 
 static jmethodID OS_write_BaII;
 static jmethodID OS_close;
 static jmethodID IS_read_BaII;
 
+static jfieldID Request_url;
+static jfieldID Request_method;
+static jfieldID Request_followLocation;
+static jfieldID Request_headers;
+static jfieldID Request_writeFile;
+static jfieldID Request_writeStream;
+static jfieldID Request_readString;
+static jfieldID Request_readBytes;
+
+
 static int JVM_VER = JNI_VERSION_1_8;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+
+    DEBUG("JNI_OnLoad start");
 
     JNIEnv* env;
     if ((*vm)->GetEnv(vm, (void **) &env, JVM_VER) != JNI_OK) {
@@ -18,26 +35,101 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     } else {
 
         char * version = curl_version();
-        printf("curl version: %s \n", version);
+        DEBUG("cURL version: %s", version);
 
         jclass jcls;
         jmethodID jmeth;
+        jfieldID jfield;
+
+        /* http.Request */
+        jcls = (*env)->FindClass(env, "org/example/http/Request");
+        if (!jcls) {
+            DEBUG("Request class not found");
+            return JNI_ERR;
+        }
+
+        /* url */
+        jfield = (*env)->GetFieldID(env, jcls, "url", "Ljava/lang/String;");
+        if (!jfield) {
+            DEBUG("Request.url field not found");
+            return JNI_ERR;
+        }
+        Request_url = jfield;
+
+        /* method */
+        jfield = (*env)->GetFieldID(env, jcls, "method", "I");
+        if (!jfield) {
+            DEBUG("Request.method field not found");
+            return JNI_ERR;
+        }
+        Request_method = jfield;
+
+        /* followLocation */
+        jfield = (*env)->GetFieldID(env, jcls, "followLocation", "I");
+        if (!jfield) {
+            DEBUG("Request.followLocation field not found");
+            return JNI_ERR;
+        }
+        Request_followLocation = jfield;
+
+        /* headers */
+        jfield = (*env)->GetFieldID(env, jcls, "headers", "[Ljava/lang/String;");
+        if (!jfield) {
+            DEBUG("Request.headers field not found");
+            return JNI_ERR;
+        }
+        Request_headers = jfield;
+
+        /* writeFile */
+        jfield = (*env)->GetFieldID(env, jcls, "writeFile", "Ljava/lang/String;");
+        if (!jfield) {
+            DEBUG("Request.writeFile field not found");
+            return JNI_ERR;
+        }
+        Request_writeFile = jfield;
+
+        /* writeStream */
+        jfield = (*env)->GetFieldID(env, jcls, "writeStream", "Ljava/io/OutputStream;");
+        if (!jfield) {
+            DEBUG("Request.writeStream field not found");
+            return JNI_ERR;
+        }
+        Request_writeStream = jfield;
+
+        /* readString */
+        jfield = (*env)->GetFieldID(env, jcls, "readString", "Ljava/lang/String;");
+        if (!jfield) {
+            DEBUG("Request.readString field not found");
+            return JNI_ERR;
+        }
+        Request_readString = jfield;
+
+        /* readBytes */
+        jfield = (*env)->GetFieldID(env, jcls, "readBytes", "[B");
+        if (!jfield) {
+            DEBUG("Request.readBytes field not found");
+            return JNI_ERR;
+        }
+        Request_readBytes = jfield;
 
         /* OutputStream */
         jcls = (*env)->FindClass(env, "java/io/OutputStream");
-        if (jcls == NULL) {
+        if (!jcls) {
+            DEBUG("OutputStream class not found");
             return JNI_ERR;
         }
         /* write */
         jmeth = (*env)->GetMethodID(env, jcls, "write", "([BII)V");
-        if (jmeth == NULL) {
+        if (!jmeth) {
+            DEBUG("OutputStream.write(BaII) method not found");
             return JNI_ERR;
         } else {
             OS_write_BaII = jmeth;
         }
         /* close */
         jmeth = (*env)->GetMethodID(env, jcls, "close", "()V");
-        if (jmeth == NULL) {
+        if (!jmeth) {
+            DEBUG("OutputStream.close method not found");
             return JNI_ERR;
         } else {
             OS_close = jmeth;
@@ -45,15 +137,19 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
         /* InputStream */
         jcls = (*env)->FindClass(env, "java/io/InputStream");
-        if (jcls == NULL) {
+        if (!jcls) {
+            DEBUG("InputStream class not found");
             return JNI_ERR;
         }
         jmeth = (*env)->GetMethodID(env, jcls, "read", "([BII)I");
-        if (jmeth == NULL) {
+        if (!jmeth) {
+            DEBUG("InputStream.read(BaII) method not found");
             return JNI_ERR;
         } else {
             IS_read_BaII = jmeth;
         }
+
+        DEBUG("JNI_OnLoad end");
 
         /* OK */
         return JVM_VER;
@@ -93,7 +189,7 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
     struct user_data *ud = (struct user_data *) userdata;
     JNIEnv *env = ud->env;
 
-    printf("callback: %lu \n", total);
+    DEBUG("write callback stream, total: %lu", total);
 
     (*env)->SetByteArrayRegion(env, ud->jbuf, 0, total, (jbyte *) data);
 
@@ -186,14 +282,7 @@ exit:
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     JNIEnv *env,
     jclass jcls,
-    jstring jurl,
-    jint jmethod,
-    jint jfollowLocation,
-    jobjectArray jheaders,
-    jstring jwriteFile,
-    jobject jwriteStream,
-    jstring jreadString,
-    jbyteArray jreadBytes
+    jobject jreq
 )
 {
     int i = 0;
@@ -208,21 +297,34 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
     CURL *curl = curl_easy_init();
 
+    jstring jurl          = (jstring) (*env)->GetObjectField(env, jreq, Request_url);
+    jint jmethod          = (*env)->GetIntField(env, jreq, Request_method);
+    jint jfollowLocation  = (*env)->GetIntField(env, jreq, Request_followLocation);
+    jobjectArray jheaders = (jobjectArray) (*env)->GetObjectField(env, jreq, Request_headers);
+    jstring jwriteFile    = (jstring) (*env)->GetObjectField(env, jreq, Request_writeFile);
+    jobject jwriteStream  = (*env)->GetObjectField(env, jreq, Request_writeStream);
+    jstring jreadString   = (jstring) (*env)->GetObjectField(env, jreq, Request_readString);
+    jbyteArray jreadBytes = (jbyteArray) (*env)->GetObjectField(env, jreq, Request_readBytes);
+
     /* URL */
     _set_url(env, curl, jurl);
+    DEBUG("url set");
 
     /* method */
     _set_method(curl, jmethod);
+    DEBUG("method set");
 
     /* FOLLOW LOCATION */
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jfollowLocation);
     if (code != CURLE_OK) goto exit;
+    DEBUG("follow location set");
 
     /* HEADERS */
     code = _set_headers(env, jheaders, headers);
     if (code != CURLE_OK) goto exit;
     code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     if (code != CURLE_OK) goto exit;
+    DEBUG("headers set");
 
     /* WRITE FILE */
     if (jwriteFile) {
@@ -236,6 +338,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         writeFile = fopen(path, "wb");
         (*env)->ReleaseStringUTFChars(env, jwriteFile, path);
         if (!writeFile) {
+            DEBUG("failed to open write file: %s", path);
             code = -4;
             goto exit;
         }
@@ -246,7 +349,6 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
     /* WRITE STREAM */
     if (jwriteStream) {
-        printf("jwriteStream\n");
         // TODO: allocate on stack?
         ud = make_user_data(env, jwriteStream);
         writeData = ud;
@@ -290,6 +392,9 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, length);
         if (code != CURLE_OK) goto exit;
     }
+
+    /* code = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1); */
+    /* if (code != CURLE_OK) goto exit; */
 
     /* PERFORM */
     code = curl_easy_perform(curl);

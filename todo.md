@@ -1,14 +1,14 @@
+- pass debug parameter
+- local http server
 - write callback
 - read file
 - read callback
 - read stream
 - global error codes
-- local http server
 - auth option
 - proxy option
 - rename the package
 - delete unused files
-- request class
 - multi support
 - reuse curl pointer
 - accept encoding

@@ -5,6 +5,7 @@ SRC_PATH = src/main/java/org/example
 
 JAVAFILES = \
 	$(SRC_PATH)/Curl3.java \
+	$(SRC_PATH)/http/Request.java \
 #	$(SRC_PATH)/Arena.java \
 #	$(SRC_PATH)/Native.java \
 #	$(SRC_PATH)/FILE.java \

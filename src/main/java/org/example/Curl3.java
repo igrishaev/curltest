@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.http.Request;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
@@ -11,29 +13,19 @@ public class Curl3 {
         System.load(libPath);
     }
 
-    native public static long perform(
-            final String url,
-            final int method,
-            final int followLocation,
-            final String[] headers,
-            final String writeFile,
-            final OutputStream writeStream,
-            final String readString,
-            final byte[] readBytes
-            );
+    native public static long perform(Request request);
 
     public static void main(final String... args) {
         final OutputStream out = new ByteArrayOutputStream();
-        final long code = perform(
-                "https://habr.com",
-                1,
-                3,
-                new String[]{"foo: bar"},
-                null, // "foo2.html",
-                out,
-                null, // "data to send",
-                new byte[] {1, 2, 0, 4, 5}
-        );
+        final Request request = Request.builder()
+                .url("https://habr.com")
+                .method(1)
+                .followLocation(3)
+                .addHeader("foo", "bar")
+                // .writeFile("test.html")
+                .writeStream(out)
+                .build();
+        final long code = perform(request);
         System.out.println(out.toString().substring(0, 10));
     }
 }
