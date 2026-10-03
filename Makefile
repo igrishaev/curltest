@@ -62,3 +62,19 @@ clear:
 
 acc:
 	$(CC) -Wall -ansi -pedantic -c -o accum.o accum.c
+
+module ?= $(error module=... parameter not set)
+
+new-module: SENTRY = __$(shell echo $(module) | tr 'a-z' 'A-Z')_H__
+new-module: FILE_H = $(module).h
+new-module: FILE_C = $(module).c
+new-module:
+	touch $(FILE_C)
+	echo "#include \"$(FILE_H)\""  		  >> $(FILE_C)
+	touch $(FILE_H)
+	echo "#ifndef $(SENTRY)"       		  >> $(FILE_H)
+	echo "#define $(SENTRY)"       		  >> $(FILE_H)
+	echo ""                        		  >> $(FILE_H)
+	echo "/* A big thing starts here! */" >> $(FILE_H)
+	echo ""                        		  >> $(FILE_H)
+	echo "#endif /* $(SENTRY) */"  		  >> $(FILE_H)
