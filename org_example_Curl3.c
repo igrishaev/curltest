@@ -30,6 +30,8 @@
         return JNI_ERR; \
     }
 
+#define call(env, method, ...) (*env)->method(env, ##__VA_ARGS__)
+
 #define J_STRING     "Ljava/lang/String;"
 #define J_STRING_ARR "[Ljava/lang/String;"
 #define J_INT        "I"
@@ -104,7 +106,7 @@ struct user_data {
 };
 
 struct user_data * make_user_data(JNIEnv *env, jobject jobj) {
-    jbyteArray jbuf = (*env)->NewByteArray(env, CURL_MAX_WRITE_SIZE);
+    jbyteArray jbuf = call(env, NewByteArray, CURL_MAX_WRITE_SIZE);
     struct user_data * ud = malloc(sizeof(struct user_data));
     ud->i = 0;
     ud->total = 0;
@@ -116,8 +118,8 @@ struct user_data * make_user_data(JNIEnv *env, jobject jobj) {
 
 void clear_user_data(struct user_data * ud) {
     if (ud == NULL) return;
-    JNIEnv *env = ud->env;
-    (*env)->DeleteLocalRef(env, ud->jbuf);
+    // JNIEnv *env = ud->env; // TODO
+    call(ud->env, DeleteLocalRef, ud->jbuf);
     free(ud);
 }
 
@@ -130,12 +132,12 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 
     DEBUG("write callback stream, total: %lu", total);
 
-    (*env)->SetByteArrayRegion(env, ud->jbuf, 0, total, (jbyte *) data);
+    call(env, SetByteArrayRegion, ud->jbuf, 0, total, (jbyte *) data);
 
-    (*env)->CallVoidMethod(env, ud->jobj, OS_write_BaII, ud->jbuf, 0, total);
-    if ((*env)->ExceptionCheck(env)) {
-        (*env)->ExceptionDescribe(env); // TODO: better handling
-        (*env)->ExceptionClear(env);
+    call(env, CallVoidMethod, ud->jobj, OS_write_BaII, ud->jbuf, 0, total);
+    if (call(env, ExceptionCheck)) {
+        call(env, ExceptionDescribe); // TODO: better handling
+        call(env, ExceptionClear);
         return CURL_WRITEFUNC_ERROR;
     }
 
@@ -149,14 +151,14 @@ static long _set_url(JNIEnv *env, CURL *curl, jstring jurl) {
     int code = 0;
     char *url = NULL;
 
-    url = (*env)->GetStringUTFChars(env, jurl, NULL);
+    url = call(env, GetStringUTFChars, jurl, NULL);
     if (!url) {
         code = -1; // TODO use enum
         goto exit;
     }
 
     code = curl_easy_setopt(curl, CURLOPT_URL, url);
-    (*env)->ReleaseStringUTFChars(env, jurl, url);
+    call(env, ReleaseStringUTFChars, jurl, url);
 
 exit:
     return code;
@@ -193,20 +195,20 @@ static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *
 
     if (jheaders == NULL) return 0;
 
-    jsize headerLen = (*env)->GetArrayLength(env, jheaders);
+    jsize headerLen = call(env, GetArrayLength, jheaders);
 
     for (i = 0; i < headerLen; i++) {
 
-        jheader = (jstring) (*env)->GetObjectArrayElement(env, jheaders, i);
+        jheader = (jstring) call(env, GetObjectArrayElement, jheaders, i);
         if (jheader == NULL) {
             continue;
         }
 
-        header = (*env)->GetStringUTFChars(env, jheader, NULL);
+        header = call(env, GetStringUTFChars, jheader, NULL);
         if (header) {
             curl_slist_append(headers, header);
-            (*env)->ReleaseStringUTFChars(env, jheader, header); // TODO
-            (*env)->DeleteLocalRef(env, jheader);
+            call(env, ReleaseStringUTFChars, jheader, header); // TODO
+            call(env, DeleteLocalRef, jheader);
         } else {
             code = -3;
             goto exit;
@@ -234,14 +236,14 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     char *readString           = NULL;
     void *readBytes            = NULL;
 
-    jstring jurl          = (jstring) (*env)->GetObjectField(env, jreq, Request_url);
-    jint jmethod          = (*env)->GetIntField(env, jreq, Request_method);
-    jint jfollowLocation  = (*env)->GetIntField(env, jreq, Request_followLocation);
-    jobjectArray jheaders = (jobjectArray) (*env)->GetObjectField(env, jreq, Request_headers);
-    jstring jwriteFile    = (jstring) (*env)->GetObjectField(env, jreq, Request_writeFile);
-    jobject jwriteStream  = (*env)->GetObjectField(env, jreq, Request_writeStream);
-    jstring jreadString   = (jstring) (*env)->GetObjectField(env, jreq, Request_readString);
-    jbyteArray jreadBytes = (jbyteArray) (*env)->GetObjectField(env, jreq, Request_readBytes);
+    jstring jurl          = (jstring) call(env, GetObjectField, jreq, Request_url);
+    jint jmethod          = call(env, GetIntField, jreq, Request_method);
+    jint jfollowLocation  = call(env, GetIntField, jreq, Request_followLocation);
+    jobjectArray jheaders = (jobjectArray) call(env, GetObjectField, jreq, Request_headers);
+    jstring jwriteFile    = (jstring) call(env, GetObjectField, jreq, Request_writeFile);
+    jobject jwriteStream  = call(env, GetObjectField, jreq, Request_writeStream);
+    jstring jreadString   = (jstring) call(env, GetObjectField, jreq, Request_readString);
+    jbyteArray jreadBytes = (jbyteArray) call(env, GetObjectField, jreq, Request_readBytes);
 
     CURL *curl = curl_easy_init();
 
@@ -268,14 +270,14 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     /* WRITE FILE */
     if (jwriteFile) {
 
-        const char *path = (*env)->GetStringUTFChars(env, jwriteFile, NULL);
+        const char *path = call(env, GetStringUTFChars, jwriteFile, NULL);
         if (!path) {
             code = -5;
             goto exit;
         }
 
         writeFile = fopen(path, "wb");
-        (*env)->ReleaseStringUTFChars(env, jwriteFile, path);
+        call(env, ReleaseStringUTFChars, jwriteFile, path);
         if (!writeFile) {
             DEBUG("failed to open write file: %s", path);
             code = -4;
@@ -306,7 +308,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
     /* POST FIELDS STRING */
     if (jreadString) {
-        readString = (*env)->GetStringUTFChars(env, jreadString, NULL);
+        readString = call(env, GetStringUTFChars, jreadString, NULL);
         if (!readString) {
             code = -5;
             goto exit;
@@ -317,7 +319,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
     /* POST FIELDS BYTES */
     if (jreadBytes) {
-        readBytes = (*env)->GetPrimitiveArrayCritical(env, jreadBytes, NULL);
+        readBytes = call(env, GetPrimitiveArrayCritical, jreadBytes, NULL);
         if (!readBytes) {
             code = -5;
             goto exit;
@@ -326,7 +328,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         code = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, readBytes);
         if (code != CURLE_OK) goto exit;
 
-        jsize length = (*env)->GetArrayLength(env, jreadBytes);
+        jsize length = call(env, GetArrayLength, jreadBytes);
 
         code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, length);
         if (code != CURLE_OK) goto exit;
@@ -348,21 +350,21 @@ exit:
 
     /* close output stream */
     if (jwriteStream) {
-        (*env)->CallVoidMethod(env, jwriteStream, OS_close);
-        if ((*env)->ExceptionCheck(env)) {
-            (*env)->ExceptionDescribe(env); // TODO: better handling
-            (*env)->ExceptionClear(env);
+        call(env, CallVoidMethod, jwriteStream, OS_close);
+        if (call(env, ExceptionCheck)) {
+            call(env, ExceptionDescribe); // TODO: better handling
+            call(env, ExceptionClear);
         }
     }
 
     /* release read string */
     if (readString) {
-        (*env)->ReleaseStringUTFChars(env, jreadString, readString);
+        call(env, ReleaseStringUTFChars, jreadString, readString);
     }
 
     /* release read bytes */
     if (readBytes) {
-        (*env)->ReleasePrimitiveArrayCritical(env, jreadBytes, readBytes, JNI_ABORT);
+        call(env, ReleasePrimitiveArrayCritical, jreadBytes, readBytes, JNI_ABORT);
     }
 
     return code;
