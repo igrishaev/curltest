@@ -19,6 +19,7 @@ public class Request {
     public final OutputStream writeStream;
     public final String readString;
     public final byte[] readBytes;
+    public final boolean accumulate;
 
     private Request(
         final String url,
@@ -28,7 +29,8 @@ public class Request {
         final String writeFile,
         final OutputStream writeStream,
         final String readString,
-        final byte[] readBytes
+        final byte[] readBytes,
+        final boolean accumulate
     ) {
         this.url = url;
         this.method = method;
@@ -38,6 +40,7 @@ public class Request {
         this.writeStream = writeStream;
         this.readString = readString;
         this.readBytes = readBytes;
+        this.accumulate = accumulate;
     }
 
     public static Builder builder() {
@@ -54,6 +57,7 @@ public class Request {
         OutputStream writeStream = null;
         String readString = null;
         byte[] readBytes = null;
+        boolean accumulate = false;
 
         public Builder url(final String url) {
             this.url = url;
@@ -126,6 +130,11 @@ public class Request {
             return this;
         }
 
+        public Builder accumulate(final boolean accumulate) {
+            this.accumulate = accumulate;
+            return this;
+        }
+
         public Request build() {
             return new Request(
                     url,
@@ -135,7 +144,8 @@ public class Request {
                     writeFile,
                     writeStream,
                     readString,
-                    readBytes
+                    readBytes,
+                    accumulate
             );
         }
 

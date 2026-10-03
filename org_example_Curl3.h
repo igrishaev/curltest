@@ -9,11 +9,27 @@ extern "C" {
 #endif
 /*
  * Class:     org_example_Curl3
+ * Method:    _init
+ * Signature: ()J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_Curl3__1init
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_example_Curl3
+ * Method:    _free
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_Curl3__1free
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_Curl3
  * Method:    perform
- * Signature: (Lorg/example/http/Request;)J
+ * Signature: (JLorg/example/http/Request;)J
  */
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform
-  (JNIEnv *, jclass, jobject);
+  (JNIEnv *, jclass, jlong, jobject);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,7 @@ JAVAFILES = \
 
 MODULES = \
 	org_example_Curl3.c \
+	accum.c \
 #	org_example_Arena.c \
 #	org_example_Native.c \
 #	org_example_FILE.c \
@@ -30,11 +31,19 @@ JAVA_INC = \
 CURL_HOME = /opt/homebrew/opt/curl
 
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib
+CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib # -DDEBUG
 
 LIBS = -lcurl
 
-all: clear headers $(SHARED_LIB)
+all: clear headers sep $(SHARED_LIB) clone
+
+sep:
+	$(info .........................................)
+	$(info .........................................)
+	$(info .........................................)
+
+clone: $(SHARED_LIB)
+	cp $(SHARED_LIB) server
 
 headers:
 	javac -h . $(JAVAFILES)
@@ -50,3 +59,6 @@ clear:
 	rm -f *.log
 	rm -f *.o
 	rm -f *.dylib
+
+acc:
+	$(CC) -Wall -ansi -pedantic -c -o accum.o accum.c

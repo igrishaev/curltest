@@ -1,32 +1,27 @@
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "curl/curl.h"
 
-#define DEBUG(fmt, ...) \
-    do { \
-        fprintf(stderr, "[DEBUG] %s:%d:%s(): " fmt "\n", \
-                __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
-    } while (0)
+#include "accum.h"
+#include "debug.h"
+
+#include "curl/curl.h"
 
 #define SET_FIELD(env, jcls, fname, ftype, fvar) \
     fvar = (*env)->GetFieldID(env, jcls, fname, ftype); \
     if (!fvar) { \
-        DEBUG(#fname " field not found"); \
         return JNI_ERR; \
     }
 
 #define GET_CLASS(env, clsname, clsvar) \
     clsvar = (*env)->FindClass(env, clsname); \
     if (!clsvar) { \
-        DEBUG(#clsname " class not found"); \
         return JNI_ERR; \
     }
 
 #define GET_METHOD(env, jcls, name, sig, var) \
     var = (*env)->GetMethodID(env, jcls, name, sig); \
     if (!var) { \
-        DEBUG("method " #name " " #sig " not found"); \
         return JNI_ERR; \
     }
 
@@ -35,6 +30,7 @@
 #define J_STRING     "Ljava/lang/String;"
 #define J_STRING_ARR "[Ljava/lang/String;"
 #define J_INT        "I"
+#define J_BOOL       "Z"
 #define J_OS         "Ljava/io/OutputStream;"
 #define J_BA         "[B"
 
@@ -51,13 +47,14 @@ static jfieldID Request_writeFile;
 static jfieldID Request_writeStream;
 static jfieldID Request_readString;
 static jfieldID Request_readBytes;
+static jfieldID Request_accumulate;
 
 static int JVM_VER = JNI_VERSION_1_8;
 
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
-    DEBUG("JNI_OnLoad start");
+    debug("JNI_OnLoad start");
 
     JNIEnv* env;
     if ((*vm)->GetEnv(vm, (void **) &env, JVM_VER) != JNI_OK) {
@@ -65,7 +62,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
     } else {
 
         char * version = curl_version();
-        DEBUG("cURL version: %s", version);
+        debug("cURL version: %s", version);
 
         jclass jcls;
         jmethodID jmeth;
@@ -81,6 +78,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         SET_FIELD(env, jcls, "writeStream",    J_OS,         Request_writeStream);
         SET_FIELD(env, jcls, "readString",     J_STRING,     Request_readString);
         SET_FIELD(env, jcls, "readBytes",      J_BA,         Request_readBytes);
+        SET_FIELD(env, jcls, "accumulate",     J_BOOL,       Request_accumulate);
 
         /* OutputStream */
         GET_CLASS(env, "java/io/OutputStream", jcls);
@@ -92,7 +90,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         GET_METHOD(env, jcls, "read",  "([BII)I", IS_read_BaII);
         GET_METHOD(env, jcls, "close", "()V",     IS_close);
 
-        DEBUG("JNI_OnLoad end");
+        debug("JNI_OnLoad end");
         return JVM_VER;
     }
 }
@@ -130,7 +128,7 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
     struct user_data *ud = (struct user_data *) userdata;
     JNIEnv *env = ud->env;
 
-    DEBUG("write callback stream, total: %lu", total);
+    debug("write callback stream, total: %lu", total);
 
     call(env, SetByteArrayRegion, ud->jbuf, 0, total, (jbyte *) data);
 
@@ -220,12 +218,24 @@ exit:
 }
 
 
+static size_t write_callback_accum(char *data, size_t size, size_t nmemb, void *userdata)
+{
+    debug("accumulator callback gets called");
+    size_t len = size * nmemb;
+    struct accum *acc = (struct accum *) userdata;
+    if (!accum_add(acc, data, len)) return CURL_WRITEFUNC_ERROR;
+    return len;
+}
+
+
 JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     JNIEnv *env,
     jclass jcls,
+    jlong jcurl,
     jobject jreq
 )
 {
+vars:
     int i = 0;
     long code = 0;
     struct user_data * ud      = NULL;
@@ -235,6 +245,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     FILE *writeFile            = NULL;
     char *readString           = NULL;
     void *readBytes            = NULL;
+    struct accum * acc         = NULL;
 
     jstring jurl          = (jstring) call(env, GetObjectField, jreq, Request_url);
     jint jmethod          = call(env, GetIntField, jreq, Request_method);
@@ -244,28 +255,30 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
     jobject jwriteStream  = call(env, GetObjectField, jreq, Request_writeStream);
     jstring jreadString   = (jstring) call(env, GetObjectField, jreq, Request_readString);
     jbyteArray jreadBytes = (jbyteArray) call(env, GetObjectField, jreq, Request_readBytes);
+    jboolean jaccumulate  = call(env, GetBooleanField, jreq, Request_accumulate);
 
-    CURL *curl = curl_easy_init();
+    // CURL *curl = curl_easy_init();
+    CURL *curl = (CURL *) jcurl;
 
     /* URL */
     _set_url(env, curl, jurl);
-    DEBUG("url set");
+    debug("url set");
 
     /* method */
     _set_method(curl, jmethod);
-    DEBUG("method set");
+    debug("method set");
 
     /* FOLLOW LOCATION */
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jfollowLocation);
     if (code != CURLE_OK) goto exit;
-    DEBUG("follow location set");
+    debug("follow location set");
 
     /* HEADERS */
     code = _set_headers(env, jheaders, headers);
     if (code != CURLE_OK) goto exit;
     code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
     if (code != CURLE_OK) goto exit;
-    DEBUG("headers set");
+    debug("headers set");
 
     /* WRITE FILE */
     if (jwriteFile) {
@@ -279,7 +292,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         writeFile = fopen(path, "wb");
         call(env, ReleaseStringUTFChars, jwriteFile, path);
         if (!writeFile) {
-            DEBUG("failed to open write file: %s", path);
+            debug("failed to open write file: %s", path);
             code = -4;
             goto exit;
         }
@@ -297,6 +310,20 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
         // TODO: close stream?
     }
 
+    /* accumulate in memory */
+    if (jaccumulate) {
+        acc = accum_init(2024, 2);
+        if (!acc) {
+            debug("failed to init accumulator");
+            code = -99;
+            goto exit;
+        }
+        debug("accumulator is OK");
+        writeData = acc;
+        writeFunction = write_callback_accum;
+    }
+
+    /* WRITING  */
     if (writeData) {
         code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeData);
         if (code != CURLE_OK) goto exit;
@@ -343,10 +370,12 @@ JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
 
 exit:
 
-    if (curl)      curl_easy_cleanup(curl);
+    // if (curl)      curl_easy_cleanup(curl);
     if (headers)   curl_slist_free_all(headers);
     if (writeFile) fclose(writeFile);
     if (ud)        clear_user_data(ud);
+
+    if (acc)       accum_free(acc);
 
     /* close output stream */
     if (jwriteStream) {
@@ -368,4 +397,16 @@ exit:
     }
 
     return code;
+}
+
+
+
+JNIEXPORT jlong JNICALL Java_org_example_Curl3__1init
+  (JNIEnv *env, jclass jcls) {
+    return (jlong) curl_easy_init();
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_Curl3__1free
+  (JNIEnv *env, jclass jcls, jlong jcurl) {
+    curl_easy_cleanup((CURL *) jcurl);
 }
