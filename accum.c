@@ -28,6 +28,7 @@ struct accum * accum_init(size_t size, size_t factor)
     acc->len = 0;
     acc->buf = buf;
     acc->factor = factor;
+
     return acc;
 
 err:
@@ -45,6 +46,7 @@ void accum_free(struct accum *acc)
 
 int accum_add(struct accum *acc, char *data, size_t len)
 {
+    if (!acc) return 0;
     size_t rem = acc->size - acc->len;
     debug("adding data, len: %lu, rem: %lu", len, rem);
     if (len > rem) {

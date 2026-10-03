@@ -14,6 +14,7 @@ JAVAFILES = \
 MODULES = \
 	org_example_Curl3.c \
 	accum.c \
+	curlopts.c \
 #	org_example_Arena.c \
 #	org_example_Native.c \
 #	org_example_FILE.c \
