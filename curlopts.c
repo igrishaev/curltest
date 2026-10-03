@@ -8,8 +8,8 @@ struct curlopts {
     size_t i;
     size_t count;
     size_t factor;
-    int *opts;
-    long *vals;
+    int    *opts;
+    long   *vals;
 };
 
 struct curlopts * curlopts_init(size_t count)

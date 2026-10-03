@@ -7,7 +7,7 @@
 struct accum {
     size_t size;
     size_t len;
-    char *buf;
+    char   *buf;
     size_t factor;
 };
 
