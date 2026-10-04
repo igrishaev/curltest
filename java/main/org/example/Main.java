@@ -16,11 +16,11 @@ public class Main {
                 .build();
         final long code = c.perform(request);
         if (code != 0) {
-            throw new RuntimeException("non zero code");
+            Err.error("non zero code");
         }
     }
 
-    public static void main(String... args) throws InterruptedException {
+    public static void main(String... args) {
         try (CurlEasy c = CurlEasy.make()) {
             test(c);
         }

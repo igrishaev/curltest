@@ -5,11 +5,14 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/Native.java \
 	$(SRC_PATH)/CurlEasy.java \
+	$(SRC_PATH)/Err.java \
 	$(SRC_PATH)/Request.java \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/org_example_Native.c \
 	$(C_PATH)/org_example_CurlEasy.c \
 	$(C_PATH)/accum.c
 

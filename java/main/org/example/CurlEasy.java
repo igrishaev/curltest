@@ -19,6 +19,9 @@ public class CurlEasy implements AutoCloseable {
 
     public static CurlEasy make() {
         final long ptr = curl_easy_init();
+        if (ptr == Native.NULL) {
+            Err.error("failed to initialize cURL");
+        }
         return new CurlEasy(ptr, false);
     }
 

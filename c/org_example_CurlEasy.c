@@ -169,7 +169,7 @@ exit:
 static long _set_method(CURL *curl, jint jmethod) {
     int code = 0;
     switch (jmethod) {
-        case 1: { // TODO use enumb
+        case 1: { // TODO use enum
             code = curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
             if (code != CURLE_OK) goto exit;
             break;
@@ -211,7 +211,7 @@ static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *
             call(env, ReleaseStringUTFChars, jheader, header); // TODO
             call(env, DeleteLocalRef, jheader);
         } else {
-            code = -3;
+            code = -3; // TODO return
             goto exit;
         }
     }
@@ -364,7 +364,6 @@ vars:
 
 exit:
 
-    // if (curl)      curl_easy_cleanup(curl);
     if (headers)   curl_slist_free_all(headers);
     if (writeFile) fclose(writeFile);
     if (ud)        clear_user_data(ud);
@@ -393,7 +392,6 @@ exit:
     return code;
 }
 
-// TODO check NULL?
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1init
   (JNIEnv *env, jclass jcls) {
     return (jlong) curl_easy_init();
