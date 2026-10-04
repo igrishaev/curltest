@@ -50,11 +50,9 @@ $(SHARED_LIB): $(OBJECTS)
 	$(CC) $(CFLAGS) $(LIBS) -shared -o $(SHARED_LIB) $(OBJECTS)
 
 clear:
-	rm -f *.html
-	rm -f *.log
-	rm -f *.o
-	rm -f *.dylib
 	rm -rf target
+	find . -name '*.o' -delete
+	find . -name '*.lob' -delete
 	find . -name '*.class' -delete
 
 acc:
