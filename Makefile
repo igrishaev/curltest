@@ -9,11 +9,13 @@ JAVAFILES = \
 	$(SRC_PATH)/CurlEasy.java \
 	$(SRC_PATH)/Err.java \
 	$(SRC_PATH)/Request.java \
+	$(SRC_PATH)/Response.java \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
 	$(C_PATH)/org_example_Native.c \
 	$(C_PATH)/org_example_CurlEasy.c \
+	$(C_PATH)/org_example_Response.c \
 	$(C_PATH)/accum.c
 
 OBJECTS = $(MODULES:.c=.o)

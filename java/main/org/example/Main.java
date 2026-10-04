@@ -2,7 +2,7 @@ package org.example;
 
 public class Main {
 
-    public static void test(final CurlEasy c) {
+    public static Response test(final CurlEasy c) {
         // final OutputStream out = new ByteArrayOutputStream();
         final Request request = Request.builder()
                 .url("https://habr.com")
@@ -14,15 +14,12 @@ public class Main {
                 // .writeFile("test.html")
                 // .writeStream(out)
                 .build();
-        final long code = c.perform(request);
-        if (code != 0) {
-            Err.error("non zero code");
-        }
+        return c.perform(request);
     }
 
     public static void main(String... args) {
         try (CurlEasy c = CurlEasy.make()) {
-            test(c);
+            System.out.println(test(c));
         }
     }
 }

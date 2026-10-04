@@ -4,11 +4,13 @@
 #include <jni.h>
 
 struct J_OutputStream {
+    jclass    class;
     jmethodID write_BaII;
     jmethodID close;
 };
 
 struct J_Request {
+    jclass   class;
     jfieldID url;
     jfieldID method;
     jfieldID followLocation;
@@ -20,12 +22,23 @@ struct J_Request {
     jfieldID accumulate;
 };
 
+struct J_Response {
+    jclass   class;
+    jfieldID status;
+    jfieldID headers;
+    jfieldID body;
+    jfieldID contentLength;
+    jfieldID effectiveUrl;
+};
+
 struct J_InputStream {
+    jclass    class;
     jmethodID read_BaII;
     jmethodID close;
 };
 
 struct J_Globals {
+    struct J_Response Response;
     struct J_Request Request;
     struct J_OutputStream OutputStream;
     struct J_InputStream InputStream;

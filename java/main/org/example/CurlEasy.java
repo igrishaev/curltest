@@ -22,8 +22,14 @@ public class CurlEasy implements AutoCloseable {
         return new CurlEasy(ptr, false);
     }
 
-    public long perform(final Request request) {
-        return curl_easy_perform(ptr, request);
+    public Response perform(final Request request) {
+        final long code = curl_easy_perform(ptr, request);
+        if (code != 0) {
+            Err.error("failed with non-zero code: %s", code);
+        }
+        final Response response = new Response();
+        response.from_curl(ptr);
+        return response;
     }
 
     native public static long curl_easy_init();
