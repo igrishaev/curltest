@@ -1,16 +1,16 @@
 
-SHARED_LIB = curltest.dylib
+SHARED_LIB = curltest.dylib # TODO rename
 
 SRC_PATH = src/main/java/org/example
 C_PATH = c
 
 JAVAFILES = \
-	$(SRC_PATH)/Curl3.java \
-	$(SRC_PATH)/http/Request.java \
+	$(SRC_PATH)/CurlEasy.java \
+	$(SRC_PATH)/Request.java \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
-	$(C_PATH)/org_example_Curl3.c \
+	$(C_PATH)/org_example_CurlEasy.c \
 	$(C_PATH)/accum.c
 
 OBJECTS = $(MODULES:.c=.o)
@@ -26,7 +26,7 @@ JAVA_INC = \
 CURL_HOME = /opt/homebrew/opt/curl
 
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib # -DDEBUG
+CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib -DDEBUG
 
 LIBS = -lcurl
 
@@ -41,7 +41,7 @@ clone: $(SHARED_LIB)
 	cp $(SHARED_LIB) server
 
 headers:
-	javac -h c $(JAVAFILES)
+	javac -h $(C_PATH) $(JAVAFILES)
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $*.c
@@ -54,6 +54,8 @@ clear:
 	rm -f *.log
 	rm -f *.o
 	rm -f *.dylib
+	rm -rf target
+	find . -name '*.class' -delete
 
 acc:
 	$(CC) -Wall -ansi -pedantic -c -o accum.o accum.c

@@ -1,27 +1,28 @@
 package org.example;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.OutputStream;
-
 public class Main {
 
-    static {
-        final String libPath = new File("curltest.dylib").getAbsolutePath();
-        System.load(libPath);
-        System.out.println(curlInit());
+    public static void test(final CurlEasy c) {
+        // final OutputStream out = new ByteArrayOutputStream();
+        final Request request = Request.builder()
+                .url("https://habr.com")
+                // .url("http://127.0.0.1:3000")
+                .method(1)
+                .followLocation(3)
+                .addHeader("foo", "bar")
+                .accumulate(true)
+                // .writeFile("test.html")
+                // .writeStream(out)
+                .build();
+        final long code = CurlEasy.perform(c.getPtr(), request);
+        if (code != 0) {
+            throw new RuntimeException("non zero code");
+        }
     }
 
-    static native int curlInit();
-
-    static native int foobar(OutputStream out);
-
-    static native int test1();
-
-    public static void main(String[] args) throws InterruptedException {
-        var baos = new ByteArrayOutputStream();
-        System.out.println(foobar(baos));
-        System.out.println(baos.toString().substring(0, 100));
+    public static void main(String... args) throws InterruptedException {
+        try (CurlEasy c = CurlEasy.make()) {
+            test(c);
+        }
     }
 }

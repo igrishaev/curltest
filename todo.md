@@ -1,3 +1,4 @@
+- global init and close
 - pass debug parameter
 - local http server
 - write callback

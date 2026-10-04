@@ -7,21 +7,24 @@
 
 #include "curl/curl.h"
 
-#define SET_FIELD(env, jcls, fname, ftype, fvar) \
-    fvar = (*env)->GetFieldID(env, jcls, fname, ftype); \
-    if (!fvar) { \
-        return JNI_ERR; \
-    }
-
 #define GET_CLASS(env, clsname, clsvar) \
     clsvar = (*env)->FindClass(env, clsname); \
     if (!clsvar) { \
+        debug("failed to find class: " clsname); \
+        return JNI_ERR; \
+    }
+
+#define SET_FIELD(env, jcls, fname, ftype, fvar) \
+    fvar = (*env)->GetFieldID(env, jcls, fname, ftype); \
+    if (!fvar) { \
+        debug("failed to find field: " fname " " ftype); \
         return JNI_ERR; \
     }
 
 #define GET_METHOD(env, jcls, name, sig, var) \
     var = (*env)->GetMethodID(env, jcls, name, sig); \
     if (!var) { \
+        debug("failed to find method: " name " " sig); \
         return JNI_ERR; \
     }
 
@@ -69,7 +72,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         jfieldID jfield;
 
         /* http.Request */
-        GET_CLASS(env, "org/example/http/Request", jcls)
+        GET_CLASS(env, "org/example/Request", jcls)
         SET_FIELD(env, jcls, "url",            J_STRING,     Request_url);
         SET_FIELD(env, jcls, "method",         J_INT,        Request_method);
         SET_FIELD(env, jcls, "followLocation", J_INT,        Request_followLocation);
@@ -228,7 +231,7 @@ static size_t write_callback_accum(char *data, size_t size, size_t nmemb, void *
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_example_Curl3_perform (
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_perform (
     JNIEnv *env,
     jclass jcls,
     jlong jcurl,
@@ -257,7 +260,6 @@ vars:
     jbyteArray jreadBytes = (jbyteArray) call(env, GetObjectField, jreq, Request_readBytes);
     jboolean jaccumulate  = call(env, GetBooleanField, jreq, Request_accumulate);
 
-    // CURL *curl = curl_easy_init();
     CURL *curl = (CURL *) jcurl;
 
     /* URL */
@@ -399,14 +401,12 @@ exit:
     return code;
 }
 
-
-
-JNIEXPORT jlong JNICALL Java_org_example_Curl3__1init
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1init
   (JNIEnv *env, jclass jcls) {
     return (jlong) curl_easy_init();
 }
 
-JNIEXPORT jlong JNICALL Java_org_example_Curl3__1free
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
   (JNIEnv *env, jclass jcls, jlong jcurl) {
     curl_easy_cleanup((CURL *) jcurl);
 }

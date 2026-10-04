@@ -1,4 +1,4 @@
-package org.example.http;
+package org.example;
 
 import java.io.File;
 import java.io.OutputStream;
