@@ -51,12 +51,13 @@ $(SHARED_LIB): $(OBJECTS)
 
 clear:
 	rm -rf target
-	find . -name '*.o'     -delete
-	find . -name '*.dylib' -delete
-	find . -name '*.lib'   -delete
-	find . -name '*.so'    -delete
-	find . -name '*.dll'   -delete
-	find . -name '*.class' -delete
+	find . -name '*.o'     	 -delete
+	find . -name '*.dylib' 	 -delete
+	find . -name '*.lib'   	 -delete
+	find . -name '*.so'    	 -delete
+	find . -name '*.dll'   	 -delete
+	find . -name '*.class' 	 -delete
+	find . -name '.DS_Store' -delete
 
 acc:
 	$(CC) -Wall -ansi -pedantic -c -o accum.o accum.c
