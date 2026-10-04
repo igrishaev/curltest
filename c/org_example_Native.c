@@ -4,6 +4,29 @@
 #include "macros.h"
 #include "curl/curl.h"
 
+#define GET_CLASS(env, clsname, clsvar) \
+    clsvar = JNI_CALL(env, FindClass, clsname); \
+    if (!clsvar) { \
+        debug("failed to find class: " clsname); \
+        return JNI_ERR; \
+    }
+
+#define SET_FIELD(env, jcls, fname, ftype, fvar) \
+    fvar = JNI_CALL(env, GetFieldID, jcls, fname, ftype); \
+    if (!fvar) { \
+        debug("failed to find field: " fname " " ftype); \
+        return JNI_ERR; \
+    }
+
+#define GET_METHOD(env, jcls, name, sig, var) \
+    var = JNI_CALL(env, GetMethodID, jcls, name, sig); \
+    if (!var) { \
+        debug("failed to find method: " name " " sig); \
+        return JNI_ERR; \
+    }
+
+struct Globals _globals;
+
 static int J_VERSION = JNI_VERSION_1_8;
 
 jmethodID OS_write_BaII;
@@ -22,6 +45,9 @@ jfieldID Request_readBytes;
 jfieldID Request_accumulate;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+
+    _globals.bar = 1;
+    _globals.baz = 1;
 
     debug("JNI_OnLoad start");
 

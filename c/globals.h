@@ -18,4 +18,12 @@ extern jfieldID Request_readString;
 extern jfieldID Request_readBytes;
 extern jfieldID Request_accumulate;
 
+struct Globals {
+    int foo;
+    int bar;
+    int baz;
+};
+
+extern struct Globals _globals;
+
 #endif /* __GLOBALS_H */
