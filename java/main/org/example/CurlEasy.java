@@ -5,7 +5,7 @@ import java.io.File;
 public class CurlEasy implements AutoCloseable {
 
     static {
-        final String libPath = new File("curltest.dylib").getAbsolutePath();
+        final String libPath = new File("resources/curltest.dylib").getAbsolutePath();
         System.load(libPath);
     }
 

@@ -1,7 +1,7 @@
 
-SHARED_LIB = curltest.dylib # TODO rename
+SHARED_LIB = resources/curltest.dylib
 
-SRC_PATH = src/main/java/org/example
+SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
@@ -51,8 +51,11 @@ $(SHARED_LIB): $(OBJECTS)
 
 clear:
 	rm -rf target
-	find . -name '*.o' -delete
-	find . -name '*.lob' -delete
+	find . -name '*.o'     -delete
+	find . -name '*.dylib' -delete
+	find . -name '*.lib'   -delete
+	find . -name '*.so'    -delete
+	find . -name '*.dll'   -delete
 	find . -name '*.class' -delete
 
 acc:

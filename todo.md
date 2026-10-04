@@ -1,5 +1,8 @@
+- rename package
+- update pom file
 - global init and close
 - pass debug parameter
+- shared lib extension
 - local http server
 - write callback
 - read file
