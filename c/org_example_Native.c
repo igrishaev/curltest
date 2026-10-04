@@ -25,29 +25,11 @@
         return JNI_ERR; \
     }
 
-struct Globals _globals;
-
 static int J_VERSION = JNI_VERSION_1_8;
 
-jmethodID OS_write_BaII;
-jmethodID OS_close;
-jmethodID IS_read_BaII;
-jmethodID IS_close;
-
-jfieldID Request_url;
-jfieldID Request_method;
-jfieldID Request_followLocation;
-jfieldID Request_headers;
-jfieldID Request_writeFile;
-jfieldID Request_writeStream;
-jfieldID Request_readString;
-jfieldID Request_readBytes;
-jfieldID Request_accumulate;
+struct J_Globals _g;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-
-    _globals.bar = 1;
-    _globals.baz = 1;
 
     debug("JNI_OnLoad start");
 
@@ -71,25 +53,25 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
         /* http.Request */
         GET_CLASS(env, "org/example/Request", jcls)
-        SET_FIELD(env, jcls, "url",            J_STRING,     Request_url);
-        SET_FIELD(env, jcls, "method",         J_INT,        Request_method);
-        SET_FIELD(env, jcls, "followLocation", J_INT,        Request_followLocation);
-        SET_FIELD(env, jcls, "headers",        J_STRING_ARR, Request_headers);
-        SET_FIELD(env, jcls, "writeFile",      J_STRING,     Request_writeFile);
-        SET_FIELD(env, jcls, "writeStream",    J_OS,         Request_writeStream);
-        SET_FIELD(env, jcls, "readString",     J_STRING,     Request_readString);
-        SET_FIELD(env, jcls, "readBytes",      J_BA,         Request_readBytes);
-        SET_FIELD(env, jcls, "accumulate",     J_BOOL,       Request_accumulate);
+        SET_FIELD(env, jcls, "url",            J_STRING,     _g.Request.url);
+        SET_FIELD(env, jcls, "method",         J_INT,        _g.Request.method);
+        SET_FIELD(env, jcls, "followLocation", J_INT,        _g.Request.followLocation);
+        SET_FIELD(env, jcls, "headers",        J_STRING_ARR, _g.Request.headers);
+        SET_FIELD(env, jcls, "writeFile",      J_STRING,     _g.Request.writeFile);
+        SET_FIELD(env, jcls, "writeStream",    J_OS,         _g.Request.writeStream);
+        SET_FIELD(env, jcls, "readString",     J_STRING,     _g.Request.readString);
+        SET_FIELD(env, jcls, "readBytes",      J_BA,         _g.Request.readBytes);
+        SET_FIELD(env, jcls, "accumulate",     J_BOOL,       _g.Request.accumulate);
 
         /* OutputStream */
         GET_CLASS(env, "java/io/OutputStream", jcls);
-        GET_METHOD(env, jcls, "write", "([BII)V", OS_write_BaII);
-        GET_METHOD(env, jcls, "close", "()V",     OS_close);
+        GET_METHOD(env, jcls, "write", "([BII)V", _g.OutputStream.write_BaII);
+        GET_METHOD(env, jcls, "close", "()V",     _g.OutputStream.close);
 
         /* InputStream */
         GET_CLASS(env, "java/io/InputStream", jcls);
-        GET_METHOD(env, jcls, "read",  "([BII)I", IS_read_BaII);
-        GET_METHOD(env, jcls, "close", "()V",     IS_close);
+        GET_METHOD(env, jcls, "read",  "([BII)I", _g.InputStream.read_BaII);
+        GET_METHOD(env, jcls, "close", "()V",     _g.InputStream.close);
 
         debug("JNI_OnLoad end");
         return J_VERSION;

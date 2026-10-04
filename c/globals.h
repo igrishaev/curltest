@@ -3,27 +3,34 @@
 
 #include <jni.h>
 
-extern jmethodID OS_write_BaII;
-extern jmethodID OS_close;
-extern jmethodID IS_read_BaII;
-extern jmethodID IS_close;
-
-extern jfieldID Request_url;
-extern jfieldID Request_method;
-extern jfieldID Request_followLocation;
-extern jfieldID Request_headers;
-extern jfieldID Request_writeFile;
-extern jfieldID Request_writeStream;
-extern jfieldID Request_readString;
-extern jfieldID Request_readBytes;
-extern jfieldID Request_accumulate;
-
-struct Globals {
-    int foo;
-    int bar;
-    int baz;
+struct J_OutputStream {
+    jmethodID write_BaII;
+    jmethodID close;
 };
 
-extern struct Globals _globals;
+struct J_Request {
+    jfieldID url;
+    jfieldID method;
+    jfieldID followLocation;
+    jfieldID headers;
+    jfieldID writeFile;
+    jfieldID writeStream;
+    jfieldID readString;
+    jfieldID readBytes;
+    jfieldID accumulate;
+};
+
+struct J_InputStream {
+    jmethodID read_BaII;
+    jmethodID close;
+};
+
+struct J_Globals {
+    struct J_Request Request;
+    struct J_OutputStream OutputStream;
+    struct J_InputStream InputStream;
+};
+
+extern struct J_Globals _g;
 
 #endif /* __GLOBALS_H */

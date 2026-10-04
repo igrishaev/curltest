@@ -44,7 +44,7 @@ static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void 
 
     JNI_CALL(env, SetByteArrayRegion, ud->jbuf, 0, total, (jbyte *) data);
 
-    JNI_CALL(env, CallVoidMethod, ud->jobj, OS_write_BaII, ud->jbuf, 0, total);
+    JNI_CALL(env, CallVoidMethod, ud->jobj, _g.OutputStream.write_BaII, ud->jbuf, 0, total);
     if (JNI_CALL(env, ExceptionCheck)) {
         JNI_CALL(env, ExceptionDescribe); // TODO: better handling
         JNI_CALL(env, ExceptionClear);
@@ -148,15 +148,15 @@ vars:
     void *readBytes            = NULL;
     struct accum * acc         = NULL;
 
-    jstring jurl          = (jstring) JNI_CALL(env, GetObjectField, jreq, Request_url);
-    jint jmethod          = JNI_CALL(env, GetIntField, jreq, Request_method);
-    jint jfollowLocation  = JNI_CALL(env, GetIntField, jreq, Request_followLocation);
-    jobjectArray jheaders = (jobjectArray) JNI_CALL(env, GetObjectField, jreq, Request_headers);
-    jstring jwriteFile    = (jstring) JNI_CALL(env, GetObjectField, jreq, Request_writeFile);
-    jobject jwriteStream  = JNI_CALL(env, GetObjectField, jreq, Request_writeStream);
-    jstring jreadString   = (jstring) JNI_CALL(env, GetObjectField, jreq, Request_readString);
-    jbyteArray jreadBytes = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, Request_readBytes);
-    jboolean jaccumulate  = JNI_CALL(env, GetBooleanField, jreq, Request_accumulate);
+    jstring jurl          = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
+    jint jmethod          = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
+    jint jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
+    jobjectArray jheaders = (jobjectArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.headers);
+    jstring jwriteFile    = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.writeFile);
+    jobject jwriteStream  = JNI_CALL(env, GetObjectField, jreq, _g.Request.writeStream);
+    jstring jreadString   = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
+    jbyteArray jreadBytes = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
+    jboolean jaccumulate  = JNI_CALL(env, GetBooleanField, jreq, _g.Request.accumulate);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -278,7 +278,7 @@ exit:
 
     /* close output stream */
     if (jwriteStream) {
-        JNI_CALL(env, CallVoidMethod, jwriteStream, OS_close);
+        JNI_CALL(env, CallVoidMethod, jwriteStream, _g.OutputStream.close);
         if (JNI_CALL(env, ExceptionCheck)) {
             JNI_CALL(env, ExceptionDescribe); // TODO: better handling
             JNI_CALL(env, ExceptionClear);
