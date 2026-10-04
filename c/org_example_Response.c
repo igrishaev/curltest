@@ -16,7 +16,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
     long http_code;
     code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
     if (code != CURLE_OK) goto exit;
-    debug("http code: %l", http_code);
+    debug("http code: %ld", http_code);
 
     char *effective_url = NULL;
     code = curl_easy_getinfo(curl, CURLINFO_EFFECTIVE_URL, &effective_url);
@@ -26,7 +26,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
     double content_length;
     code = curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &content_length);
     if (code != CURLE_OK) goto exit;
-    debug("http content length: %d", content_length);
+    debug("http content length: %f", content_length);
 
     debug("processing headers");
     {
