@@ -4,6 +4,8 @@
 #include "accum.h"
 #include "debug.h"
 
+#include "curl/curl.h"
+
 struct accum {
     size_t size;
     size_t len;
@@ -65,4 +67,13 @@ int accum_add(struct accum *acc, char *data, size_t len)
     acc->len += len;
     debug("acc size: %lu, len: %lu", acc->size, acc->len);
     return 1;
+}
+
+size_t accum_write_callback(char *data, size_t size, size_t nmemb, void *userdata)
+{
+    debug("accumulator callback gets called");
+    size_t len = size * nmemb;
+    struct accum *acc = (struct accum *) userdata;
+    if (!accum_add(acc, data, len)) return CURL_WRITEFUNC_ERROR;
+    return len;
 }

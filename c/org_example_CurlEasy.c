@@ -221,14 +221,6 @@ exit:
 }
 
 
-static size_t write_callback_accum(char *data, size_t size, size_t nmemb, void *userdata)
-{
-    debug("accumulator callback gets called");
-    size_t len = size * nmemb;
-    struct accum *acc = (struct accum *) userdata;
-    if (!accum_add(acc, data, len)) return CURL_WRITEFUNC_ERROR;
-    return len;
-}
 
 
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform (
@@ -322,7 +314,7 @@ vars:
         }
         debug("accumulator is OK");
         writeData = acc;
-        writeFunction = write_callback_accum;
+        writeFunction = accum_write_callback;
     }
 
     /* WRITING  */

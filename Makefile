@@ -30,15 +30,12 @@ CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL
 
 LIBS = -lcurl
 
-all: clear headers sep $(SHARED_LIB) clone
+all: clear headers sep $(SHARED_LIB)
 
 sep:
 	$(info .........................................)
 	$(info .........................................)
 	$(info .........................................)
-
-clone: $(SHARED_LIB)
-	cp $(SHARED_LIB) server
 
 headers:
 	javac -h $(C_PATH) $(JAVAFILES)
