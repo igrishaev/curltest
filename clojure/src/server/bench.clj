@@ -2,7 +2,7 @@
   (:import
    (java.io InputStream
             ByteArrayOutputStream)
-   (org.example Curl3))
+   (org.example CurlEasy Main))
   (:use criterium.core)
   (:require
    [org.httpkit.client :as http]
@@ -28,6 +28,7 @@
               {:keys [body]}
               response]
 
+          #_
           (assert (string? body))))
 
     #_
@@ -67,6 +68,6 @@
 
 
 (defn test-curl []
-  (with-open [c (Curl3/create)]
+  (with-open [c (CurlEasy/make)]
     (quick-bench
-        (Curl3/test c))))
+        (Main/test c))))

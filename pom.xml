@@ -15,7 +15,7 @@
     </properties>
 
     <build>
-        <sourceDirectory>${project.basedir}/src/java/main</sourceDirectory>
+        <sourceDirectory>${project.basedir}/java/main</sourceDirectory>
     </build>
 
 </project>

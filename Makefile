@@ -76,3 +76,6 @@ new-module:
 	echo "/* A big thing starts here! */" >> $(FILE_H)
 	echo ""                        		  >> $(FILE_H)
 	echo "#endif /* $(SENTRY) */"  		  >> $(FILE_H)
+
+repl:
+	DEBUG=1 lein with-profile +test repl
