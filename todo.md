@@ -1,3 +1,7 @@
+- make response
+- response
+- global cache for _g
+- releae local refs
 - rename package
 - update pom file
 - global init and close
