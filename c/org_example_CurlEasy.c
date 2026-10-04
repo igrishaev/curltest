@@ -231,7 +231,7 @@ static size_t write_callback_accum(char *data, size_t size, size_t nmemb, void *
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_perform (
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform (
     JNIEnv *env,
     jclass jcls,
     jlong jcurl,

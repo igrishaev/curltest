@@ -1,10 +1,10 @@
 (ns server.bench
   (:import
    (java.io InputStream
-            ByteArrayOutputStream)
-   (org.example CurlEasy Main))
+            ByteArrayOutputStream))
   (:use criterium.core)
   (:require
+   [curl]
    [org.httpkit.client :as http]
    [babashka.http-client :as bb]
    [clj-http.conn-mgr :as conn]
@@ -68,6 +68,16 @@
 
 
 (defn test-curl []
+  (with-open [c (curl/init)]
+    (let [req {:url "http://127.0.0.1:3000"
+               :method 1
+               :follow-redirects 3
+               :headers {"foo" "bar"}
+               :accumulate true}]
+      (quick-bench
+          (curl/perform c req))))
+
+  #_
   (with-open [c (CurlEasy/make)]
     (quick-bench
         (Main/test c))))

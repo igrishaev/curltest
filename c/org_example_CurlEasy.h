@@ -25,10 +25,10 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
 
 /*
  * Class:     org_example_CurlEasy
- * Method:    perform
+ * Method:    curl_easy_perform
  * Signature: (JLorg/example/Request;)J
  */
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_perform
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform
   (JNIEnv *, jclass, jlong, jobject);
 
 #ifdef __cplusplus

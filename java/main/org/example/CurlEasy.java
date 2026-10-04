@@ -22,13 +22,13 @@ public class CurlEasy implements AutoCloseable {
         return new CurlEasy(ptr, false);
     }
 
-    public long getPtr() {
-        return ptr;
+    public long perform(final Request request) {
+        return curl_easy_perform(ptr, request);
     }
 
     native public static long curl_easy_init();
     native public static long curl_easy_cleanup(final long curlPtr);
-    native public static long perform(final long curl, Request request);
+    native public static long curl_easy_perform(final long curl, Request request);
 
     @Override
     public void close() {

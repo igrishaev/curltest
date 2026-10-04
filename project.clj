@@ -16,7 +16,7 @@
   :java-source-paths ["java/main"]
 
   :managed-dependencies
-  [[org.clojure/clojure "1.11.1"]
+  [[org.clojure/clojure "1.10.0" :scope "provided"]
    [ring/ring-core "1.10.0"]
    [ring/ring-jetty-adapter "1.10.0"]
    [http-kit "2.3.0"]

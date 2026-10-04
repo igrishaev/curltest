@@ -14,7 +14,7 @@ public class Main {
                 // .writeFile("test.html")
                 // .writeStream(out)
                 .build();
-        final long code = CurlEasy.perform(c.getPtr(), request);
+        final long code = c.perform(request);
         if (code != 0) {
             throw new RuntimeException("non zero code");
         }
