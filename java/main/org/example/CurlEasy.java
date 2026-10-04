@@ -1,12 +1,9 @@
 package org.example;
 
-import java.io.File;
-
 public class CurlEasy implements AutoCloseable {
 
     static {
-        final String libPath = new File("resources/curltest.dylib").getAbsolutePath();
-        System.load(libPath);
+        Native.loadLib();
     }
 
     private final long ptr;
