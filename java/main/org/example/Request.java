@@ -11,7 +11,7 @@ public class Request {
     public final int followLocation;
     public final long headersPtr;
     public final long writeFilePtr;
-    public final OutputStream writeStream;
+    public final long writeStreamPtr;
     public final String readString;
     public final byte[] readBytes;
     public final long accumPtr;
@@ -22,7 +22,7 @@ public class Request {
         final int followLocation,
         final long headersPtr,
         final long writeFilePtr,
-        final OutputStream writeStream,
+        final long writeStreamPtr,
         final String readString,
         final byte[] readBytes,
         final long accumPtr
@@ -32,7 +32,7 @@ public class Request {
         this.followLocation = followLocation;
         this.headersPtr = headersPtr;
         this.writeFilePtr = writeFilePtr;
-        this.writeStream = writeStream;
+        this.writeStreamPtr = writeStreamPtr;
         this.readString = readString;
         this.readBytes = readBytes;
         this.accumPtr = accumPtr;
@@ -49,7 +49,7 @@ public class Request {
         private int followLocation = 3;
         private long headersPtr = Native.NULL;
         private long writeFilePtr = Native.NULL;
-        private OutputStream writeStream = null;
+        private long writeStreamPtr = Native.NULL;
         private String readString = null;
         private byte[] readBytes = null;
         private long accumPtr = Native.NULL;
@@ -89,8 +89,8 @@ public class Request {
             return this;
         }
 
-        public Builder writeStream(final OutputStream stream) {
-            this.writeStream = stream;
+        public Builder writeStream(final IResource writeStream) {
+            this.writeStreamPtr = writeStream.ptr();
             return this;
         }
 
@@ -106,7 +106,7 @@ public class Request {
                     followLocation,
                     headersPtr,
                     writeFilePtr,
-                    writeStream,
+                    writeStreamPtr,
                     readString,
                     readBytes,
                     accumPtr

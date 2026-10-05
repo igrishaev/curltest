@@ -67,7 +67,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         SET_FIELD(env, jcls, "followLocation", J_INT,    _g.Request.followLocation);
         SET_FIELD(env, jcls, "headersPtr",     J_LONG,   _g.Request.headersPtr);
         SET_FIELD(env, jcls, "writeFilePtr",   J_LONG,   _g.Request.writeFilePtr);
-        SET_FIELD(env, jcls, "writeStream",    J_OS,     _g.Request.writeStream);
+        SET_FIELD(env, jcls, "writeStreamPtr", J_LONG,   _g.Request.writeStreamPtr);
         SET_FIELD(env, jcls, "readString",     J_STRING, _g.Request.readString);
         SET_FIELD(env, jcls, "readBytes",      J_BA,     _g.Request.readBytes);
         SET_FIELD(env, jcls, "accumPtr",       J_LONG,   _g.Request.accumPtr);

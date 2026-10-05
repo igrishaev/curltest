@@ -5,56 +5,8 @@
 #include "debug.h"
 #include "globals.h"
 #include "macros.h"
+#include "write_data.h"
 #include "curl/curl.h"
-
-struct user_data {
-    size_t i;
-    size_t total;
-    JNIEnv *env;
-    jbyteArray jbuf;
-    jobject jobj;
-};
-
-struct user_data * make_user_data(JNIEnv *env, jobject jobj) {
-    jbyteArray jbuf = JNI_CALL(env, NewByteArray, CURL_MAX_WRITE_SIZE);
-    struct user_data * ud = malloc(sizeof(struct user_data));
-    ud->i = 0;
-    ud->total = 0;
-    ud->env = env;
-    ud->jbuf = jbuf;
-    ud->jobj = jobj;
-    return ud;
-}
-
-void clear_user_data(struct user_data * ud) {
-    if (ud == NULL) return;
-    // JNIEnv *env = ud->env; // TODO
-    JNI_CALL(ud->env, DeleteLocalRef, ud->jbuf);
-    free(ud);
-}
-
-
-static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userdata)
-{
-    size_t total = size * nmemb;
-    struct user_data *ud = (struct user_data *) userdata;
-    JNIEnv *env = ud->env;
-
-    debug("write callback stream, total: %lu", total);
-
-    JNI_CALL(env, SetByteArrayRegion, ud->jbuf, 0, total, (jbyte *) data);
-
-    JNI_CALL(env, CallVoidMethod, ud->jobj, _g.OutputStream.write_BaII, ud->jbuf, 0, total);
-    if (JNI_CALL(env, ExceptionCheck)) {
-        JNI_CALL(env, ExceptionDescribe); // TODO: better handling
-        JNI_CALL(env, ExceptionClear);
-        return CURL_WRITEFUNC_ERROR;
-    }
-
-    ud->i++;
-    ud->total += total;
-    return total;
-}
 
 
 static long _set_url(JNIEnv *env, CURL *curl, jstring jurl) {
@@ -119,7 +71,7 @@ vars:
     jint       jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
     jlong      jheadersPtr      = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
     jlong      jwriteFilePtr    = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
-    jobject    jwriteStream     = JNI_CALL(env, GetObjectField, jreq, _g.Request.writeStream);
+    jlong      jwriteStreamPtr  = JNI_CALL(env, GetLongField, jreq, _g.Request.writeStreamPtr);
     jstring    jreadString      = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
     jbyteArray jreadBytes       = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
     jlong      jaccumPtr        = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
@@ -154,13 +106,10 @@ vars:
     }
 
     /* WRITE STREAM */
-    if (jwriteStream) {
-        // TODO: allocate on stack?
-        ud = make_user_data(env, jwriteStream);
-        writeData = ud;
+    if (jwriteStreamPtr != NULL) {
+        writeData = (void *) jwriteStreamPtr;
         writeFunction = write_callback_stream;
         debug("write stream is set");
-        // TODO: close stream?
     }
 
     /* accumulate in memory */
@@ -217,24 +166,12 @@ vars:
     if (code != CURLE_OK) goto exit;
 
 exit:
-    if (ud)        clear_user_data(ud);
-
     // TODO
-    // write stream (user data)
     // write callback
     // read string
     // read bytes
     // read string: copy!!!
     // read byte: copy!!!
-
-    /* close output stream */
-    if (jwriteStream) {
-        JNI_CALL(env, CallVoidMethod, jwriteStream, _g.OutputStream.close);
-        if (JNI_CALL(env, ExceptionCheck)) {
-            JNI_CALL(env, ExceptionDescribe); // TODO: better handling
-            JNI_CALL(env, ExceptionClear);
-        }
-    }
 
     /* release read string */
     if (readString) {

@@ -16,7 +16,7 @@ struct J_Request {
     jfieldID followLocation;
     jfieldID headersPtr;
     jfieldID writeFilePtr;
-    jfieldID writeStream;
+    jfieldID writeStreamPtr;
     jfieldID readString;
     jfieldID readBytes;
     jfieldID accumPtr;

@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/WriteStream.java \
 	$(SRC_PATH)/IResource.java \
 	$(SRC_PATH)/Accumulator.java \
 	$(SRC_PATH)/Headers.java \
@@ -17,13 +18,15 @@ JAVAFILES = \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/write_data.c \
+	$(C_PATH)/org_example_WriteStream.c \
 	$(C_PATH)/org_example_Accumulator.c \
 	$(C_PATH)/org_example_Headers.c \
 	$(C_PATH)/org_example_FILE.c \
 	$(C_PATH)/org_example_Native.c \
 	$(C_PATH)/org_example_CurlEasy.c \
 	$(C_PATH)/org_example_Response.c \
-	$(C_PATH)/accum.c
+	$(C_PATH)/accum.c \
 
 OBJECTS = $(MODULES:.c=.o)
 
