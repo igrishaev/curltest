@@ -37,7 +37,7 @@ public class FILE implements AutoCloseable {
         }
         return new FILE(fd, path, mode, false);
     }
-
+    
     public static FILE open(final File file, final String mode) {
         return open(file.getAbsolutePath(), mode);
     }
