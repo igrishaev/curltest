@@ -97,38 +97,6 @@ exit:
     return code;
 }
 
-static long _set_headers(JNIEnv *env, jobjectArray jheaders, struct curl_slist *headers) {
-    int i = 0;
-    long code = 0;
-    char *header = NULL;
-    jstring jheader = NULL;
-
-    if (jheaders == NULL) return 0;
-
-    jsize headerLen = JNI_CALL(env, GetArrayLength, jheaders);
-
-    for (i = 0; i < headerLen; i++) {
-
-        jheader = (jstring) JNI_CALL(env, GetObjectArrayElement, jheaders, i);
-        if (jheader == NULL) {
-            continue;
-        }
-
-        header = JNI_CALL(env, GetStringUTFChars, jheader, NULL);
-        if (header) {
-            curl_slist_append(headers, header);
-            JNI_CALL(env, ReleaseStringUTFChars, jheader, header); // TODO
-            JNI_CALL(env, DeleteLocalRef, jheader);
-        } else {
-            code = -3; // TODO return
-            goto exit;
-        }
-    }
-
-exit:
-    return code;
-}
-
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform (
     JNIEnv *env,
     jclass jcls,
@@ -150,7 +118,7 @@ vars:
     jstring jurl          = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
     jint jmethod          = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
     jint jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
-    jobjectArray jheaders = (jobjectArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.headers);
+    jlong jheadersPtr     = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
     jlong jwriteFilePtr   = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
     jobject jwriteStream  = JNI_CALL(env, GetObjectField, jreq, _g.Request.writeStream);
     jstring jreadString   = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
@@ -173,11 +141,11 @@ vars:
     debug("follow location set");
 
     /* HEADERS */
-    code = _set_headers(env, jheaders, headers);
-    if (code != CURLE_OK) goto exit;
-    code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-    if (code != CURLE_OK) goto exit;
-    debug("headers set");
+    if (jheadersPtr != NULL) {
+        code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, jheadersPtr);
+        if (code != CURLE_OK) goto exit;
+        debug("headers set");
+    }
 
     /* WRITE FILE */
     if (jwriteFilePtr != NULL) {

@@ -3,16 +3,13 @@ package org.example;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class Request {
 
     public final String url;
     public final int method;
     public final int followLocation;
-    public final String[] headers;
+    public final long headersPtr;
     public final long writeFilePtr;
     public final OutputStream writeStream;
     public final String readString;
@@ -23,7 +20,7 @@ public class Request {
         final String url,
         final int method,
         final int followLocation,
-        final String[] headers,
+        final long headersPtr,
         final long writeFilePtr,
         final OutputStream writeStream,
         final String readString,
@@ -33,7 +30,7 @@ public class Request {
         this.url = url;
         this.method = method;
         this.followLocation = followLocation;
-        this.headers = headers;
+        this.headersPtr = headersPtr;
         this.writeFilePtr = writeFilePtr;
         this.writeStream = writeStream;
         this.readString = readString;
@@ -50,7 +47,7 @@ public class Request {
         private String url = null;
         private int method = 1;
         private int followLocation = 3;
-        private List<String> headers = null;
+        private long headersPtr = Native.NULL;
         private long writeFilePtr = Native.NULL;
         private OutputStream writeStream = null;
         private String readString = null;
@@ -82,29 +79,8 @@ public class Request {
             return this;
         }
 
-        private void initHeaders() {
-            if (headers == null) {
-                headers = new ArrayList<>();
-            }
-        }
-
-        public Builder addHeader(String header, String value) {
-            initHeaders();
-            headers.add(header + ":" + value); // TODO
-            return this;
-        }
-
-        public Builder addHeaders(final List<String> listHeaders) {
-            initHeaders();
-            headers.addAll(listHeaders);
-            return this;
-        }
-
-        public Builder addHeaders(final Map<String, String> mapHeaders) {
-            initHeaders();
-            for (Map.Entry<String, String> entry: mapHeaders.entrySet()) {
-                headers.add(entry.getKey() + ":" + entry.getValue()); // TODO
-            }
+        public Builder headers(final Headers headers) {
+            this.headersPtr = headers.ptr();
             return this;
         }
 
@@ -128,7 +104,7 @@ public class Request {
                     url,
                     method,
                     followLocation,
-                    (headers == null) ? null : headers.toArray(new String[0]),
+                    headersPtr,
                     writeFilePtr,
                     writeStream,
                     readString,

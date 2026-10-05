@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/Headers.java \
 	$(SRC_PATH)/FILE.java \
 	$(SRC_PATH)/Native.java \
 	$(SRC_PATH)/CurlEasy.java \
@@ -14,6 +15,7 @@ JAVAFILES = \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/org_example_Headers.c \
 	$(C_PATH)/org_example_FILE.c \
 	$(C_PATH)/org_example_Native.c \
 	$(C_PATH)/org_example_CurlEasy.c \
