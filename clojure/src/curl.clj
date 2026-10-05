@@ -63,7 +63,7 @@
 
 (defn open-accum ^IResource [accumulate?]
   (if accumulate?
-    (Accumulator/create 2048)
+    (Accumulator/create 4096)
     Dummy/INSTANCE))
 
 (defn perform2 [^CurlEasy curl opts]
@@ -87,7 +87,8 @@
         {:status (.-status response)
          :headers (.-headers response)
          :body (when accumulate?
-                 (.getString ^Accumulator a))}
+                 (.getBytes ^Accumulator a)
+                 #_(.getString ^Accumulator a))}
 
         #_
         response))))

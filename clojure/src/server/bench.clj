@@ -50,7 +50,9 @@
 
 (defn test-http-kit []
   (quick-bench
-      @(http/get "http://127.0.0.1:3000")
+      @(http/get "http://127.0.0.1:3000"
+                 {:as :byte-array}
+                 )
 
       #_
       (let [out
