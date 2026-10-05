@@ -23,12 +23,13 @@ struct J_Request {
 };
 
 struct J_Response {
-    jclass   class;
-    jfieldID status;
-    jfieldID headers;
-    jfieldID body;
-    jfieldID contentLength;
-    jfieldID effectiveUrl;
+    jclass    class;
+    jfieldID  status;
+    jfieldID  headers;
+    jfieldID  body;
+    jfieldID  contentLength;
+    jfieldID  effectiveUrl;
+    jmethodID addHeader;
 };
 
 struct J_InputStream {

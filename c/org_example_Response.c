@@ -8,7 +8,6 @@
 JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
   (JNIEnv *env, jobject jresp, jlong jcurl) {
 
-
     debug("composing in the response");
     CURL *curl = (CURL *) jcurl;
     CURLcode code = 0;
@@ -32,23 +31,35 @@ JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
     {
         struct curl_header *h;
         struct curl_header *prev = NULL;
+        jstring jname;
+        jstring jvalue;
         do {
             h = curl_easy_nextheader(curl, CURLH_HEADER, -1, prev);
             if (h) {
-                debug("header %s: %s (%u)", h->name, h->value, (unsigned int)h->amount);
+                debug("header %s: %s (%u)", h->name, h->value, (unsigned int) h->amount);
+                jname = JNI_CALL(env, NewStringUTF, h->name);
+                jvalue = JNI_CALL(env, NewStringUTF, h->value);
+                JNI_CALL(env, CallVoidMethod, jresp, _g.Response.addHeader, jname, jvalue);
+                debug("header set %s: %s", h->name, h->value);
             }
             prev = h;
         } while(h);
     }
 
-    debug("setting fields");
-    /* JNI_CALL(jresp, SetIntField,    jresp, _g.Response.status,        4); */
-    /* JNI_CALL(jresp, SetObjectField, jresp, _g.Response.headers,       3); */
-    /* JNI_CALL(jresp, SetObjectField, jresp, _g.Response.body,          3); */
-    /* JNI_CALL(jresp, SetIntField,    jresp, _g.Response.contentLength, 1); */
-    /* JNI_CALL(jresp, SetObjectField, jresp, _g.Response.effectiveUrl,  2); */
+    JNI_CALL(env, SetIntField, jresp, _g.Response.status, (int) http_code);
+    debug("http status is set");
+
+    /* TODO JNI_CALL(jresp, SetObjectField, jresp, _g.Response.body, ); */
+
+    JNI_CALL(env, SetLongField, jresp, _g.Response.contentLength, (long) content_length);
+    debug("content length is set");
+
+    if (effective_url) {
+        jstring jeffurl = JNI_CALL(env, NewStringUTF, effective_url);
+        JNI_CALL(env, SetObjectField, jresp, _g.Response.effectiveUrl, jeffurl);
+        debug("effective URL is set");
+    }
 
 exit:
     return code;
-
 }

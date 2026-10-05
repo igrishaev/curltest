@@ -18,7 +18,7 @@
         return JNI_ERR; \
     }
 
-#define GET_METHOD(env, jcls, name, sig, var) \
+#define SET_METHOD(env, jcls, name, sig, var) \
     var = JNI_CALL(env, GetMethodID, jcls, name, sig); \
     if (!var) { \
         debug("failed to find method: " name " " sig); \
@@ -51,7 +51,16 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         jmethodID jmeth;
         jfieldID jfield;
 
-        /* http.Request */
+        /* Response */
+        GET_CLASS(env, "org/example/Response", jcls);
+        SET_FIELD(env, jcls, "status",        J_INT,     _g.Response.status);
+        SET_FIELD(env, jcls, "headers",       J_MAP,     _g.Response.headers);
+        SET_FIELD(env, jcls, "body",          J_OBJ,     _g.Response.body);
+        SET_FIELD(env, jcls, "contentLength", J_LONG,    _g.Response.contentLength);
+        SET_FIELD(env, jcls, "effectiveUrl",  J_STRING,  _g.Response.effectiveUrl);
+        SET_METHOD(env, jcls, "addHeader", "(" J_STRING J_STRING ")V", _g.Response.addHeader);
+
+        /* Request */
         GET_CLASS(env, "org/example/Request", jcls)
         SET_FIELD(env, jcls, "url",            J_STRING,     _g.Request.url);
         SET_FIELD(env, jcls, "method",         J_INT,        _g.Request.method);
@@ -65,13 +74,13 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
         /* OutputStream */
         GET_CLASS(env, "java/io/OutputStream", jcls);
-        GET_METHOD(env, jcls, "write", "([BII)V", _g.OutputStream.write_BaII);
-        GET_METHOD(env, jcls, "close", "()V",     _g.OutputStream.close);
+        SET_METHOD(env, jcls, "write", "([BII)V", _g.OutputStream.write_BaII);
+        SET_METHOD(env, jcls, "close", "()V",     _g.OutputStream.close);
 
         /* InputStream */
         GET_CLASS(env, "java/io/InputStream", jcls);
-        GET_METHOD(env, jcls, "read",  "([BII)I", _g.InputStream.read_BaII);
-        GET_METHOD(env, jcls, "close", "()V",     _g.InputStream.close);
+        SET_METHOD(env, jcls, "read",  "([BII)I", _g.InputStream.read_BaII);
+        SET_METHOD(env, jcls, "close", "()V",     _g.InputStream.close);
 
         debug("JNI_OnLoad end");
         return J_VERSION;
