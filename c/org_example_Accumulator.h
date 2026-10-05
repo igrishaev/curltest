@@ -23,6 +23,14 @@ JNIEXPORT jlong JNICALL Java_org_example_Accumulator__1allocate
 JNIEXPORT jlong JNICALL Java_org_example_Accumulator__1free
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_example_Accumulator
+ * Method:    _get_bytes
+ * Signature: (J)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_org_example_Accumulator__1get_1bytes
+  (JNIEnv *, jclass, jlong);
+
 #ifdef __cplusplus
 }
 #endif

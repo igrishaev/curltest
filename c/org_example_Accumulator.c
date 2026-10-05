@@ -13,3 +13,11 @@ JNIEXPORT jlong JNICALL Java_org_example_Accumulator__1free
     accum_free((void *)jptr);
     return 0;
 }
+
+JNIEXPORT jbyteArray JNICALL Java_org_example_Accumulator__1get_1bytes
+  (JNIEnv *env, jclass jcls, jlong jptr) {
+    struct accum * acc = (struct accum *) jptr;
+    jbyteArray jarr = JNI_CALL(env, NewByteArray, acc->len);
+    JNI_CALL(env, SetByteArrayRegion, jarr, 0, acc->len, (jbyte *) acc->buf);
+    return jarr;
+}

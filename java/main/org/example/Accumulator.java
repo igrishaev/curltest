@@ -1,5 +1,8 @@
 package org.example;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 public class Accumulator implements AutoCloseable {
 
     private final long ptr;
@@ -31,8 +34,21 @@ public class Accumulator implements AutoCloseable {
         return String.format("<Accumulator %s>", ptr);
     }
 
+    public byte[] getBytes() {
+        return _get_bytes(ptr);
+    }
+
+    public String getString() {
+        return getString(StandardCharsets.UTF_8);
+    }
+
+    public String getString(final Charset charset) {
+        return new String(getBytes(), charset);
+    }
+
     private native static long _allocate(final long initSize);
     private native static long _free(final long ptr);
+    private native static byte[] _get_bytes(final long ptr);
 
     @Override
     public void close() {

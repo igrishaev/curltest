@@ -17,7 +17,11 @@ public class Main {
                     // .writeFile(f)
                     // .writeStream(out)
                     .build();
-            return c.perform(request);
+            Response r = c.perform(request);
+            System.out.println("----------");
+            System.out.println(acc.getString().substring(0, 100));
+            System.out.println("----------");
+            return r;
         }
 
     }

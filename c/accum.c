@@ -6,13 +6,6 @@
 
 #include "curl/curl.h"
 
-struct accum {
-    size_t size;
-    size_t len;
-    char   *buf;
-    size_t factor;
-};
-
 struct accum * accum_init(size_t size, size_t factor)
 {
     /* vars */
