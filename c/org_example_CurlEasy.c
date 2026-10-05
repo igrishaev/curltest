@@ -180,7 +180,7 @@ vars:
     debug("headers set");
 
     /* WRITE FILE */
-    if (jwriteFilePtr > 0) {
+    if (jwriteFilePtr != NULL) {
         writeData = (void *) jwriteFilePtr;
         writeFunction = fwrite;
     }

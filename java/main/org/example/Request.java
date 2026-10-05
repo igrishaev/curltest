@@ -51,7 +51,7 @@ public class Request {
         private int method = 1;
         private int followLocation = 3;
         private List<String> headers = null;
-        private long writeFilePtr = 0;
+        private long writeFilePtr = Native.NULL;
         private OutputStream writeStream = null;
         private String readString = null;
         private byte[] readBytes = null;
