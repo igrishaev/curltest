@@ -4,17 +4,21 @@ public class Main {
 
     public static Response test(final CurlEasy c) {
         // final OutputStream out = new ByteArrayOutputStream();
-        final Request request = Request.builder()
-                .url("https://habr.com")
-                // .url("http://127.0.0.1:3000")
-                .method(1)
-                .followLocation(3)
-                .addHeader("foo", "bar")
-                .accumulate(true)
-                // .writeFile("test.html")
-                // .writeStream(out)
-                .build();
-        return c.perform(request);
+        try(FILE f = FILE.open("foo.txt", "wb")) {
+            final Request request = Request.builder()
+                    .url("https://habr.com")
+                    // .url("http://127.0.0.1:3000")
+                    .method(1)
+                    .followLocation(3)
+                    .addHeader("foo", "bar")
+                    .writeFile(f)
+                    // .accumulate(true)
+                    // .writeFile("test.html")
+                    // .writeStream(out)
+                    .build();
+            return c.perform(request);
+        }
+
     }
 
     public static void main(String... args) {

@@ -143,7 +143,6 @@ vars:
     struct curl_slist *headers = NULL;
     void *writeData            = NULL;
     void *writeFunction        = NULL;
-    FILE *writeFile            = NULL;
     char *readString           = NULL;
     void *readBytes            = NULL;
     struct accum * acc         = NULL;
@@ -152,7 +151,7 @@ vars:
     jint jmethod          = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
     jint jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
     jobjectArray jheaders = (jobjectArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.headers);
-    jstring jwriteFile    = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.writeFile);
+    jlong jwriteFilePtr   = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
     jobject jwriteStream  = JNI_CALL(env, GetObjectField, jreq, _g.Request.writeStream);
     jstring jreadString   = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
     jbyteArray jreadBytes = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
@@ -181,23 +180,8 @@ vars:
     debug("headers set");
 
     /* WRITE FILE */
-    if (jwriteFile) {
-
-        const char *path = JNI_CALL(env, GetStringUTFChars, jwriteFile, NULL);
-        if (!path) {
-            code = -5;
-            goto exit;
-        }
-
-        writeFile = fopen(path, "wb");
-        JNI_CALL(env, ReleaseStringUTFChars, jwriteFile, path);
-        if (!writeFile) {
-            debug("failed to open write file: %s", path);
-            code = -4;
-            goto exit;
-        }
-
-        writeData = writeFile;
+    if (jwriteFilePtr > 0) {
+        writeData = (void *) jwriteFilePtr;
         writeFunction = fwrite;
     }
 
@@ -271,7 +255,6 @@ vars:
 exit:
 
     if (headers)   curl_slist_free_all(headers);
-    if (writeFile) fclose(writeFile);
     if (ud)        clear_user_data(ud);
 
     if (acc)       accum_free(acc);

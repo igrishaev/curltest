@@ -1,10 +1,8 @@
 package org.example;
 
-import java.io.File;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,7 @@ public class Request {
     public final int method;
     public final int followLocation;
     public final String[] headers;
-    public final String writeFile;
+    public final long writeFilePtr;
     public final OutputStream writeStream;
     public final String readString;
     public final byte[] readBytes;
@@ -26,7 +24,7 @@ public class Request {
         final int method,
         final int followLocation,
         final String[] headers,
-        final String writeFile,
+        final long writeFilePtr,
         final OutputStream writeStream,
         final String readString,
         final byte[] readBytes,
@@ -36,7 +34,7 @@ public class Request {
         this.method = method;
         this.followLocation = followLocation;
         this.headers = headers;
-        this.writeFile = writeFile;
+        this.writeFilePtr = writeFilePtr;
         this.writeStream = writeStream;
         this.readString = readString;
         this.readBytes = readBytes;
@@ -49,15 +47,15 @@ public class Request {
 
     public static class Builder {
 
-        String url = null;
-        int method = 1;
-        int followLocation = 3;
-        List<String> headers = null;
-        String writeFile = null;
-        OutputStream writeStream = null;
-        String readString = null;
-        byte[] readBytes = null;
-        boolean accumulate = false;
+        private String url = null;
+        private int method = 1;
+        private int followLocation = 3;
+        private List<String> headers = null;
+        private long writeFilePtr = 0;
+        private OutputStream writeStream = null;
+        private String readString = null;
+        private byte[] readBytes = null;
+        private boolean accumulate = false;
 
         public Builder url(final String url) {
             this.url = url;
@@ -110,18 +108,8 @@ public class Request {
             return this;
         }
 
-        public Builder writeFile(final String writeFile) {
-            this.writeFile = writeFile;
-            return this;
-        }
-
-        public Builder writeFile(final File writeFile) {
-            this.writeFile = writeFile.getAbsolutePath();
-            return this;
-        }
-
-        public Builder writeFile(final Path writeFile) {
-            this.writeFile = writeFile.toAbsolutePath().toString();
+        public Builder writeFile(final FILE writeFile) {
+            this.writeFilePtr = writeFile.ptr();
             return this;
         }
 
@@ -141,7 +129,7 @@ public class Request {
                     method,
                     followLocation,
                     (headers == null) ? null : headers.toArray(new String[0]),
-                    writeFile,
+                    writeFilePtr,
                     writeStream,
                     readString,
                     readBytes,
