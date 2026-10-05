@@ -3,7 +3,7 @@ package org.example;
 import java.io.File;
 import java.nio.file.Path;
 
-public class FILE implements AutoCloseable {
+public class FILE implements IResource {
 
     private final long ptr;
     private final String path;
@@ -21,6 +21,7 @@ public class FILE implements AutoCloseable {
         this.isClosed = isClosed;
     }
 
+    @Override
     public long ptr() {
         return ptr;
     }

@@ -12,8 +12,8 @@ public class Main {
                     // .url("http://127.0.0.1:3000")
                     .method(1)
                     .followLocation(3)
-                    .headers(h)
-                    .accum(acc)
+//                    .headers(h)
+//                    .accum(acc)
                     // .writeFile(f)
                     // .writeStream(out)
                     .build();

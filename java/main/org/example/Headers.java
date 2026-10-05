@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Headers implements AutoCloseable {
+public class Headers implements IResource {
 
     private final long ptr;
     private final String[] headers;
@@ -53,6 +53,7 @@ public class Headers implements AutoCloseable {
         return String.format("<Headers, ptr: %s, values: %s>", ptr, Arrays.toString(headers));
     }
 
+    @Override
     public long ptr() {
         return ptr;
     }

@@ -1,0 +1,18 @@
+package org.example;
+
+public class Dummy implements IResource {
+
+    public static final Dummy INSTANCE;
+    static {
+        INSTANCE = new Dummy();
+    }
+
+    @Override
+    public long ptr() {
+        return Native.NULL;
+    }
+
+    @Override
+    public void close() {
+    }
+}

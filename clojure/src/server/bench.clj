@@ -73,9 +73,9 @@
                :method 1
                :follow-redirects 3
                :headers {"foo" "bar"}
-               :accumulate true}]
+               :accumulate? true}]
       (quick-bench
-          (curl/perform c req))))
+          (curl/perform2 c req))))
 
   #_
   (with-open [c (CurlEasy/make)]

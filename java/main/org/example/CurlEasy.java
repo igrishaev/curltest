@@ -1,6 +1,6 @@
 package org.example;
 
-public class CurlEasy implements AutoCloseable {
+public class CurlEasy implements IResource {
 
     static {
         Native.loadLib();
@@ -30,6 +30,11 @@ public class CurlEasy implements AutoCloseable {
         final Response response = new Response();
         response.from_curl(ptr);
         return response;
+    }
+
+    @Override
+    public long ptr() {
+        return ptr;
     }
 
     native public static long curl_easy_init();

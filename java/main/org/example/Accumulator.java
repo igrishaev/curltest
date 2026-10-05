@@ -3,7 +3,7 @@ package org.example;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class Accumulator implements AutoCloseable {
+public class Accumulator implements IResource {
 
     private final long ptr;
     private boolean isClosed;
@@ -12,6 +12,7 @@ public class Accumulator implements AutoCloseable {
         Native.loadLib();
     }
 
+    @Override
     public long ptr() {
         return ptr;
     }

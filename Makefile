@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/IResource.java \
 	$(SRC_PATH)/Accumulator.java \
 	$(SRC_PATH)/Headers.java \
 	$(SRC_PATH)/FILE.java \
@@ -37,7 +38,7 @@ JAVA_INC = \
 CURL_HOME = /opt/homebrew/opt/curl
 
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib -DDEBUG
+CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib # -DDEBUG
 
 LIBS = -lcurl
 

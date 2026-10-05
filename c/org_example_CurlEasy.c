@@ -150,6 +150,7 @@ vars:
     if (jwriteFilePtr != NULL) {
         writeData = (void *) jwriteFilePtr;
         writeFunction = fwrite;
+        debug("write file is set");
     }
 
     /* WRITE STREAM */
@@ -158,6 +159,7 @@ vars:
         ud = make_user_data(env, jwriteStream);
         writeData = ud;
         writeFunction = write_callback_stream;
+        debug("write stream is set");
         // TODO: close stream?
     }
 

@@ -79,13 +79,13 @@ public class Request {
             return this;
         }
 
-        public Builder headers(final Headers headers) {
-            this.headersPtr = headers.ptr();
+        public Builder headers(final IResource resource) {
+            this.headersPtr = resource.ptr();
             return this;
         }
 
-        public Builder writeFile(final FILE writeFile) {
-            this.writeFilePtr = writeFile.ptr();
+        public Builder writeFile(final IResource resource) {
+            this.writeFilePtr = resource.ptr();
             return this;
         }
 
@@ -94,8 +94,8 @@ public class Request {
             return this;
         }
 
-        public Builder accum(final Accumulator accum) {
-            this.accumPtr = accum.ptr();
+        public Builder accum(final IResource resource) {
+            this.accumPtr = resource.ptr();
             return this;
         }
 
