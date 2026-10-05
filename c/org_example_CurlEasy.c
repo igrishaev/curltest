@@ -221,11 +221,15 @@ vars:
     if (code != CURLE_OK) goto exit;
 
 exit:
-
-    if (headers)   curl_slist_free_all(headers);
     if (ud)        clear_user_data(ud);
-
     if (acc)       accum_free(acc);
+
+    // TODO
+    // accum
+    // write stream
+    // write callback
+    // read string
+    // read bytes
 
     /* close output stream */
     if (jwriteStream) {
