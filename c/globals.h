@@ -19,7 +19,7 @@ struct J_Request {
     jfieldID writeStream;
     jfieldID readString;
     jfieldID readBytes;
-    jfieldID accumulate;
+    jfieldID accumPtr;
 };
 
 struct J_Response {

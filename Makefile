@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/Accumulator.java \
 	$(SRC_PATH)/Headers.java \
 	$(SRC_PATH)/FILE.java \
 	$(SRC_PATH)/Native.java \
@@ -15,6 +16,7 @@ JAVAFILES = \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/org_example_Accumulator.c \
 	$(C_PATH)/org_example_Headers.c \
 	$(C_PATH)/org_example_FILE.c \
 	$(C_PATH)/org_example_Native.c \

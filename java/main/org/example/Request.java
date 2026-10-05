@@ -14,7 +14,7 @@ public class Request {
     public final OutputStream writeStream;
     public final String readString;
     public final byte[] readBytes;
-    public final boolean accumulate;
+    public final long accumPtr;
 
     private Request(
         final String url,
@@ -25,7 +25,7 @@ public class Request {
         final OutputStream writeStream,
         final String readString,
         final byte[] readBytes,
-        final boolean accumulate
+        final long accumPtr
     ) {
         this.url = url;
         this.method = method;
@@ -35,7 +35,7 @@ public class Request {
         this.writeStream = writeStream;
         this.readString = readString;
         this.readBytes = readBytes;
-        this.accumulate = accumulate;
+        this.accumPtr = accumPtr;
     }
 
     public static Builder builder() {
@@ -52,7 +52,7 @@ public class Request {
         private OutputStream writeStream = null;
         private String readString = null;
         private byte[] readBytes = null;
-        private boolean accumulate = false;
+        private long accumPtr = Native.NULL;
 
         public Builder url(final String url) {
             this.url = url;
@@ -94,8 +94,8 @@ public class Request {
             return this;
         }
 
-        public Builder accumulate(final boolean accumulate) {
-            this.accumulate = accumulate;
+        public Builder accum(final Accumulator accum) {
+            this.accumPtr = accum.ptr();
             return this;
         }
 
@@ -109,7 +109,7 @@ public class Request {
                     writeStream,
                     readString,
                     readBytes,
-                    accumulate
+                    accumPtr
             );
         }
 

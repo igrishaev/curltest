@@ -113,17 +113,16 @@ vars:
     void *writeFunction        = NULL;
     char *readString           = NULL;
     void *readBytes            = NULL;
-    struct accum * acc         = NULL;
 
-    jstring jurl          = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
-    jint jmethod          = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
-    jint jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
-    jlong jheadersPtr     = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
-    jlong jwriteFilePtr   = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
-    jobject jwriteStream  = JNI_CALL(env, GetObjectField, jreq, _g.Request.writeStream);
-    jstring jreadString   = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
-    jbyteArray jreadBytes = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
-    jboolean jaccumulate  = JNI_CALL(env, GetBooleanField, jreq, _g.Request.accumulate);
+    jstring    jurl             = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
+    jint       jmethod          = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
+    jint       jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
+    jlong      jheadersPtr      = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
+    jlong      jwriteFilePtr    = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
+    jobject    jwriteStream     = JNI_CALL(env, GetObjectField, jreq, _g.Request.writeStream);
+    jstring    jreadString      = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
+    jbyteArray jreadBytes       = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
+    jlong      jaccumPtr        = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -163,16 +162,11 @@ vars:
     }
 
     /* accumulate in memory */
-    if (jaccumulate) {
-        acc = accum_init(2024, 2);
-        if (!acc) {
-            debug("failed to init accumulator");
-            code = -99;
-            goto exit;
-        }
-        debug("accumulator is OK");
-        writeData = acc;
+    if (jaccumPtr != NULL) {
+        debug("accumulator is passed");
+        writeData = (void *) jaccumPtr;
         writeFunction = accum_write_callback;
+        debug("accumulator is set");
     }
 
     /* WRITING  */
@@ -222,14 +216,14 @@ vars:
 
 exit:
     if (ud)        clear_user_data(ud);
-    if (acc)       accum_free(acc);
 
     // TODO
-    // accum
-    // write stream
+    // write stream (user data)
     // write callback
     // read string
     // read bytes
+    // read string: copy!!!
+    // read byte: copy!!!
 
     /* close output stream */
     if (jwriteStream) {

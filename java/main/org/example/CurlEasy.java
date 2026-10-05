@@ -7,11 +7,11 @@ public class CurlEasy implements AutoCloseable {
     }
 
     private final long ptr;
-    private boolean closed;
+    private boolean isClosed;
 
-    private CurlEasy(long ptr, boolean closed) {
+    private CurlEasy(long ptr, boolean isClosed) {
         this.ptr = ptr;
-        this.closed = closed;
+        this.isClosed = isClosed;
     }
 
     public static CurlEasy make() {
@@ -38,9 +38,9 @@ public class CurlEasy implements AutoCloseable {
 
     @Override
     public void close() {
-        if (!closed) {
+        if (!isClosed) {
             curl_easy_cleanup(ptr);
         }
-        closed = true;
+        isClosed = true;
     }
 }
