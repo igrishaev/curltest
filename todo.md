@@ -5,8 +5,9 @@
 - writeHandler class
 - make response
 - response
+- CurlEasy: check thread
 - global cache for _g
-- releae local refs
+- release local refs
 - rename package
 - update pom file
 - global init and close
