@@ -12,7 +12,7 @@ public class Native {
     public static final String libPath;
 
     private static String writeLibToTemp() throws IOException {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        ClassLoader cl = Native.class.getClassLoader();
         String resourcePath = OS.getLibName();
         final URL url = cl.getResource(resourcePath);
         if (url == null) {
