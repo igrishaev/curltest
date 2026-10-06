@@ -11,10 +11,10 @@ public class Response {
 
     public int status = -1;
     public Map<String, String> headers = new HashMap<>();
-    public Object body;
     public long contentLength = -1;
     public String effectiveUrl;
 
+    @SuppressWarnings("unused")
     public void addHeader(final String name, final String value) {
         headers.put(name, value);
     }

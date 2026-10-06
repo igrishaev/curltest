@@ -43,9 +43,8 @@ public class CurlEasy implements IResource {
 
     @Override
     public void close() {
-        if (!isClosed) {
-            curl_easy_cleanup(ptr);
-        }
+        if (isClosed) return;
+        curl_easy_cleanup(ptr);
         isClosed = true;
     }
 }

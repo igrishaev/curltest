@@ -32,12 +32,11 @@ public class WriteCallback implements IResource {
 
     @Override
     public void close() {
-        if (!isClosed) {
-            long code = _free(ptr);
-            isClosed = true;
-            if (code != 0) {
-                Err.error("failed to close WriteCallback, code: %s", code);
-            }
+        if (isClosed) return;
+        long code = _free(ptr);
+        isClosed = true;
+        if (code != 0) {
+            Err.error("failed to close WriteCallback, code: %s", code);
         }
     }
 }

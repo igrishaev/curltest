@@ -1,5 +1,6 @@
 package org.example;
 
+@SuppressWarnings("unused")
 public class Dummy implements IResource {
 
     public static final Dummy INSTANCE;

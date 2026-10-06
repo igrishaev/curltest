@@ -6,7 +6,7 @@ import java.io.OutputStream;
 
 public class Main {
 
-    public static Response test(final CurlEasy c) throws IOException {
+    public static Response test(final CurlEasy c) {
         final OutputStream out = new ByteArrayOutputStream();
         try(// FILE f = FILE.open("foo.txt", "wb");
             Headers h = Headers.create(new String[] {"foo: bar"});

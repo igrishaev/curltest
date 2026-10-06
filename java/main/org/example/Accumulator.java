@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -47,18 +49,22 @@ public class Accumulator implements IResource {
         return new String(getBytes(), charset);
     }
 
+    @SuppressWarnings("unused")
+    public InputStream getStream() {
+        return new ByteArrayInputStream(getBytes());
+    }
+
     private native static long _allocate(final long initSize);
     private native static long _free(final long ptr);
     private native static byte[] _get_bytes(final long ptr);
 
     @Override
     public void close() {
-        if (!isClosed) {
-            final long code = _free(ptr);
-            isClosed = true;
-            if (code != 0) {
-                Err.error("failed to close accumulator, code: %s", code);
-            }
+        if (isClosed) return;
+        final long code = _free(ptr);
+        isClosed = true;
+        if (code != 0) {
+            Err.error("failed to close Accumulator, code: %s", code);
         }
     }
 }

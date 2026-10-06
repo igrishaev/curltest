@@ -1,9 +1,6 @@
 - request autocloaseable
 - FILE: open temp
 - common name patterns
-- accum: get bytes, string, stream
-- writeStream class
-- writeHandler class
 - make response
 - response
 - CurlEasy: check thread

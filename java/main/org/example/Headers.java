@@ -63,12 +63,11 @@ public class Headers implements IResource {
 
     @Override
     public void close() {
-        if (!isClosed) {
-            final long code = _free(ptr);
-            isClosed = true;
-            if (code != 0) {
-                Err.error("failed to close headers, code: %s", code);
-            }
+        if (isClosed) return;
+        final long code = _free(ptr);
+        isClosed = true;
+        if (code != 0) {
+            Err.error("failed to close headers, code: %s", code);
         }
     }
 

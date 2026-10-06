@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 
 public class WriteStream implements IResource {
 
@@ -36,15 +37,17 @@ public class WriteStream implements IResource {
     }
 
     @Override
-    public void close() throws IOException {
-        if (!isClosed) {
-            try (OutputStream ignored = out) {
-                final long code = _free(ptr);
-                isClosed = true;
-                if (code != 0) {
-                    Err.error("failed to close write stream, code: %s", code);
-                }
-            }
+    public void close() {
+        if (isClosed) return;
+        final long code = _free(ptr);
+        isClosed = true;
+        try {
+            out.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        if (code != 0) {
+            Err.error("failed to close write stream, code: %s", code);
         }
     }
 }

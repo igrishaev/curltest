@@ -39,10 +39,12 @@ public class FILE implements IResource {
         return new FILE(fd, path, mode, false);
     }
 
+    @SuppressWarnings("unused")
     public static FILE open(final File file, final String mode) {
         return open(file.getAbsolutePath(), mode);
     }
 
+    @SuppressWarnings("unused")
     public static FILE open(final Path path, final String mode) {
         return open(path.toAbsolutePath().toString(), mode);
     }
@@ -53,12 +55,11 @@ public class FILE implements IResource {
 
     @Override
     public void close() {
-        if (!isClosed) {
-            final long code = _fclose(ptr);
-            isClosed = true;
-            if (code != 0) {
-                Err.error("fclose failed, code: %s, mode: %s, path: %s", code, mode, path);
-            }
+        if (isClosed) return;
+        final long code = _fclose(ptr);
+        isClosed = true;
+        if (code != 0) {
+            Err.error("fclose failed, code: %s, mode: %s, path: %s", code, mode, path);
         }
     }
 
