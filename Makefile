@@ -47,7 +47,7 @@ CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL
 
 LIBS = -lcurl
 
-all: clear headers sep $(SHARED_LIB)
+all: clear headers sep resources/jcurl_$(shell java java/main/org/example/OS.java).lib
 
 sep:
 	$(info .........................................)
@@ -60,8 +60,8 @@ headers:
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $*.c
 
-$(SHARED_LIB): $(OBJECTS)
-	$(CC) $(CFLAGS) $(LIBS) -shared -o $(SHARED_LIB) $(OBJECTS)
+%.lib: $(OBJECTS)
+	$(CC) $(CFLAGS) $(LIBS) -shared -o $@ $(OBJECTS)
 
 clear:
 	rm -rf target

@@ -11,7 +11,11 @@ public class Native {
     public static final long NULL;
     public static final String libPath;
     // TODO: use curl in the path
-    public static final String resourcePath = "curltest.dylib";
+    public static final String resourcePath;
+
+    static {
+        resourcePath = "jcurl_" + OS.getPlatform() + ".lib";
+    }
 
     private static String writeLibToTemp() throws IOException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
