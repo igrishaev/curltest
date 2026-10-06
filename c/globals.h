@@ -20,6 +20,7 @@ struct J_Request {
     jfieldID readString;
     jfieldID readBytes;
     jfieldID accumPtr;
+    jfieldID verbose;
 };
 
 struct J_Response {

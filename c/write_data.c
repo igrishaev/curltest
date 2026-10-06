@@ -15,27 +15,44 @@ struct write_data {
 
 struct write_data * write_data_init(JNIEnv *env, jobject jobj)
 {
-    jbyteArray jbuf = JNI_CALL(env, NewByteArray, CURL_MAX_WRITE_SIZE);
-    jobject jbuf_glob = JNI_CALL(env, NewGlobalRef, jbuf);
-    if (!jbuf_glob) {
-        debug("NewGlobalRef() has failed");
-        return NULL;
-    } // TODO
+    jobject jbufG = NULL;
+    jobject jobjG = NULL;
+    jbyteArray jbuf = NULL;
+    struct write_data * wd = NULL;
+
+    jbuf = JNI_CALL(env, NewByteArray, CURL_MAX_WRITE_SIZE);
+    jbufG = JNI_CALL(env, NewGlobalRef, jbuf);
+    if (!jbufG) {
+        debug("NewGlobalRef(jbuf) has failed");
+        goto err;
+    }
 
     JNI_CALL(env, DeleteLocalRef, jbuf);
 
-    jobject jobj_glob = JNI_CALL(env, NewGlobalRef, jobj);
-    if (!jobj_glob) {
-        debug("NewGlobalRef() has failed");
-        return NULL;
+    jobjG = JNI_CALL(env, NewGlobalRef, jobj);
+    if (!jobjG) {
+        debug("NewGlobalRef(jobj) has failed");
+        goto err;
     }
-    struct write_data * wd = malloc(sizeof(struct write_data));
-    wd->i = 0;
+
+    wd = malloc(sizeof(struct write_data));
+    if (!wd) {
+        debug("failed to allocate struct write_data");
+        goto err;
+    }
+
+    wd->i     = 0;
     wd->total = 0;
-    wd->env = env;
-    wd->jbuf = jbuf_glob;
-    wd->jobj = jobj_glob;
+    wd->env   = env;
+    wd->jbuf  = jbufG;
+    wd->jobj  = jobjG;
     return wd;
+
+err:
+    if (jbufG) JNI_CALL(env, DeleteGlobalRef, jbufG);
+    if (jobjG) JNI_CALL(env, DeleteGlobalRef, jobjG);
+    if (wd)    free(wd);
+    return NULL;
 }
 
 void write_data_free(struct write_data * wd)
@@ -46,7 +63,7 @@ void write_data_free(struct write_data * wd)
     free(wd);
 }
 
-static size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userdata)
+size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userdata)
 {
     size_t total = size * nmemb;
     struct write_data *wd = (struct write_data *) userdata;

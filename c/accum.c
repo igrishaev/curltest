@@ -14,16 +14,21 @@ struct accum * accum_init(size_t size, size_t factor)
 
     /* begin */
     buf = malloc(size);
-    if (!buf) goto err;
+    if (!buf) {
+        debug("failed to malloc(size)");
+        goto err;
+    }
 
     acc = malloc(sizeof(struct accum));
-    if (!acc) goto err;
+    if (!acc) {
+        debug("failed to malloc struct accum");
+        goto err;
+    }
 
     acc->size = size;
     acc->len = 0;
     acc->buf = buf;
     acc->factor = factor;
-
     return acc;
 
 err:

@@ -1,32 +1,39 @@
 package org.example;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class Main {
 
-    public static Response test(final CurlEasy c) {
-        // final OutputStream out = new ByteArrayOutputStream();
+    public static Response test(final CurlEasy c) throws IOException {
+        final OutputStream out = new ByteArrayOutputStream();
         try(FILE f = FILE.open("foo.txt", "wb");
             Headers h = Headers.create(new String[] {"foo: bar"});
-            Accumulator acc = Accumulator.create(2048)) {
+            Accumulator acc = Accumulator.create(2048);
+            WriteStream ws = WriteStream.create(out)) {
             final Request request = Request.builder()
                     .url("https://habr.com")
                     // .url("http://127.0.0.1:3000")
                     .method(1)
                     .followLocation(3)
+                    .writeStream(ws)
+                    .verbose(false)
 //                    .headers(h)
 //                    .accum(acc)
                     // .writeFile(f)
                     // .writeStream(out)
                     .build();
             Response r = c.perform(request);
-            System.out.println("----------");
-            System.out.println(acc.getString().substring(0, 100));
-            System.out.println("----------");
+//            System.out.println("----------");
+//            System.out.println(acc.getString().substring(0, 100));
+//            System.out.println("----------");
             return r;
         }
 
     }
 
-    public static void main(String... args) {
+    public static void main(String... args) throws IOException {
         try (CurlEasy c = CurlEasy.make()) {
             System.out.println(test(c));
         }

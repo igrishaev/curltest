@@ -75,6 +75,7 @@ vars:
     jstring    jreadString      = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
     jbyteArray jreadBytes       = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
     jlong      jaccumPtr        = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
+    jlong      jverbose         = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -134,7 +135,7 @@ vars:
     if (jreadString) {
         readString = JNI_CALL(env, GetStringUTFChars, jreadString, NULL);
         if (!readString) {
-            code = -5;
+            code = -5; // TODO: COPY
             goto exit;
         }
         code = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, readString);
@@ -149,6 +150,7 @@ vars:
             goto exit;
         }
 
+        // TODO: COPY
         code = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, readBytes);
         if (code != CURLE_OK) goto exit;
 
@@ -158,8 +160,12 @@ vars:
         if (code != CURLE_OK) goto exit;
     }
 
-    /* code = curl_easy_setopt(curl, CURLOPT_VERBOSE, 1); */
-    /* if (code != CURLE_OK) goto exit; */
+    /* verbose */
+    if (jverbose != 0) {
+        debug("setting verbose flag: %ld", jverbose);
+        code = curl_easy_setopt(curl, CURLOPT_VERBOSE, jverbose);
+        if (code != CURLE_OK) goto exit;
+    }
 
     /* PERFORM */
     code = curl_easy_perform(curl);

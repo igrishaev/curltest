@@ -1,6 +1,5 @@
 package org.example;
 
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
 
@@ -15,6 +14,7 @@ public class Request {
     public final String readString;
     public final byte[] readBytes;
     public final long accumPtr;
+    public final long verbose;
 
     private Request(
         final String url,
@@ -25,7 +25,8 @@ public class Request {
         final long writeStreamPtr,
         final String readString,
         final byte[] readBytes,
-        final long accumPtr
+        final long accumPtr,
+        final long verbose
     ) {
         this.url = url;
         this.method = method;
@@ -36,6 +37,7 @@ public class Request {
         this.readString = readString;
         this.readBytes = readBytes;
         this.accumPtr = accumPtr;
+        this.verbose = verbose;
     }
 
     public static Builder builder() {
@@ -53,6 +55,7 @@ public class Request {
         private String readString = null;
         private byte[] readBytes = null;
         private long accumPtr = Native.NULL;
+        private long verbose = 0;
 
         public Builder url(final String url) {
             this.url = url;
@@ -99,6 +102,11 @@ public class Request {
             return this;
         }
 
+        public Builder verbose(boolean isVerbose) {
+            this.verbose = (isVerbose ? 1 : 0);
+            return this;
+        }
+
         public Request build() {
             return new Request(
                     url,
@@ -109,7 +117,8 @@ public class Request {
                     writeStreamPtr,
                     readString,
                     readBytes,
-                    accumPtr
+                    accumPtr,
+                    verbose
             );
         }
 
