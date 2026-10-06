@@ -8,17 +8,22 @@ public class Main {
 
     public static Response test(final CurlEasy c) throws IOException {
         final OutputStream out = new ByteArrayOutputStream();
-        try(FILE f = FILE.open("foo.txt", "wb");
+        try(// FILE f = FILE.open("foo.txt", "wb");
             Headers h = Headers.create(new String[] {"foo: bar"});
             Accumulator acc = Accumulator.create(2048);
-            WriteStream ws = WriteStream.create(out)) {
+            WriteStream ws = WriteStream.create(out);
+            WriteCallback wc = WriteCallback.create((buf, off, len) -> {
+                System.out.printf("lead: %s, off: %s, len: %s%n", buf[0], off, len);
+            })
+        ) {
             final Request request = Request.builder()
                     .url("https://habr.com")
                     // .url("http://127.0.0.1:3000")
                     .method(1)
                     .followLocation(3)
-                    .writeStream(ws)
+                    // .writeStream(ws)
                     .verbose(false)
+                    .writeCallback(wc)
 //                    .headers(h)
 //                    .accum(acc)
                     // .writeFile(f)

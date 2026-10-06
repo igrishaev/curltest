@@ -66,16 +66,18 @@ vars:
     char *readString           = NULL;
     void *readBytes            = NULL;
 
-    jstring    jurl             = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
-    jint       jmethod          = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
-    jint       jfollowLocation  = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
-    jlong      jheadersPtr      = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
-    jlong      jwriteFilePtr    = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
-    jlong      jwriteStreamPtr  = JNI_CALL(env, GetLongField, jreq, _g.Request.writeStreamPtr);
-    jstring    jreadString      = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
-    jbyteArray jreadBytes       = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
-    jlong      jaccumPtr        = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
-    jlong      jverbose         = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
+    jstring    jurl              = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
+    jint       jmethod           = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
+    jint       jfollowLocation   = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
+    jlong      jheadersPtr       = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
+    jlong      jwriteFilePtr     = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
+    jlong      jwriteStreamPtr   = JNI_CALL(env, GetLongField, jreq, _g.Request.writeStreamPtr);
+    jstring    jreadString       = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
+    jbyteArray jreadBytes        = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
+    jlong      jaccumPtr         = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
+    jlong      jverbose          = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
+    // TODO: coerce to poiners ^
+    void *writeCallbackPtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -111,6 +113,12 @@ vars:
         writeData = (void *) jwriteStreamPtr;
         writeFunction = write_callback_stream;
         debug("write stream is set");
+    }
+
+    /* write callback */
+    if (writeCallbackPtr != NULL) {
+        writeData = writeCallbackPtr;
+        writeFunction = write_callback_handler;
     }
 
     /* accumulate in memory */
@@ -173,7 +181,6 @@ vars:
 
 exit:
     // TODO
-    // write callback
     // read string
     // read bytes
     // read string: copy!!!

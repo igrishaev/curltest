@@ -3,14 +3,17 @@
 
 #include <jni.h>
 
+struct J_IWriteHandler {
+    jmethodID handle_BaII;
+};
+
+
 struct J_OutputStream {
-    jclass    class;
     jmethodID write_BaII;
     jmethodID close;
 };
 
 struct J_Request {
-    jclass   class;
     jfieldID url;
     jfieldID method;
     jfieldID followLocation;
@@ -21,10 +24,10 @@ struct J_Request {
     jfieldID readBytes;
     jfieldID accumPtr;
     jfieldID verbose;
+    jfieldID writeCallbackPtr;
 };
 
 struct J_Response {
-    jclass    class;
     jfieldID  status;
     jfieldID  headers;
     jfieldID  body;
@@ -34,7 +37,6 @@ struct J_Response {
 };
 
 struct J_InputStream {
-    jclass    class;
     jmethodID read_BaII;
     jmethodID close;
 };
@@ -44,6 +46,7 @@ struct J_Globals {
     struct J_Request Request;
     struct J_OutputStream OutputStream;
     struct J_InputStream InputStream;
+    struct J_IWriteHandler IWriteHandler;
 };
 
 extern struct J_Globals _g;

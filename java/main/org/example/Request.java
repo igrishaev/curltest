@@ -15,6 +15,7 @@ public class Request {
     public final byte[] readBytes;
     public final long accumPtr;
     public final long verbose;
+    public final long writeCallbackPtr;
 
     private Request(
         final String url,
@@ -26,7 +27,8 @@ public class Request {
         final String readString,
         final byte[] readBytes,
         final long accumPtr,
-        final long verbose
+        final long verbose,
+        final long writeCallbackPtr
     ) {
         this.url = url;
         this.method = method;
@@ -38,6 +40,7 @@ public class Request {
         this.readBytes = readBytes;
         this.accumPtr = accumPtr;
         this.verbose = verbose;
+        this.writeCallbackPtr = writeCallbackPtr;
     }
 
     public static Builder builder() {
@@ -56,6 +59,7 @@ public class Request {
         private byte[] readBytes = null;
         private long accumPtr = Native.NULL;
         private long verbose = 0;
+        private long writeCallbackPtr = Native.NULL;
 
         public Builder url(final String url) {
             this.url = url;
@@ -97,6 +101,11 @@ public class Request {
             return this;
         }
 
+        public Builder writeCallback(final IResource writeCallback) {
+            this.writeCallbackPtr = writeCallback.ptr();
+            return this;
+        }
+
         public Builder accum(final IResource resource) {
             this.accumPtr = resource.ptr();
             return this;
@@ -118,7 +127,8 @@ public class Request {
                     readString,
                     readBytes,
                     accumPtr,
-                    verbose
+                    verbose,
+                    writeCallbackPtr
             );
         }
 

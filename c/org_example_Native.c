@@ -51,6 +51,10 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         jmethodID jmeth;
         jfieldID jfield;
 
+        /* IWriteHandler */
+        GET_CLASS(env, "org/example/IWriteHandler", jcls);
+        SET_METHOD(env, jcls, "handle", "([BII)V", _g.IWriteHandler.handle_BaII);
+
         /* Response */
         GET_CLASS(env, "org/example/Response", jcls);
         SET_FIELD(env, jcls, "status",        J_INT,     _g.Response.status);
@@ -62,16 +66,17 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
         /* Request */
         GET_CLASS(env, "org/example/Request", jcls)
-        SET_FIELD(env, jcls, "url",            J_STRING, _g.Request.url);
-        SET_FIELD(env, jcls, "method",         J_INT,    _g.Request.method);
-        SET_FIELD(env, jcls, "followLocation", J_INT,    _g.Request.followLocation);
-        SET_FIELD(env, jcls, "headersPtr",     J_LONG,   _g.Request.headersPtr);
-        SET_FIELD(env, jcls, "writeFilePtr",   J_LONG,   _g.Request.writeFilePtr);
-        SET_FIELD(env, jcls, "writeStreamPtr", J_LONG,   _g.Request.writeStreamPtr);
-        SET_FIELD(env, jcls, "readString",     J_STRING, _g.Request.readString);
-        SET_FIELD(env, jcls, "readBytes",      J_BA,     _g.Request.readBytes);
-        SET_FIELD(env, jcls, "accumPtr",       J_LONG,   _g.Request.accumPtr);
-        SET_FIELD(env, jcls, "verbose",        J_LONG,   _g.Request.verbose);
+        SET_FIELD(env, jcls, "url",              J_STRING, _g.Request.url);
+        SET_FIELD(env, jcls, "method",           J_INT,    _g.Request.method);
+        SET_FIELD(env, jcls, "followLocation",   J_INT,    _g.Request.followLocation);
+        SET_FIELD(env, jcls, "headersPtr",       J_LONG,   _g.Request.headersPtr);
+        SET_FIELD(env, jcls, "writeFilePtr",     J_LONG,   _g.Request.writeFilePtr);
+        SET_FIELD(env, jcls, "writeStreamPtr",   J_LONG,   _g.Request.writeStreamPtr);
+        SET_FIELD(env, jcls, "readString",       J_STRING, _g.Request.readString);
+        SET_FIELD(env, jcls, "readBytes",        J_BA,     _g.Request.readBytes);
+        SET_FIELD(env, jcls, "accumPtr",         J_LONG,   _g.Request.accumPtr);
+        SET_FIELD(env, jcls, "verbose",          J_LONG,   _g.Request.verbose);
+        SET_FIELD(env, jcls, "writeCallbackPtr", J_LONG,   _g.Request.writeCallbackPtr);
 
         /* OutputStream */
         GET_CLASS(env, "java/io/OutputStream", jcls);

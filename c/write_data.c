@@ -72,9 +72,50 @@ size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userda
     debug("write callback stream, total: %lu", total);
 
     JNI_CALL(env, SetByteArrayRegion, wd->jbuf, 0, total, (jbyte *) data);
+    if (JNI_CALL(env, ExceptionCheck)) {
+        debug("SetByteArrayRegion has failed");
+#ifdef DEBUG
+        JNI_CALL(env, ExceptionDescribe);
+#endif
+        return CURL_WRITEFUNC_ERROR;
+    }
 
     JNI_CALL(env, CallVoidMethod, wd->jobj, _g.OutputStream.write_BaII, wd->jbuf, 0, total);
     if (JNI_CALL(env, ExceptionCheck)) {
+        debug("write callback stream has failed");
+#ifdef DEBUG
+        JNI_CALL(env, ExceptionDescribe);
+#endif
+        return CURL_WRITEFUNC_ERROR;
+    }
+    wd->i++;
+    wd->total += total;
+    return total;
+}
+
+size_t write_callback_handler(char *data, size_t size, size_t nmemb, void *userdata)
+{
+    size_t total = size * nmemb;
+    struct write_data *wd = (struct write_data *) userdata;
+    JNIEnv *env = wd->env;
+
+    debug("write callback handler, total: %lu", total);
+
+    JNI_CALL(env, SetByteArrayRegion, wd->jbuf, 0, total, (jbyte *) data);
+    if (JNI_CALL(env, ExceptionCheck)) {
+        debug("SetByteArrayRegion has failed");
+#ifdef DEBIG
+        JNI_CALL(env, ExceptionDescribe);
+#endif
+        return CURL_WRITEFUNC_ERROR;
+    }
+
+    JNI_CALL(env, CallVoidMethod, wd->jobj, _g.IWriteHandler.handle_BaII, wd->jbuf, 0, total);
+    if (JNI_CALL(env, ExceptionCheck)) {
+        debug("write callback handler has failed");
+#ifdef DEBIG
+        JNI_CALL(env, ExceptionDescribe);
+#endif
         return CURL_WRITEFUNC_ERROR;
     }
     wd->i++;
