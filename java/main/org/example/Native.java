@@ -1,12 +1,45 @@
 package org.example;
 
-import java.io.File;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class Native {
-    static final long NULL;
+
+    public static final long NULL;
+    public static final String libPath;
+    // TODO: use curl in the path
+    public static final String resourcePath = "curltest.dylib";
+
+    private static String writeLibToTemp() throws IOException {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        final URL url = cl.getResource(resourcePath);
+        if (url == null) {
+            Err.error("failed to load a resource: %s", resourcePath);
+        }
+        final File tmp = File.createTempFile("temp_", ".lib");
+        final Path path = tmp.toPath();
+        System.out.println(path);
+        tmp.deleteOnExit();
+        try (InputStream in = url.openStream();
+             OutputStream out = Files.newOutputStream(tmp.toPath())) {
+            Files.copy(in, path, StandardCopyOption.REPLACE_EXISTING);
+            in.transferTo(out);
+        }
+        return path.toString();
+    }
+
+    static {
+        try {
+            libPath = writeLibToTemp();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     static void loadLib() {
-        final String libPath = new File("resources/curltest.dylib").getAbsolutePath();
         System.load(libPath);
     }
 

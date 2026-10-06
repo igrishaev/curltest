@@ -30,7 +30,6 @@ struct J_Request {
 struct J_Response {
     jfieldID  status;
     jfieldID  headers;
-    jfieldID  body;
     jfieldID  contentLength;
     jfieldID  effectiveUrl;
     jmethodID addHeader;

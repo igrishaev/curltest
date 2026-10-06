@@ -14,6 +14,7 @@
 
   :source-paths ["clojure/src"]
   :java-source-paths ["java/main"]
+  :resource-paths ["resources"]
 
   :managed-dependencies
   [[org.clojure/clojure "1.10.0" :scope "provided"]
