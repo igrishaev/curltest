@@ -76,6 +76,16 @@ public class Request {
             return this;
         }
 
+        public Builder readString(final String readString) {
+            this.readString = readString;
+            return this;
+        }
+
+        public Builder readBytes(final byte[] readBytes) {
+            this.readBytes = readBytes;
+            return this;
+        }
+
         public Builder followLocation(final int followLocation) {
             this.followLocation = followLocation;
             return this;
