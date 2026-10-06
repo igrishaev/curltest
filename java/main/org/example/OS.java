@@ -24,16 +24,18 @@ public class OS {
         }
     }
 
-    public static String getPlatform() {
+    public static String getLibName() {
         OSFamily osFamily = getOSFamily();
         String osArch = System.getProperty("os.arch");
-        return (osFamily.toString() + "_" + osArch)
-                .replace("-", "_")
-                .replace(" ", "_")
-                .toLowerCase();
+        return "curl_"
+                + (osFamily.toString() + "_" + osArch)
+                    .replace("-", "_")
+                    .replace(" ", "_")
+                    .toLowerCase()
+                + ".lib";
     }
 
     public static void main(String... args) {
-        System.out.print(getPlatform());
+        System.out.print(getLibName());
     }
 }

@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/OS.java \
 	$(SRC_PATH)/WriteCallback.java \
 	$(SRC_PATH)/WriteStream.java \
 	$(SRC_PATH)/IResource.java \
@@ -47,7 +48,7 @@ CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL
 
 LIBS = -lcurl
 
-all: clear headers sep resources/jcurl_$(shell java java/main/org/example/OS.java).lib
+all: clear headers sep resources/$(shell java java/main/org/example/OS.java)
 
 sep:
 	$(info .........................................)

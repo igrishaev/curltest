@@ -10,15 +10,10 @@ public class Native {
 
     public static final long NULL;
     public static final String libPath;
-    // TODO: use curl in the path
-    public static final String resourcePath;
-
-    static {
-        resourcePath = "jcurl_" + OS.getPlatform() + ".lib";
-    }
 
     private static String writeLibToTemp() throws IOException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        String resourcePath = OS.getLibName();
         final URL url = cl.getResource(resourcePath);
         if (url == null) {
             Err.error("failed to load a resource: %s", resourcePath);
