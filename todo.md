@@ -1,3 +1,5 @@
+- separate perform and setting options
+- error codes
 - request autocloaseable
 - FILE: open temp
 - common name patterns

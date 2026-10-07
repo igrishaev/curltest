@@ -59,11 +59,8 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform (
 vars:
     int i = 0;
     long code = 0;
-    struct user_data * ud      = NULL;
-    struct curl_slist *headers = NULL;
     void *writeData            = NULL;
     void *writeFunction        = NULL;
-    char *readString           = NULL;
     void *readBytes            = NULL;
 
     jstring    jurl              = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
@@ -81,7 +78,7 @@ vars:
 
     CURL *curl = (CURL *) jcurl;
 
-    /* URL */
+    /* url */
     _set_url(env, curl, jurl);
     debug("url set");
 
@@ -89,26 +86,26 @@ vars:
     _set_method(curl, jmethod);
     debug("method set");
 
-    /* FOLLOW LOCATION */
+    /* follow location */
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jfollowLocation);
     if (code != CURLE_OK) goto exit;
     debug("follow location set");
 
-    /* HEADERS */
+    /* headers */
     if (jheadersPtr != NULL) {
         code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, jheadersPtr);
         if (code != CURLE_OK) goto exit;
         debug("headers set");
     }
 
-    /* WRITE FILE */
+    /* write file */
     if (jwriteFilePtr != NULL) {
         writeData = (void *) jwriteFilePtr;
         writeFunction = fwrite;
         debug("write file is set");
     }
 
-    /* WRITE STREAM */
+    /* write stream */
     if (jwriteStreamPtr != NULL) {
         writeData = (void *) jwriteStreamPtr;
         writeFunction = write_callback_stream;
@@ -129,7 +126,7 @@ vars:
         debug("accumulator is set");
     }
 
-    /* WRITING  */
+    /* writing  */
     if (writeData) {
         code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeData);
         if (code != CURLE_OK) goto exit;
@@ -139,31 +136,31 @@ vars:
         if (code != CURLE_OK) goto exit;
     }
 
-    /* POST FIELDS STRING */
+    /* post string */
     if (jreadString) {
-        readString = JNI_CALL(env, GetStringUTFChars, jreadString, NULL);
+        char * readString = JNI_CALL(env, GetStringUTFChars, jreadString, NULL);
         if (!readString) {
-            code = -5; // TODO: COPY
+            code = -5; // TODO special error code
             goto exit;
         }
-        code = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, readString);
+        code = curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, readString);
+        JNI_CALL(env, ReleaseStringUTFChars, jreadString, readString);
         if (code != CURLE_OK) goto exit;
     }
 
-    /* POST FIELDS BYTES */
+    /* post bytes */
     if (jreadBytes) {
-        readBytes = JNI_CALL(env, GetPrimitiveArrayCritical, jreadBytes, NULL);
+        char * readBytes = JNI_CALL(env, GetPrimitiveArrayCritical, jreadBytes, NULL);
         if (!readBytes) {
-            code = -5;
+            code = -5; // TODO error const
             goto exit;
         }
 
-        // TODO: COPY
-        code = curl_easy_setopt(curl, CURLOPT_POSTFIELDS, readBytes);
+        code = curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, readBytes);
+        JNI_CALL(env, ReleasePrimitiveArrayCritical, jreadBytes, readBytes, JNI_ABORT);
         if (code != CURLE_OK) goto exit;
 
         jsize length = JNI_CALL(env, GetArrayLength, jreadBytes);
-
         code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, length);
         if (code != CURLE_OK) goto exit;
     }
@@ -175,26 +172,11 @@ vars:
         if (code != CURLE_OK) goto exit;
     }
 
-    /* PERFORM */
+    /* perform */
     code = curl_easy_perform(curl);
     if (code != CURLE_OK) goto exit;
 
 exit:
-    // TODO
-    // read string
-    // read bytes
-    // read string: copy!!!
-    // read byte: copy!!!
-
-    /* release read string */
-    if (readString) {
-        JNI_CALL(env, ReleaseStringUTFChars, jreadString, readString);
-    }
-
-    /* release read bytes */
-    if (readBytes) {
-        JNI_CALL(env, ReleasePrimitiveArrayCritical, jreadBytes, readBytes, JNI_ABORT);
-    }
 
     return code;
 }
