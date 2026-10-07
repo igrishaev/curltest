@@ -48,7 +48,13 @@ CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL
 
 LIBS = -lcurl
 
-all: clear headers sep resources/$(shell java java/main/org/example/OS.java)
+all: clear headers sep resources/$(shell java java/main/org/example/OS.java) sync-resources
+
+CLASSES_DIR = target/classes
+
+sync-resources:
+	mkdir -p $(CLASSES_DIR)
+	cp resources/* $(CLASSES_DIR)
 
 sep:
 	$(info .........................................)
