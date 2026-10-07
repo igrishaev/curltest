@@ -61,6 +61,8 @@ vars:
     long code = 0;
     void *writeData            = NULL;
     void *writeFunction        = NULL;
+    void *readData             = NULL;
+    void *readFunction         = NULL;
     void *readBytes            = NULL;
 
     jstring    jurl              = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
@@ -75,6 +77,7 @@ vars:
     jlong      jverbose          = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
     // TODO: coerce to poiners ^
     void *writeCallbackPtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
+    void *readFilePtr            = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -133,6 +136,22 @@ vars:
     }
     if (writeFunction) {
         code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
+        if (code != CURLE_OK) goto exit;
+    }
+
+    /* read file */
+    if (readFilePtr) {
+        readData = readFilePtr;
+        readFunction = fread;
+    }
+
+    /* reading */
+    if (readData) {
+        code = curl_easy_setopt(curl, CURLOPT_READDATA, readData);
+        if (code != CURLE_OK) goto exit;
+    }
+    if (readFunction) {
+        code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, readFunction);
         if (code != CURLE_OK) goto exit;
     }
 

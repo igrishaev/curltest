@@ -76,6 +76,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         SET_FIELD(env, jcls, "accumPtr",         J_LONG,   _g.Request.accumPtr);
         SET_FIELD(env, jcls, "verbose",          J_LONG,   _g.Request.verbose);
         SET_FIELD(env, jcls, "writeCallbackPtr", J_LONG,   _g.Request.writeCallbackPtr);
+        SET_FIELD(env, jcls, "readFilePtr",      J_LONG,   _g.Request.readFilePtr);
 
         /* OutputStream */
         GET_CLASS(env, "java/io/OutputStream", jcls);

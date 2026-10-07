@@ -16,6 +16,7 @@ public class Request {
     public final long accumPtr;
     public final long verbose;
     public final long writeCallbackPtr;
+    public final long readFilePtr;
 
     private Request(
         final String url,
@@ -28,7 +29,8 @@ public class Request {
         final byte[] readBytes,
         final long accumPtr,
         final long verbose,
-        final long writeCallbackPtr
+        final long writeCallbackPtr,
+        final long readFilePtr
     ) {
         this.url = url;
         this.method = method;
@@ -41,6 +43,7 @@ public class Request {
         this.accumPtr = accumPtr;
         this.verbose = verbose;
         this.writeCallbackPtr = writeCallbackPtr;
+        this.readFilePtr = readFilePtr;
     }
 
     public static Builder builder() {
@@ -60,6 +63,7 @@ public class Request {
         private long accumPtr = Native.NULL;
         private long verbose = 0;
         private long writeCallbackPtr = Native.NULL;
+        private long readFilePtr = Native.NULL;
 
         public Builder url(final String url) {
             this.url = url;
@@ -96,13 +100,18 @@ public class Request {
             return this;
         }
 
-        public Builder headers(final IResource resource) {
-            this.headersPtr = resource.ptr();
+        public Builder headers(final Headers headers) {
+            this.headersPtr = headers.ptr();
             return this;
         }
 
-        public Builder writeFile(final IResource resource) {
-            this.writeFilePtr = resource.ptr();
+        public Builder writeFile(final FILE file) {
+            this.writeFilePtr = file.ptr();
+            return this;
+        }
+
+        public Builder readFile(final FILE file) {
+            this.readFilePtr = file.ptr();
             return this;
         }
 
@@ -116,8 +125,8 @@ public class Request {
             return this;
         }
 
-        public Builder accum(final IResource resource) {
-            this.accumPtr = resource.ptr();
+        public Builder accum(final Accumulator accum) {
+            this.accumPtr = accum.ptr();
             return this;
         }
 
@@ -138,7 +147,8 @@ public class Request {
                     readBytes,
                     accumPtr,
                     verbose,
-                    writeCallbackPtr
+                    writeCallbackPtr,
+                    readFilePtr
             );
         }
 

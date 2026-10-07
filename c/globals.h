@@ -25,6 +25,7 @@ struct J_Request {
     jfieldID accumPtr;
     jfieldID verbose;
     jfieldID writeCallbackPtr;
+    jfieldID readFilePtr;
 };
 
 struct J_Response {
@@ -41,10 +42,10 @@ struct J_InputStream {
 };
 
 struct J_Globals {
-    struct J_Response Response;
-    struct J_Request Request;
-    struct J_OutputStream OutputStream;
-    struct J_InputStream InputStream;
+    struct J_Response      Response;
+    struct J_Request       Request;
+    struct J_OutputStream  OutputStream;
+    struct J_InputStream   InputStream;
     struct J_IWriteHandler IWriteHandler;
 };
 
