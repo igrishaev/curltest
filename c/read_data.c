@@ -67,6 +67,6 @@ int read_seek_file(void *userdata, curl_off_t offset, int origin) {
 }
 
 int read_seek_cannot(void *userdata, curl_off_t offset, int origin) {
-    debug("calling read_seek_cannot")
+    debug("calling read_seek_cannot");
     return CURL_SEEKFUNC_CANTSEEK;
 }

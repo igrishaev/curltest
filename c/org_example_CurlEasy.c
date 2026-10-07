@@ -67,18 +67,17 @@ vars:
 
     jstring    jurl              = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
     jint       jmethod           = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
-    jint       jfollowLocation   = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
-    jlong      jheadersPtr       = JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
-    jlong      jwriteFilePtr     = JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
-    jlong      jwriteStreamPtr   = JNI_CALL(env, GetLongField, jreq, _g.Request.writeStreamPtr);
+    jint       followLocation    = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
+    void      *headersPtr        = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
+    void      *writeFilePtr      = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
+    void      *writeStreamPtr    = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeStreamPtr);
     jstring    jreadString       = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
     jbyteArray jreadBytes        = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
-    jlong      jaccumPtr         = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
+    void      *accumPtr          = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
     jlong      jverbose          = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
-    // TODO: coerce to pointers ^
-    void *writeCallbackPtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
-    void *readFilePtr            = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
-    void *readStreamPtr          = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readStreamPtr);
+    void      *writeCallbackPtr  = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
+    void      *readFilePtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
+    void      *readStreamPtr     = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readStreamPtr);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -91,42 +90,42 @@ vars:
     debug("method set");
 
     /* follow location */
-    code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jfollowLocation);
+    code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, followLocation);
     if (code != CURLE_OK) goto exit;
     debug("follow location set");
 
     /* headers */
-    if (jheadersPtr != NULL) {
-        code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, jheadersPtr);
+    if (headersPtr) {
+        code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headersPtr);
         if (code != CURLE_OK) goto exit;
         debug("headers set");
     }
 
     /* write file */
-    if (jwriteFilePtr != NULL) {
-        writeData = (void *) jwriteFilePtr;
+    if (writeFilePtr) {
+        writeData = writeFilePtr;
         writeFunction = fwrite;
         debug("write file is set");
     }
 
     /* write stream */
-    if (jwriteStreamPtr != NULL) {
-        writeData = (void *) jwriteStreamPtr;
+    if (writeStreamPtr) {
+        writeData = writeStreamPtr;
         writeFunction = write_callback_stream;
         debug("write stream is set");
     }
 
     /* write callback */
-    if (writeCallbackPtr != NULL) {
+    if (writeCallbackPtr) {
         writeData = writeCallbackPtr;
         writeFunction = write_callback_handler;
         debug("write callback is set");
     }
 
     /* accumulate in memory */
-    if (jaccumPtr != NULL) {
+    if (accumPtr) {
         debug("accumulator is passed");
-        writeData = (void *) jaccumPtr;
+        writeData = accumPtr;
         writeFunction = accum_write_callback;
         debug("accumulator is set");
     }
