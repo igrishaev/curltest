@@ -52,3 +52,21 @@ size_t read_callback_file(char *ptr, size_t size, size_t nmemb, void *userdata) 
     debug("read callback file, read: %lu", result);
     return result;
 }
+
+int read_seek_file(void *userdata, curl_off_t offset, int origin) {
+    FILE *f = (FILE *) userdata;
+    int res = fseek(f, offset, origin);
+    if (res) {
+        debug("failed to seek a file, res: %d, offset: %ld, origin: %d",
+              res, offset, origin);
+        return CURL_SEEKFUNC_FAIL;
+    } else {
+        debug("seeking a file was OK");
+        return CURL_SEEKFUNC_OK;
+    }
+}
+
+int read_seek_cannot(void *userdata, curl_off_t offset, int origin) {
+    debug("calling read_seek_cannot")
+    return CURL_SEEKFUNC_CANTSEEK;
+}

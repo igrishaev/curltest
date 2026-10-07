@@ -151,24 +151,31 @@ vars:
         readFunction = read_callback_file;
         /* readFunction = fread; */
 
-        /* code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, fseek); */
+        // TODO: only for windows
+        code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, read_seek_file);
+        if (code != CURLE_OK) goto exit;
+        debug("seek function is set");
+
+        code = curl_easy_setopt(curl, CURLOPT_SEEKDATA, readFilePtr);
+        if (code != CURLE_OK) goto exit;
+        debug("seek data is set");
+
+        // TODO: set size?
+        /* code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 1248); */
         /* if (code != CURLE_OK) goto exit; */
 
-        code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 1248);
-        if (code != CURLE_OK) goto exit;
-
-        // CURLOPT_SEEKFUNCTION
-        // CURLOPT_SEEKDATA
-
-        // TODO upload
         code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
         if (code != CURLE_OK) goto exit;
+        debug("UPLOAD is set");
 
         debug("read file is set");
     }
 
     /* read stream */
     if (readStreamPtr) {
+
+        // TODO: upload=1, seek=cannot
+
         readData = readStreamPtr;
         readFunction = read_callback_stream;
         debug("read stream is set");
