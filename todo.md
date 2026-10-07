@@ -1,3 +1,4 @@
+- user_data module
 - separate perform and setting options
 - error codes
 - request autocloaseable
@@ -43,4 +44,3 @@
 - tcp no delay
 - timeout
 - user-agent
-- verbose

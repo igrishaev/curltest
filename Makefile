@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/ReadStream.java \
 	$(SRC_PATH)/OS.java \
 	$(SRC_PATH)/WriteCallback.java \
 	$(SRC_PATH)/WriteStream.java \
@@ -20,6 +21,7 @@ JAVAFILES = \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/org_example_ReadStream.c \
 	$(C_PATH)/org_example_WriteCallback.c \
 	$(C_PATH)/write_data.c \
 	$(C_PATH)/org_example_WriteStream.c \
