@@ -21,9 +21,12 @@ JAVAFILES = \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/accum.c \
+	$(C_PATH)/read_data.c \
+	$(C_PATH)/curl_data.c \
+	$(C_PATH)/write_data.c \
 	$(C_PATH)/org_example_ReadStream.c \
 	$(C_PATH)/org_example_WriteCallback.c \
-	$(C_PATH)/write_data.c \
 	$(C_PATH)/org_example_WriteStream.c \
 	$(C_PATH)/org_example_Accumulator.c \
 	$(C_PATH)/org_example_Headers.c \
@@ -31,7 +34,6 @@ MODULES = \
 	$(C_PATH)/org_example_Native.c \
 	$(C_PATH)/org_example_CurlEasy.c \
 	$(C_PATH)/org_example_Response.c \
-	$(C_PATH)/accum.c \
 
 OBJECTS = $(MODULES:.c=.o)
 

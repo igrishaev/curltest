@@ -6,6 +6,7 @@
 #include "globals.h"
 #include "macros.h"
 #include "write_data.h"
+#include "read_data.h"
 #include "curl/curl.h"
 
 
@@ -78,6 +79,7 @@ vars:
     // TODO: coerce to pointers ^
     void *writeCallbackPtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
     void *readFilePtr            = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
+    void *readStreamPtr          = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readStreamPtr);
 
     CURL *curl = (CURL *) jcurl;
 
@@ -143,6 +145,12 @@ vars:
     if (readFilePtr) {
         readData = readFilePtr;
         readFunction = fread;
+    }
+
+    /* read stream */
+    if (readStreamPtr) {
+        readData = readStreamPtr;
+        readFunction = read_callback_stream;
     }
 
     /* reading */

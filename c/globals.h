@@ -26,6 +26,7 @@ struct J_Request {
     jfieldID verbose;
     jfieldID writeCallbackPtr;
     jfieldID readFilePtr;
+    jfieldID readStreamPtr;
 };
 
 struct J_Response {

@@ -1,16 +1,16 @@
 #include <jni.h>
-#include "read_data.h"
+#include "curl_data.h"
 
 
 JNIEXPORT jlong JNICALL Java_org_example_ReadStream__1allocate
-  (JNIEnv *, jclass, jobject) {
-    return (jlong) read_data_init(env, jstream);
+  (JNIEnv *env, jclass jcls, jobject jstream) {
+    return (jlong) curl_data_init(env, jstream);
 }
 
 
 JNIEXPORT jlong JNICALL Java_org_example_ReadStream__1free
-  (JNIEnv *, jclass, jlong) {
+  (JNIEnv *env, jclass jcls, jlong jptr) {
     void *ptr = (void *) jptr;
-    read_data_free(ptr);
+    curl_data_free(ptr);
     return 0;
 }

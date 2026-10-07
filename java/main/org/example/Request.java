@@ -17,6 +17,7 @@ public class Request {
     public final long verbose;
     public final long writeCallbackPtr;
     public final long readFilePtr;
+    public final long readStreamPtr;
 
     private Request(
         final String url,
@@ -30,7 +31,8 @@ public class Request {
         final long accumPtr,
         final long verbose,
         final long writeCallbackPtr,
-        final long readFilePtr
+        final long readFilePtr,
+        final long readStreamPtr
     ) {
         this.url = url;
         this.method = method;
@@ -44,6 +46,7 @@ public class Request {
         this.verbose = verbose;
         this.writeCallbackPtr = writeCallbackPtr;
         this.readFilePtr = readFilePtr;
+        this.readStreamPtr = readStreamPtr;
     }
 
     public static Builder builder() {
@@ -64,6 +67,7 @@ public class Request {
         private long verbose = 0;
         private long writeCallbackPtr = Native.NULL;
         private long readFilePtr = Native.NULL;
+        private long readStreamPtr = Native.NULL;
 
         public Builder url(final String url) {
             this.url = url;
@@ -115,8 +119,13 @@ public class Request {
             return this;
         }
 
-        public Builder writeStream(final IResource writeStream) {
+        public Builder writeStream(final WriteStream writeStream) {
             this.writeStreamPtr = writeStream.ptr();
+            return this;
+        }
+
+        public Builder readStream(final ReadStream readStream) {
+            this.readStreamPtr = readStream.ptr();
             return this;
         }
 
@@ -148,7 +157,8 @@ public class Request {
                     accumPtr,
                     verbose,
                     writeCallbackPtr,
-                    readFilePtr
+                    readFilePtr,
+                    readStreamPtr
             );
         }
 
