@@ -64,7 +64,6 @@ vars:
     void *writeFunction        = NULL;
     void *readData             = NULL;
     void *readFunction         = NULL;
-    void *readBytes            = NULL;
 
     jstring    jurl              = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
     jint       jmethod           = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
@@ -121,6 +120,7 @@ vars:
     if (writeCallbackPtr != NULL) {
         writeData = writeCallbackPtr;
         writeFunction = write_callback_handler;
+        debug("write callback is set");
     }
 
     /* accumulate in memory */
@@ -133,38 +133,62 @@ vars:
 
     /* writing  */
     if (writeData) {
+        debug("setting write data...");
         code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeData);
         if (code != CURLE_OK) goto exit;
     }
     if (writeFunction) {
+        debug("setting write function...");
         code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
         if (code != CURLE_OK) goto exit;
     }
 
     /* read file */
     if (readFilePtr) {
+        debug("read file ptr: %lu", (long) readFilePtr);
         readData = readFilePtr;
-        readFunction = fread;
+
+        readFunction = read_callback_file;
+        /* readFunction = fread; */
+
+        /* code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, fseek); */
+        /* if (code != CURLE_OK) goto exit; */
+
+        code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 1248);
+        if (code != CURLE_OK) goto exit;
+
+        // CURLOPT_SEEKFUNCTION
+        // CURLOPT_SEEKDATA
+
+        // TODO upload
+        code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+        if (code != CURLE_OK) goto exit;
+
+        debug("read file is set");
     }
 
     /* read stream */
     if (readStreamPtr) {
         readData = readStreamPtr;
         readFunction = read_callback_stream;
+        debug("read stream is set");
     }
 
     /* reading */
     if (readData) {
         code = curl_easy_setopt(curl, CURLOPT_READDATA, readData);
         if (code != CURLE_OK) goto exit;
+        debug("read data is set");
     }
     if (readFunction) {
         code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, readFunction);
         if (code != CURLE_OK) goto exit;
+        debug("read function is set");
     }
 
     /* post string */
     if (jreadString) {
+        debug("setting read string... ");
         char * readString = JNI_CALL(env, GetStringUTFChars, jreadString, NULL);
         if (!readString) {
             code = -5; // TODO special error code
@@ -177,6 +201,7 @@ vars:
 
     /* post bytes */
     if (jreadBytes) {
+        debug("setting read bytes... ");
         char * readBytes = JNI_CALL(env, GetPrimitiveArrayCritical, jreadBytes, NULL);
         if (!readBytes) {
             code = -5; // TODO error const
@@ -200,6 +225,7 @@ vars:
     }
 
     /* perform */
+    debug("running perform... ");
     code = curl_easy_perform(curl);
     if (code != CURLE_OK) goto exit;
 

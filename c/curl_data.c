@@ -11,8 +11,9 @@ struct curl_data * curl_data_init(JNIEnv *env, jobject jobj)
     jobject jobjG = NULL;
     jbyteArray jbuf = NULL;
     struct curl_data * cd = NULL;
+    size_t size = CURL_MAX_WRITE_SIZE;
 
-    jbuf = JNI_CALL(env, NewByteArray, CURL_MAX_WRITE_SIZE);
+    jbuf = JNI_CALL(env, NewByteArray, size);
     jbufG = JNI_CALL(env, NewGlobalRef, jbuf);
     if (!jbufG) {
         debug("NewGlobalRef(jbuf) has failed");
@@ -38,6 +39,7 @@ struct curl_data * curl_data_init(JNIEnv *env, jobject jobj)
     cd->env   = env;
     cd->jbuf  = jbufG;
     cd->jobj  = jobjG;
+    cd->size  = size;
     return cd;
 
 err:

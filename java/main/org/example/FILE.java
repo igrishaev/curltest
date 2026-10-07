@@ -64,7 +64,7 @@ public class FILE implements IResource {
     }
 
     public static void main(final String... args) {
-        try (final FILE f = open("hello.txt", "wb")) {
+        try (final FILE f = open("pom.txt", "rb")) {
             System.out.println(f);
         }
     }

@@ -3,6 +3,7 @@
 
 #include "accum.h"
 #include "debug.h"
+#include "macros.h"
 
 #include "curl/curl.h"
 
@@ -50,7 +51,7 @@ int accum_add(struct accum *acc, char *data, size_t len)
     size_t rem = acc->size - acc->len;
     debug("adding data, len: %lu, rem: %lu", len, rem);
     if (len > rem) {
-        size_t size_new = ((acc->size > len) ? acc->size : len) * acc->factor;
+        size_t size_new = _MAX(acc->size, len) * acc->factor;
         debug("resizing, size new: %lu", size_new);
         void *tmp = realloc(acc->buf, size_new);
         if (!tmp) {

@@ -8,6 +8,7 @@ struct curl_data {
     size_t total;
     JNIEnv *env;
     jbyteArray jbuf;
+    size_t size;
     jobject jobj;
 };
 
