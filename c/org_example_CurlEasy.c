@@ -75,7 +75,7 @@ vars:
     jbyteArray jreadBytes        = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
     jlong      jaccumPtr         = JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
     jlong      jverbose          = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
-    // TODO: coerce to poiners ^
+    // TODO: coerce to pointers ^
     void *writeCallbackPtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
     void *readFilePtr            = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
 
