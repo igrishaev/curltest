@@ -105,3 +105,6 @@ new-module:
 
 repl:
 	DEBUG=1 lein with-profile +test repl
+
+test:
+	mvn test

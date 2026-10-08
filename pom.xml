@@ -14,6 +14,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+      <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter</artifactId>
+        <version>6.1.3</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+
     <build>
         <sourceDirectory>${project.basedir}/java/main</sourceDirectory>
         <resources>
@@ -21,6 +30,7 @@
                 <directory>${project.basedir}/resources</directory>
             </resource>
         </resources>
+        <testSourceDirectory>${project.basedir}/java/test</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
