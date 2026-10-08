@@ -76,12 +76,13 @@ headers:
 
 clear:
 	rm -rf target
-	find . -name '*.o'     	 -delete
-	find . -name '*.dylib' 	 -delete
-	find . -name '*.lib'   	 -delete
-	find . -name '*.so'    	 -delete
-	find . -name '*.dll'   	 -delete
-	find . -name '*.class' 	 -delete
+	find . -name '*.log'     -delete
+	find . -name '*.o'       -delete
+	find . -name '*.dylib'   -delete
+	find . -name '*.lib'     -delete
+	find . -name '*.so'      -delete
+	find . -name '*.dll'     -delete
+	find . -name '*.class'   -delete
 	find . -name '.DS_Store' -delete
 
 acc:
@@ -94,14 +95,15 @@ new-module: FILE_H = $(module).h
 new-module: FILE_C = $(module).c
 new-module:
 	touch $(FILE_C)
-	echo "#include \"$(FILE_H)\""  		  >> $(FILE_C)
+	echo "#include \"$(FILE_H)\""    	  >> $(FILE_C)
 	touch $(FILE_H)
-	echo "#ifndef $(SENTRY)"       		  >> $(FILE_H)
-	echo "#define $(SENTRY)"       		  >> $(FILE_H)
-	echo ""                        		  >> $(FILE_H)
+	echo "#ifndef $(SENTRY)"         	  >> $(FILE_H)
+	echo "#define $(SENTRY)"         	  >> $(FILE_H)
+	echo ""                          	  >> $(FILE_H)
 	echo "/* A big thing starts here! */" >> $(FILE_H)
-	echo ""                        		  >> $(FILE_H)
-	echo "#endif /* $(SENTRY) */"  		  >> $(FILE_H)
+	echo ""                          	  >> $(FILE_H)
+	echo "#endif /* $(SENTRY) */"    	  >> $(FILE_H)
+	mv $(module).* c
 
 repl:
 	DEBUG=1 lein with-profile +test repl
