@@ -189,6 +189,12 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_follow_location(ptr, value));
     }
 
+    native private static long _set_read_stream(long curl, long value);
+    public CurlEasy setReadStream(ReadStream stream) {
+        Objects.requireNonNull(stream, "read stream cannot be null");
+        return checkClosed().checkCode(_set_read_stream(ptr, stream.ptr()));
+    }
+
     @Override
     public void close() {
         if (isClosed) return;

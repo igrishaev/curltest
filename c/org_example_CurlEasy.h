@@ -159,6 +159,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1read_1file
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
   (JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_read_stream
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1read_1stream
+  (JNIEnv *, jclass, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif
