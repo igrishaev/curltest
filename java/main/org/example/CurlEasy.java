@@ -2,7 +2,9 @@ package org.example;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -144,6 +146,32 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_accumulator(ptr, acc.ptr()));
     }
 
+    // TODO: check for null
+    native private static long _set_post_fields_bytes(long curl, byte[] buf, int len);
+    public CurlEasy setPostData(byte[] buf) {
+        return checkClosed().checkCode(_set_post_fields_bytes(ptr, buf, buf.length));
+    }
+
+    public CurlEasy setPostData(String string, Charset charset) {
+        return setPostData(string.getBytes(charset));
+    }
+
+    public CurlEasy setPostData(String string, String charset) {
+        final byte[] buf;
+        try {
+            buf = string.getBytes(charset);
+        } catch (UnsupportedEncodingException e) {
+            throw Err.error("TODO"); // TODO
+        }
+        return setPostData(buf);
+    }
+
+    native private static long _set_verbose(long curl, long value);
+    public CurlEasy setVerbose(boolean flag) {
+        long value = flag ? 1 : 0;
+        return checkClosed().checkCode(_set_verbose(ptr, value));
+    }
+
     @Override
     public void close() {
         if (isClosed) return;
@@ -167,6 +195,7 @@ public class CurlEasy implements IResource {
                     // .setWriteFile(wf)
                     // .setWriteStream(ws)
                     .setMethod(1)
+                    .setPostData(new byte[] {1, 2, 3})
                     .perform();
             System.out.println(acc.getString());
         }

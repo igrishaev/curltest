@@ -128,49 +128,6 @@ vars:
         log_debug("read function is set");
     }
 
-    /* post string */
-    if (jreadString) {
-        log_debug("setting read string... ");
-        char * readString = JNI_CALL(env, GetStringUTFChars, jreadString, NULL);
-        if (!readString) {
-            code = -5; // TODO special error code
-            goto exit;
-        }
-        code = curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, readString);
-        JNI_CALL(env, ReleaseStringUTFChars, jreadString, readString);
-        if (code != CURLE_OK) goto exit;
-    }
-
-    /* post bytes */
-    if (jreadBytes) {
-        log_debug("setting read bytes... ");
-        char * readBytes = JNI_CALL(env, GetPrimitiveArrayCritical, jreadBytes, NULL);
-        if (!readBytes) {
-            code = -5; // TODO error const
-            goto exit;
-        }
-
-        code = curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, readBytes);
-        JNI_CALL(env, ReleasePrimitiveArrayCritical, jreadBytes, readBytes, JNI_ABORT);
-        if (code != CURLE_OK) goto exit;
-
-        jsize length = JNI_CALL(env, GetArrayLength, jreadBytes);
-        code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, length);
-        if (code != CURLE_OK) goto exit;
-    }
-
-    /* verbose */
-    if (jverbose != 0) {
-        log_debug("setting verbose flag: %ld", jverbose);
-        code = curl_easy_setopt(curl, CURLOPT_VERBOSE, jverbose);
-        if (code != CURLE_OK) goto exit;
-    }
-
-    /* perform */
-    log_debug("running perform... ");
-    code = curl_easy_perform(curl);
-    if (code != CURLE_OK) goto exit;
-
 exit:
 
     return code;
@@ -344,4 +301,33 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1accumulator
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jacc) {
     CURL *curl = (CURL *) jcurl;
     return set_write_params(curl, (void *) jacc, accum_write_callback);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1post_1fields_1bytes
+  (JNIEnv *env, jclass jcls, jlong jcurl, jbyteArray jbuf, jint jlen) {
+
+    CURLcode code;
+    CURL *curl = (CURL *) jcurl;
+    char *buf = JNI_CALL(env, GetPrimitiveArrayCritical, jbuf, NULL);
+    if (!buf) {
+        code = CURLE_OUT_OF_MEMORY;
+        goto exit;
+    }
+
+    code = curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, buf);
+    JNI_CALL(env, ReleasePrimitiveArrayCritical, jbuf, buf, JNI_ABORT);
+    if (code != CURLE_OK) goto exit;
+
+    code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, jlen);
+    if (code != CURLE_OK) goto exit;
+
+exit:
+    return code;
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1verbose
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jvalue) {
+    CURL *curl = (CURL *) jcurl;
+    return curl_easy_setopt(curl, CURLOPT_VERBOSE, jvalue);
 }

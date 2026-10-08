@@ -2,7 +2,7 @@ package org.example;
 
 // TODO: CURLException
 public class Err {
-    public static void error(final String template, final Object... args) {
-        throw new RuntimeException(String.format(template, args));
+    public static RuntimeException error(final String template, final Object... args) {
+        return new RuntimeException(String.format(template, args));
     }
 }

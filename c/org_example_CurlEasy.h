@@ -119,6 +119,22 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1stream
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1accumulator
   (JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_post_fields_bytes
+ * Signature: (J[BI)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1post_1fields_1bytes
+  (JNIEnv *, jclass, jlong, jbyteArray, jint);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_verbose
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1verbose
+  (JNIEnv *, jclass, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif
