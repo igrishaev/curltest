@@ -39,6 +39,30 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1url
   (JNIEnv *, jclass, jlong, jstring);
 
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_method
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1method
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _perform
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1perform
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_error_buffer
+ * Signature: (JLjava/nio/ByteBuffer;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
+  (JNIEnv *, jclass, jlong, jobject);
+
 #ifdef __cplusplus
 }
 #endif

@@ -271,19 +271,100 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1url
   (JNIEnv *env, jclass jcls, jlong jcurl, jstring jurl) {
 
-    /* CURLcode code; */
-    /* char *url; */
+    CURLcode code;
+    char *url;
+    CURL *curl = (CURL *) jcurl;
 
-    /* url = JNI_CALL(env, GetStringUTFChars, jurl, NULL); */
-    /* if (!url) { */
+    if (!jurl) {
+        log_debug("HTTP URL is NULL, setting NULL");
+        code = curl_easy_setopt(curl, CURLOPT_URL, NULL);
+        if (code != CURLE_OK) {
+            log_error("curl_easy_setopt(CURLOPT_URL, NULL) has failed");
+        }
+        goto exit;
+    }
 
-    /* } */
+    url = JNI_CALL(env, GetStringUTFChars, jurl, NULL);
+    if (!url) {
+        code = CURLE_OUT_OF_MEMORY;
+        log_error("JNI GetStringUTFChars() has failed");
+        goto exit;
+    }
 
-    /* code = curl_easy_setopt(curl, CURLOPT_URL, url); */
-    /* JNI_CALL(env, ReleaseStringUTFChars, jurl, url); */
+    code = curl_easy_setopt(curl, CURLOPT_URL, url);
+    JNI_CALL(env, ReleaseStringUTFChars, jurl, url);
+    if (code != CURLE_OK) {
+        log_error("curl_easy_setopt() has failed, url: %s", url);
+        goto exit;
+    }
 
-    /* if (code != CURLE_OK) { */
-    /*     log_error("failed to set url, code: %d", code); */
-    /* } */
-    return 0;
+exit:
+    return code;
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1method
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jmethod) {
+
+    CURLcode code;
+    CURL *curl = (CURL *) jcurl;
+
+    switch (jmethod) {
+        case 1: { // TODO use enum
+            code = curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
+            if (code != CURLE_OK) {
+                log_error("curl_easy_setopt() CURLOPT_HTTPGET has failed");
+                goto exit;
+            }
+            break;
+        }
+        case 2: {
+            code = curl_easy_setopt(curl, CURLOPT_HTTPPOST, 1);
+            if (code != CURLE_OK) {
+                log_error("curl_easy_setopt() CURLOPT_HTTPPOST has failed");
+                goto exit;
+            }
+            break;
+        }
+        default: {
+            log_error("unknown HTTP method: %d", jmethod);
+            code = CURLE_UNKNOWN_OPTION;
+            goto exit;
+        }
+    }
+
+exit:
+    return code;
+
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1perform
+  (JNIEnv *env, jclass jcls, jlong jcurl) {
+    CURL *curl = (CURL *) jcurl;
+    return curl_easy_perform(curl);
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
+  (JNIEnv *env, jclass jcls, jlong jcurl, jobject jbb) {
+
+    CURLcode code;
+    char *ptr;
+    CURL *curl = (CURL *) jcurl;
+
+    ptr = JNI_CALL(env, GetDirectBufferAddress, jbb);
+    if (!ptr) {
+        code = CURLE_OUT_OF_MEMORY;
+        log_error("JNI GetDirectBufferAddress() has failed");
+        goto exit;
+    }
+
+    code = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, ptr);
+    if (code != CURLE_OK) {
+        log_error("curl_easy_setopt(CURLOPT_ERRORBUFFER) has failed");
+        goto exit;
+    }
+
+exit:
+    return code;
 }
