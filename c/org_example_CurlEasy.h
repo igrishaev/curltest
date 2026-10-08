@@ -33,6 +33,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform
 
 /*
  * Class:     org_example_CurlEasy
+ * Method:    _get_CURL_ERROR_SIZE
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_example_CurlEasy__1get_1CURL_1ERROR_1SIZE
+  (JNIEnv *, jclass);
+
+/*
+ * Class:     org_example_CurlEasy
  * Method:    _set_url
  * Signature: (JLjava/lang/String;)J
  */
@@ -62,6 +70,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1perform
  */
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
   (JNIEnv *, jclass, jlong, jobject);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _get_str_error
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1str_1error
+  (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

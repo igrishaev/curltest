@@ -1,16 +1,19 @@
 package org.example;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 public class CurlEasy implements IResource {
 
     static {
         Native.loadLib();
+        ERROR_SIZE = _get_CURL_ERROR_SIZE();
     }
 
     private final long ptr;
     private final ByteBuffer bb;
     private boolean isClosed;
+    private final static int ERROR_SIZE;
 
     private CurlEasy(long ptr, ByteBuffer bb, boolean isClosed) {
         this.ptr = ptr;
@@ -23,11 +26,11 @@ public class CurlEasy implements IResource {
         if (ptr == Native.NULL) {
             Err.error("failed to initialize cURL");
         }
-
-        ByteBuffer bb = ByteBuffer.allocateDirect(2048);
-        return new CurlEasy(ptr, bb, false);
+        ByteBuffer bb = ByteBuffer.allocateDirect(ERROR_SIZE);
+        return new CurlEasy(ptr, bb, false).setErrorBuffer();
     }
 
+    // TODO delete
     public Response perform(final Request request) {
         final long code = curl_easy_perform(ptr, request);
         if (code != 0) {
@@ -43,6 +46,7 @@ public class CurlEasy implements IResource {
         return ptr;
     }
 
+    // TODO: delete
     native public static long curl_easy_init();
     native public static long curl_easy_cleanup(final long curlPtr);
     native public static long curl_easy_perform(final long curl, Request request);
@@ -55,19 +59,36 @@ public class CurlEasy implements IResource {
         }
     }
 
+    private static String readCString(final ByteBuffer bb) {
+        bb.rewind();
+        if (bb.get(0) == 0) {
+            return null;
+        }
+        int len = bb.limit();
+        int pos = 0;
+        for (int i = 0; i < len; i++) {
+            if (bb.get(pos) == 0) {
+                break;
+            }
+            pos++;
+        }
+        ByteBuffer slice = bb.slice(0, pos);
+        return StandardCharsets.UTF_8.decode(slice).toString();
+    }
+
     private CurlEasy checkCode(final long code) {
         if (code == 0) {
             return this;
         } else {
-            // curl_easy_strerror
-            bb.rewind();
-            byte[] buf = new byte[2048];
-            bb.get(buf);
-            String msg = new String(buf);
-            System.out.println(msg);
-            throw new RuntimeException(String.format("curl code: %d", code));
+            String errorDescription = _get_str_error(code);
+            String errorExplanation = readCString(bb);
+            throw new RuntimeException(
+                    String.format("curl code: %d, description: %s, explanation: %s",
+                            code, errorDescription, errorExplanation));
         }
     }
+
+    native private static int _get_CURL_ERROR_SIZE();
 
     native private static long _set_url(final long curlPtr, final String url);
     public CurlEasy setUrl(final String url) {
@@ -85,9 +106,11 @@ public class CurlEasy implements IResource {
     }
 
     native private static long _set_error_buffer(long curlPtr, ByteBuffer bb);
-    public CurlEasy setErrorBuffer() {
+    private CurlEasy setErrorBuffer() {
         return checkClosed().checkCode(_set_error_buffer(ptr, bb));
     }
+
+    native private static String _get_str_error(long curlCode);
 
     @Override
     public void close() {
@@ -99,8 +122,7 @@ public class CurlEasy implements IResource {
     public static void main(String... args) {
         try (CurlEasy c = CurlEasy.make()) {
             c
-                    .setErrorBuffer()
-                    .setUrl(null)
+                    .setUrl("https://habr.com")
                     .setMethod(1)
                     .perform();
         }

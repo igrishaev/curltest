@@ -368,3 +368,19 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
 exit:
     return code;
 }
+
+
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1str_1error
+  (JNIEnv *env, jclass jcls, jlong jcode) {
+    const char *str = curl_easy_strerror(jcode);
+    if (str) {
+        return JNI_CALL(env, NewStringUTF, str);
+    } else {
+        return NULL;
+    }
+}
+
+JNIEXPORT jint JNICALL Java_org_example_CurlEasy__1get_1CURL_1ERROR_1SIZE
+  (JNIEnv *env, jclass jcls) {
+    return CURL_ERROR_SIZE;
+}

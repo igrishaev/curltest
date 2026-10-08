@@ -1,4 +1,4 @@
-(def MIN_JAVA_VERSION "16")
+(def MIN_JAVA_VERSION "13")
 
 (defproject server "0.1.0-SNAPSHOT"
 
