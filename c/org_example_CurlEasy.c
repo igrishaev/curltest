@@ -391,3 +391,41 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1reset
     curl_easy_reset(curl);
     return CURLE_OK;
 }
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1set_1headers
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jheaders) {
+    CURL *curl = (CURL *) jcurl;
+    return curl_easy_setopt(curl, CURLOPT_HTTPHEADER, (struct curl_slist *) jheaders);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1file
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jfile) {
+    CURLcode code;
+    CURL *curl = (CURL *) jcurl;
+
+    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (FILE *) jfile);
+    if (code != CURLE_OK) goto exit;
+
+    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
+    if (code != CURLE_OK) goto exit;
+
+exit:
+    return code;
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1stream
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jstream) {
+
+    CURLcode code;
+    CURL *curl = (CURL *) jcurl;
+
+    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) jstream);
+    if (code != CURLE_OK) goto exit;
+
+    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_stream);
+    if (code != CURLE_OK) goto exit;
+
+exit:
+    return code;
+}

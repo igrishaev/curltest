@@ -87,6 +87,30 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1reset
 JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1curl_1easy_1strerror
   (JNIEnv *, jclass, jlong);
 
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _curl_set_headers
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1set_1headers
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_write_file
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1file
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_write_stream
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1stream
+  (JNIEnv *, jclass, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,7 +1,10 @@
 package org.example;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class CurlEasy implements IResource {
 
@@ -111,11 +114,29 @@ public class CurlEasy implements IResource {
     }
 
     native private static long _curl_easy_reset(long curlPtr);
-    public CurlEasy curl_easy_reset() {
+    public CurlEasy resetOptions() {
         return checkClosed().checkCode(_curl_easy_reset(ptr));
     }
 
     native private static String _curl_easy_strerror(long curlCode);
+
+    native private static long _curl_set_headers(long curl, long headers);
+    public CurlEasy setHeaders(Headers headers) {
+        final long hhPtr = (headers == null) ? Native.NULL : headers.ptr();
+        return checkClosed().checkCode(_curl_set_headers(ptr, hhPtr));
+    }
+
+    native private static long _set_write_file(long curl, long file);
+    public CurlEasy setWriteFile(FILE file) {
+        Objects.requireNonNull(file, "the file object cannot be null");
+        return checkClosed().checkCode(_set_write_file(ptr, file.ptr()));
+    }
+
+    native private static long _set_write_stream(long curl, long stream);
+    public CurlEasy setWriteStream(WriteStream stream) {
+        Objects.requireNonNull(stream, "the stream object cannot be null");
+        return checkClosed().checkCode(_set_write_stream(ptr, stream.ptr()));
+    }
 
     @Override
     public void close() {
@@ -124,13 +145,22 @@ public class CurlEasy implements IResource {
         isClosed = true;
     }
 
-    public static void main(String... args) {
-        try (CurlEasy c = CurlEasy.make()) {
+    public static void main(String... args) throws IOException {
+        try (CurlEasy c = CurlEasy.make();
+             Headers hh = Headers.create(new String[] {"foo: bar"});
+             FILE wf = FILE.open("aaa.txt", "wb");
+             ByteArrayOutputStream out = new ByteArrayOutputStream(32);
+             WriteStream ws = WriteStream.create(out)
+        ) {
             c
-                    .curl_easy_reset()
+                    .resetOptions()
                     .setUrl("https://habr.com")
+                    .setHeaders(hh)
+                    .setWriteFile(wf)
+                    .setWriteStream(ws)
                     .setMethod(1)
                     .perform();
+            System.out.println(out);
         }
     }
 }
