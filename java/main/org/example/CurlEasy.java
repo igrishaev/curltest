@@ -138,6 +138,12 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_write_stream(ptr, stream.ptr()));
     }
 
+    native private static long _set_accumulator(long curl, long ptr);
+    public CurlEasy setAccumulator(Accumulator acc) {
+        Objects.requireNonNull(acc, "the accumulator cannot be null");
+        return checkClosed().checkCode(_set_accumulator(ptr, acc.ptr()));
+    }
+
     @Override
     public void close() {
         if (isClosed) return;
@@ -150,17 +156,19 @@ public class CurlEasy implements IResource {
              Headers hh = Headers.create(new String[] {"foo: bar"});
              FILE wf = FILE.open("aaa.txt", "wb");
              ByteArrayOutputStream out = new ByteArrayOutputStream(32);
+             Accumulator acc = Accumulator.create(2048);
              WriteStream ws = WriteStream.create(out)
         ) {
             c
                     .resetOptions()
                     .setUrl("https://habr.com")
                     .setHeaders(hh)
-                    .setWriteFile(wf)
-                    .setWriteStream(ws)
+                    .setAccumulator(acc)
+                    // .setWriteFile(wf)
+                    // .setWriteStream(ws)
                     .setMethod(1)
                     .perform();
-            System.out.println(out);
+            System.out.println(acc.getString());
         }
     }
 }

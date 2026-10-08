@@ -10,46 +10,6 @@
 #include "curl/curl.h"
 
 
-static long _set_url(JNIEnv *env, CURL *curl, jstring jurl) {
-    int code = 0;
-    char *url = NULL;
-
-    url = JNI_CALL(env, GetStringUTFChars, jurl, NULL);
-    if (!url) {
-        code = -1; // TODO use enum
-        goto exit;
-    }
-
-    code = curl_easy_setopt(curl, CURLOPT_URL, url);
-    JNI_CALL(env, ReleaseStringUTFChars, jurl, url);
-
-exit:
-    return code;
-}
-
-
-static long _set_method(CURL *curl, jint jmethod) {
-    int code = 0;
-    switch (jmethod) {
-        case 1: { // TODO use enum
-            code = curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
-            if (code != CURLE_OK) goto exit;
-            break;
-        }
-        case 2: {
-            code = curl_easy_setopt(curl, CURLOPT_HTTPPOST, 1);
-            if (code != CURLE_OK) goto exit;
-            break;
-        }
-        default: {
-            code = -2;
-            goto exit;
-        }
-    }
-exit:
-    return code;
-}
-
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform (
     JNIEnv *env,
     jclass jcls,
@@ -82,57 +42,16 @@ vars:
     // TODO: reuse
     CURL *curl = (CURL *) jcurl;
 
-    // TODO: pass a flag
-    curl_easy_reset(curl);
-    log_debug("curl has been reset");
-
-    /* url */
-    _set_url(env, curl, jurl);
-    log_debug("url set");
-
-    /* method */
-    _set_method(curl, jmethod);
-    log_debug("method set");
-
     /* follow location */
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, followLocation);
     if (code != CURLE_OK) goto exit;
     log_debug("follow location set");
-
-    /* headers */
-    if (headersPtr) {
-        code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headersPtr);
-        if (code != CURLE_OK) goto exit;
-        log_debug("headers set");
-    }
-
-    /* write file */
-    if (writeFilePtr) {
-        writeData = writeFilePtr;
-        writeFunction = fwrite;
-        log_debug("write file is set");
-    }
-
-    /* write stream */
-    if (writeStreamPtr) {
-        writeData = writeStreamPtr;
-        writeFunction = write_callback_stream;
-        log_debug("write stream is set");
-    }
 
     /* write callback */
     if (writeCallbackPtr) {
         writeData = writeCallbackPtr;
         writeFunction = write_callback_handler;
         log_debug("write callback is set");
-    }
-
-    /* accumulate in memory */
-    if (accumPtr) {
-        log_debug("accumulator is passed");
-        writeData = accumPtr;
-        writeFunction = accum_write_callback;
-        log_debug("accumulator is set");
     }
 
     /* writing  */
@@ -398,34 +317,31 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1set_1headers
     return curl_easy_setopt(curl, CURLOPT_HTTPHEADER, (struct curl_slist *) jheaders);
 }
 
+static CURLcode set_write_params(CURL *curl, void *write_data, void *write_function) {
+    CURLcode code;
+    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, write_data);
+    if (code != CURLE_OK) return code;
+    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_function);
+    if (code != CURLE_OK) return code;
+    return code;
+}
+
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1file
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jfile) {
-    CURLcode code;
     CURL *curl = (CURL *) jcurl;
-
-    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (FILE *) jfile);
-    if (code != CURLE_OK) goto exit;
-
-    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fwrite);
-    if (code != CURLE_OK) goto exit;
-
-exit:
-    return code;
+    return set_write_params(curl, (FILE *) jfile, fwrite);
 }
 
 
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1stream
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jstream) {
-
-    CURLcode code;
     CURL *curl = (CURL *) jcurl;
+    return set_write_params(curl, (void *) jstream, write_callback_stream);
+}
 
-    code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) jstream);
-    if (code != CURLE_OK) goto exit;
 
-    code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback_stream);
-    if (code != CURLE_OK) goto exit;
-
-exit:
-    return code;
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1accumulator
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jacc) {
+    CURL *curl = (CURL *) jcurl;
+    return set_write_params(curl, (void *) jacc, accum_write_callback);
 }
