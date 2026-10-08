@@ -214,10 +214,12 @@ public class CurlEasy implements IResource {
                     .resetOptions()
                     .setUrl("https://habr.com")
                     .setHeaders(hh)
+                    .setFollowLocation(3)
                     .setAccumulator(acc)
                     // .setWriteFile(wf)
                     // .setWriteStream(ws)
-                    .setMethod(1)
+                    .setMethod(2)
+                    .setVerbose(true)
                     .setPostData(new byte[] {1, 2, 3})
                     .perform();
             System.out.println(acc.getString());

@@ -323,5 +323,5 @@ exit:
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jvalue) {
     CURL *curl = (CURL *) jcurl;
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jvalue);
+    return curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jvalue);
 }
