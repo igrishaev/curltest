@@ -140,13 +140,13 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_write_stream(ptr, stream.ptr()));
     }
 
-    native private static long _set_write_callback(long curl, long ptr);
+    native private static long _set_write_callback(long curl, long callback);
     public CurlEasy setWriteCallback(WriteCallback callback) {
         Objects.requireNonNull(callback, "write callback cannot be null");
         return checkClosed().checkCode(_set_write_callback(ptr, callback.ptr()));
     }
 
-    native private static long _set_accumulator(long curl, long ptr);
+    native private static long _set_accumulator(long curl, long acc);
     public CurlEasy setAccumulator(Accumulator acc) {
         Objects.requireNonNull(acc, "the accumulator cannot be null");
         return checkClosed().checkCode(_set_accumulator(ptr, acc.ptr()));
@@ -176,6 +176,17 @@ public class CurlEasy implements IResource {
     public CurlEasy setVerbose(boolean flag) {
         long value = flag ? 1 : 0;
         return checkClosed().checkCode(_set_verbose(ptr, value));
+    }
+
+    native private static long _set_read_file(long curl, long file);
+    public CurlEasy setReadFile(FILE file) {
+        Objects.requireNonNull(file, "read file cannot be null");
+        return checkClosed().checkCode(_set_read_file(ptr, file.ptr()));
+    }
+
+    native private static long _set_follow_location(long curl, long value);
+    public CurlEasy setFollowLocation(long value) {
+        return checkClosed().checkCode(_set_follow_location(ptr, value));
     }
 
     @Override

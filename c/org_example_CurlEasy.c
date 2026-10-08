@@ -42,39 +42,6 @@ vars:
     // TODO: reuse
     CURL *curl = (CURL *) jcurl;
 
-    /* follow location */
-    code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, followLocation);
-    if (code != CURLE_OK) goto exit;
-    log_debug("follow location set");
-
-
-    if (readFilePtr) {
-        log_debug("read file ptr: %lu", (long) readFilePtr);
-        readData = readFilePtr;
-
-        readFunction = read_callback_file;
-        /* readFunction = fread; */
-
-        // TODO: only for windows
-        code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, read_seek_file);
-        if (code != CURLE_OK) goto exit;
-        log_debug("seek function is set");
-
-        code = curl_easy_setopt(curl, CURLOPT_SEEKDATA, readFilePtr);
-        if (code != CURLE_OK) goto exit;
-        log_debug("seek data is set");
-
-        // TODO: set size?
-        /* code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 1248); */
-        /* if (code != CURLE_OK) goto exit; */
-
-        code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
-        if (code != CURLE_OK) goto exit;
-        log_debug("UPLOAD is set");
-
-        log_debug("read file is set");
-    }
-
     /* read stream */
     if (readStreamPtr) {
 
@@ -94,23 +61,9 @@ vars:
         readFunction = read_callback_stream;
         log_debug("read stream is set");
 
-
-    }
-
-    /* reading */
-    if (readData) {
-        code = curl_easy_setopt(curl, CURLOPT_READDATA, readData);
-        if (code != CURLE_OK) goto exit;
-        log_debug("read data is set");
-    }
-    if (readFunction) {
-        code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, readFunction);
-        if (code != CURLE_OK) goto exit;
-        log_debug("read function is set");
     }
 
 exit:
-
     return code;
 }
 
@@ -318,4 +271,58 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1verbose
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jvalue) {
     CURL *curl = (CURL *) jcurl;
     return curl_easy_setopt(curl, CURLOPT_VERBOSE, jvalue);
+}
+
+static CURLcode set_read_params(CURL *curl, void *read_data, void *read_function) {
+    CURLcode code;
+    code = curl_easy_setopt(curl, CURLOPT_READDATA, read_data);
+    if (code != CURLE_OK) return code;
+    code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, read_function);
+    if (code != CURLE_OK) return code;
+    return code;
+}
+
+
+static CURLcode set_seek_params(CURL *curl, void *seek_data, void *seek_function) {
+    CURLcode code;
+    code = curl_easy_setopt(curl, CURLOPT_SEEKDATA, seek_data);
+    if (code != CURLE_OK) goto exit;
+    code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, seek_function);
+    if (code != CURLE_OK) goto exit;
+exit:
+    return code;
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1read_1file
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jfile) {
+    CURL *curl = (CURL *) jcurl;
+    CURLcode code;
+
+    code = set_read_params(curl, (FILE *) jfile, fread);
+    if (code != CURLE_OK) goto exit;
+
+    // TODO windows
+    /* code = set_read_params(curl, (FILE *) jfile, read_callback_file); */
+    /* if (code != CURLE_OK) goto exit; */
+
+    /* code = set_seek_params(curl, (FILE *) jfile, read_seek_file); */
+    /* if (code != CURLE_OK) goto exit; */
+
+    /* code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1); */
+    /* if (code != CURLE_OK) goto exit; */
+
+    // TODO: set size?
+    /* code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, ????); */
+    /* if (code != CURLE_OK) goto exit; */
+
+exit:
+    return code;
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jvalue) {
+    CURL *curl = (CURL *) jcurl;
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jvalue);
 }

@@ -143,6 +143,22 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1post_1fields_1bytes
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1verbose
   (JNIEnv *, jclass, jlong, jlong);
 
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_read_file
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1read_1file
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_follow_location
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
+  (JNIEnv *, jclass, jlong, jlong);
+
 #ifdef __cplusplus
 }
 #endif
