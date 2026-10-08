@@ -31,7 +31,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Headers__1allocate
 
         header = JNI_CALL(env, GetStringUTFChars, jheader, NULL);
         if (!header) {
-            log_debug("GetStringUTFChars() has failed");
+            log_error("JNI GetStringUTFChars has failed");
             code = -1;
             goto exit;
         }
@@ -40,7 +40,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Headers__1allocate
         JNI_CALL(env, ReleaseStringUTFChars, jheader, header);
         JNI_CALL(env, DeleteLocalRef, jheader);
         if (!temp) {
-            log_debug("curl_slist_append() has failed");
+            log_error("curl_slist_append() has failed");
             code = -2;
             goto exit;
         }

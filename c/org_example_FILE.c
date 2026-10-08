@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <stdio.h>
 #include "macros.h"
+#include "logging.h"
 
 JNIEXPORT jlong JNICALL Java_org_example_FILE__1fopen
   (JNIEnv *env, jclass jcls, jstring jpath, jstring jmode) {
@@ -12,18 +13,21 @@ JNIEXPORT jlong JNICALL Java_org_example_FILE__1fopen
 
     path = JNI_CALL(env, GetStringUTFChars, jpath, NULL);
     if (!path) {
+        log_error("JNI GetStringUTFChars error");
         return -1;
         goto exit;
     }
 
     mode = JNI_CALL(env, GetStringUTFChars, jmode, NULL);
     if (!mode) {
+        log_error("JNI GetStringUTFChars error");
         result = -2;
         goto exit;
     }
 
     fp = fopen(path, mode);
     if (!fp) {
+        log_error("failed to open a file, mode: %s, path: %s", mode, path);
         result = -3;
         goto exit;
     }

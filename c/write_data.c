@@ -16,7 +16,7 @@ size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userda
 
     JNI_CALL(env, SetByteArrayRegion, cd->jbuf, 0, total, (jbyte *) data);
     if (JNI_CALL(env, ExceptionCheck)) {
-        log_debug("SetByteArrayRegion has failed");
+        log_error("JNI SetByteArrayRegion has failed");
 #ifdef DEBUG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -25,7 +25,7 @@ size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userda
 
     JNI_CALL(env, CallVoidMethod, cd->jobj, _g.OutputStream.write_BaII, cd->jbuf, 0, total);
     if (JNI_CALL(env, ExceptionCheck)) {
-        log_debug("write callback stream has failed");
+        log_debug("JNI OutputStream.write() has failed");
 #ifdef DEBUG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -46,7 +46,7 @@ size_t write_callback_handler(char *data, size_t size, size_t nmemb, void *userd
 
     JNI_CALL(env, SetByteArrayRegion, cd->jbuf, 0, total, (jbyte *) data);
     if (JNI_CALL(env, ExceptionCheck)) {
-        log_debug("SetByteArrayRegion has failed");
+        log_error("JNI SetByteArrayRegion has failed");
 #ifdef DEBIG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -55,7 +55,7 @@ size_t write_callback_handler(char *data, size_t size, size_t nmemb, void *userd
 
     JNI_CALL(env, CallVoidMethod, cd->jobj, _g.IWriteHandler.handle_BaII, cd->jbuf, 0, total);
     if (JNI_CALL(env, ExceptionCheck)) {
-        log_debug("write callback handler has failed");
+        log_error("JNI IWriteHandler.handle() call has failed");
 #ifdef DEBIG
         JNI_CALL(env, ExceptionDescribe);
 #endif

@@ -14,13 +14,13 @@ struct accum * accum_init(size_t size, size_t factor)
     /* begin */
     buf = malloc(size);
     if (!buf) {
-        log_debug("failed to malloc(size)");
+        log_error("failed to malloc(size)");
         goto err;
     }
 
     acc = malloc(sizeof(struct accum));
     if (!acc) {
-        log_debug("failed to malloc struct accum");
+        log_error("failed to malloc struct accum");
         goto err;
     }
 
@@ -53,7 +53,7 @@ int accum_add(struct accum *acc, char *data, size_t len)
         log_debug("resizing, size new: %lu", size_new);
         void *tmp = realloc(acc->buf, size_new);
         if (!tmp) {
-            log_debug("failed to resize");
+            log_error("failed to resize, size new: %lu", size_new);
             return 0;
         }
         acc->buf = tmp;

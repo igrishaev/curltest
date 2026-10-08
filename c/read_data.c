@@ -19,7 +19,7 @@ size_t read_callback_stream(char *ptr, size_t size, size_t nmemb, void *userdata
 
     jint read = JNI_CALL(env, CallIntMethod, cd->jobj, _g.InputStream.read_BaII, cd->jbuf, 0, limit);
     if (JNI_CALL(env, ExceptionCheck)) {
-        log_debug("InputStream.read has failed");
+        log_error("JNI InputStream.read has failed");
 #ifdef DEBUG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -36,6 +36,7 @@ size_t read_callback_stream(char *ptr, size_t size, size_t nmemb, void *userdata
     char * buf = JNI_CALL(env, GetPrimitiveArrayCritical, cd->jbuf, NULL);
     if (!buf) {
 #ifdef DEBUG
+        log_error("JNI GetPrimitiveArrayCritical has failed");
         JNI_CALL(env, ExceptionDescribe);
 #endif
         return CURL_READFUNC_ABORT;
@@ -64,8 +65,8 @@ int read_seek_file(void *userdata, curl_off_t offset, int origin) {
     FILE *f = (FILE *) userdata;
     int res = fseek(f, offset, origin);
     if (res) {
-        log_debug("failed to seek a file, res: %d, offset: %ld, origin: %d",
-              res, offset, origin);
+        log_error("failed to seek a file, res: %d, offset: %ld, origin: %d",
+                  res, offset, origin);
         return CURL_SEEKFUNC_FAIL;
     } else {
         log_debug("seeking a file was OK");

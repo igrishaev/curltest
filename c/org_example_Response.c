@@ -9,7 +9,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
 
     log_debug("composing in the response");
     CURL *curl = (CURL *) jcurl;
-    CURLcode code = 0;
+    CURLcode code = CURLE_OK;
 
     long http_code;
     code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
@@ -48,8 +48,6 @@ JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
     JNI_CALL(env, SetIntField, jresp, _g.Response.status, (int) http_code);
     log_debug("http status is set");
 
-    /* TODO JNI_CALL(jresp, SetObjectField, jresp, _g.Response.body, ); */
-
     JNI_CALL(env, SetLongField, jresp, _g.Response.contentLength, (long) content_length);
     log_debug("content length is set");
 
@@ -60,5 +58,8 @@ JNIEXPORT jlong JNICALL Java_org_example_Response_from_1curl
     }
 
 exit:
+    if (code != CURLE_OK) {
+        log_error("response processing failed with code: %d", code);
+    }
     return code;
 }

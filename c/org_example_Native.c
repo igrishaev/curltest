@@ -7,21 +7,21 @@
 #define GET_CLASS(env, clsname, clsvar) \
     clsvar = JNI_CALL(env, FindClass, clsname); \
     if (!clsvar) { \
-        log_debug("failed to find class: " clsname); \
+        log_error("JNI failed to find class: " clsname); \
         return JNI_ERR; \
     }
 
 #define SET_FIELD(env, jcls, fname, ftype, fvar) \
     fvar = JNI_CALL(env, GetFieldID, jcls, fname, ftype); \
     if (!fvar) { \
-        log_debug("failed to find field: " fname " " ftype); \
+        log_error("JNI failed to find field: " fname " " ftype); \
         return JNI_ERR; \
     }
 
 #define SET_METHOD(env, jcls, name, sig, var) \
     var = JNI_CALL(env, GetMethodID, jcls, name, sig); \
     if (!var) { \
-        log_debug("failed to find method: " name " " sig); \
+        log_error("JNI failed to find method: " name " " sig); \
         return JNI_ERR; \
     }
 

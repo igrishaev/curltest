@@ -283,7 +283,7 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1url
     /* JNI_CALL(env, ReleaseStringUTFChars, jurl, url); */
 
     /* if (code != CURLE_OK) { */
-    /*     log_debug("failed to set url, code: %d", code); */
+    /*     log_error("failed to set url, code: %d", code); */
     /* } */
     return 0;
 }
