@@ -26,6 +26,13 @@ size_t read_callback_stream(char *ptr, size_t size, size_t nmemb, void *userdata
         return CURL_READFUNC_ABORT;
     }
 
+    debug("bytes read: %i:", read);
+
+    if (read == -1) { /* EOF */
+        debug("read stream EOF is reached");
+        return 0;
+    }
+
     char * buf = JNI_CALL(env, GetPrimitiveArrayCritical, cd->jbuf, NULL);
     if (!buf) {
 #ifdef DEBUG

@@ -29,6 +29,7 @@ public class Main {
                     .followLocation(3)
                     // .writeStream(ws)
                     .verbose(false)
+                    .readStream(rs)
                     // .writeCallback(wc)
 //                    .headers(h)
 //                    .accum(acc)

@@ -1,3 +1,8 @@
+- set options method
+- perform method
+- throw exeption
+- pass reset flag
+- reuse curl pointer
 - rename write and read functions
 - user_data module
 - separate perform and setting options

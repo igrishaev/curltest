@@ -79,7 +79,12 @@ vars:
     void      *readFilePtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
     void      *readStreamPtr     = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readStreamPtr);
 
+    // TODO: reuse
     CURL *curl = (CURL *) jcurl;
+
+    // TODO: pass a flag
+    curl_easy_reset(curl);
+    debug("curl has been reset");
 
     /* url */
     _set_url(env, curl, jurl);
@@ -173,11 +178,23 @@ vars:
     /* read stream */
     if (readStreamPtr) {
 
-        // TODO: upload=1, seek=cannot
+        code = curl_easy_setopt(curl, CURLOPT_SEEKDATA, NULL);
+        if (code != CURLE_OK) goto exit;
+        debug("seek data is set");
+
+        code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, read_seek_cannot);
+        if (code != CURLE_OK) goto exit;
+        debug("seek function is set");
+
+        code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
+        if (code != CURLE_OK) goto exit;
+        debug("UPLOAD is set");
 
         readData = readStreamPtr;
         readFunction = read_callback_stream;
         debug("read stream is set");
+
+
     }
 
     /* reading */
