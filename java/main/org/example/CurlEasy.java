@@ -80,7 +80,7 @@ public class CurlEasy implements IResource {
         if (code == 0) {
             return this;
         } else {
-            String errorDescription = _get_str_error(code);
+            String errorDescription = _curl_easy_strerror(code);
             String errorExplanation = readCString(bb);
             throw new RuntimeException(
                     String.format("curl code: %d, description: %s, explanation: %s",
@@ -110,7 +110,12 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_error_buffer(ptr, bb));
     }
 
-    native private static String _get_str_error(long curlCode);
+    native private static long _curl_easy_reset(long curlPtr);
+    public CurlEasy curl_easy_reset() {
+        return checkClosed().checkCode(_curl_easy_reset(ptr));
+    }
+
+    native private static String _curl_easy_strerror(long curlCode);
 
     @Override
     public void close() {
@@ -122,6 +127,7 @@ public class CurlEasy implements IResource {
     public static void main(String... args) {
         try (CurlEasy c = CurlEasy.make()) {
             c
+                    .curl_easy_reset()
                     .setUrl("https://habr.com")
                     .setMethod(1)
                     .perform();

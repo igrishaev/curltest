@@ -370,7 +370,7 @@ exit:
 }
 
 
-JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1str_1error
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1curl_1easy_1strerror
   (JNIEnv *env, jclass jcls, jlong jcode) {
     const char *str = curl_easy_strerror(jcode);
     if (str) {
@@ -383,4 +383,11 @@ JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1str_1error
 JNIEXPORT jint JNICALL Java_org_example_CurlEasy__1get_1CURL_1ERROR_1SIZE
   (JNIEnv *env, jclass jcls) {
     return CURL_ERROR_SIZE;
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1reset
+  (JNIEnv *env, jclass jcls, jlong jcurl) {
+    CURL *curl = (CURL *) jcurl;
+    curl_easy_reset(curl);
+    return CURLE_OK;
 }

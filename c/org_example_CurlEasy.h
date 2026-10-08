@@ -73,10 +73,18 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
 
 /*
  * Class:     org_example_CurlEasy
- * Method:    _get_str_error
+ * Method:    _curl_easy_reset
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1reset
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _curl_easy_strerror
  * Signature: (J)Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1str_1error
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1curl_1easy_1strerror
   (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
