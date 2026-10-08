@@ -1,6 +1,6 @@
 #include <jni.h>
 #include "macros.h"
-#include "debug.h"
+#include "logging.h"
 #include "curl/curl.h"
 
 /*
@@ -23,7 +23,7 @@ JNIEXPORT jlong JNICALL Java_org_example_Headers__1allocate
 
     for (i = 0; i < jsize; i++) {
 
-        debug("processing header: %d", i);
+        log_debug("processing header: %d", i);
         jheader = (jstring) JNI_CALL(env, GetObjectArrayElement, jheaders, i);
         if (jheader == NULL) {
             continue;
@@ -31,16 +31,16 @@ JNIEXPORT jlong JNICALL Java_org_example_Headers__1allocate
 
         header = JNI_CALL(env, GetStringUTFChars, jheader, NULL);
         if (!header) {
-            debug("GetStringUTFChars() has failed");
+            log_debug("GetStringUTFChars() has failed");
             code = -1;
             goto exit;
         }
         temp = curl_slist_append(slist, header);
-        debug("header: %s", header);
+        log_debug("header: %s", header);
         JNI_CALL(env, ReleaseStringUTFChars, jheader, header);
         JNI_CALL(env, DeleteLocalRef, jheader);
         if (!temp) {
-            debug("curl_slist_append() has failed");
+            log_debug("curl_slist_append() has failed");
             code = -2;
             goto exit;
         }

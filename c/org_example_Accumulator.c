@@ -1,6 +1,6 @@
 #include <jni.h>
 #include "macros.h"
-#include "debug.h"
+#include "logging.h"
 #include "accum.h"
 
 JNIEXPORT jlong JNICALL Java_org_example_Accumulator__1allocate

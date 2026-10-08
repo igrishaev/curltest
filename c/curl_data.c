@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "macros.h"
-#include "debug.h"
+#include "logging.h"
 #include "curl/curl.h"
 #include "curl_data.h"
 
@@ -16,7 +16,7 @@ struct curl_data * curl_data_init(JNIEnv *env, jobject jobj)
     jbuf = JNI_CALL(env, NewByteArray, size);
     jbufG = JNI_CALL(env, NewGlobalRef, jbuf);
     if (!jbufG) {
-        debug("NewGlobalRef(jbuf) has failed");
+        log_debug("NewGlobalRef(jbuf) has failed");
         goto err;
     }
 
@@ -24,13 +24,13 @@ struct curl_data * curl_data_init(JNIEnv *env, jobject jobj)
 
     jobjG = JNI_CALL(env, NewGlobalRef, jobj);
     if (!jobjG) {
-        debug("NewGlobalRef(jobj) has failed");
+        log_debug("NewGlobalRef(jobj) has failed");
         goto err;
     }
 
     cd = malloc(sizeof(struct curl_data));
     if (!cd) {
-        debug("failed to allocate struct curl_data");
+        log_debug("failed to allocate struct curl_data");
         goto err;
     }
 

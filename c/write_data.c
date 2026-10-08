@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "curl_data.h"
 #include "macros.h"
-#include "debug.h"
+#include "logging.h"
 #include "globals.h"
 #include "curl/curl.h"
 #include "curl_data.h"
@@ -12,11 +12,11 @@ size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userda
     struct curl_data *cd = (struct curl_data *) userdata;
     JNIEnv *env = cd->env;
 
-    debug("write callback stream, total: %lu", total);
+    log_debug("write callback stream, total: %lu", total);
 
     JNI_CALL(env, SetByteArrayRegion, cd->jbuf, 0, total, (jbyte *) data);
     if (JNI_CALL(env, ExceptionCheck)) {
-        debug("SetByteArrayRegion has failed");
+        log_debug("SetByteArrayRegion has failed");
 #ifdef DEBUG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -25,7 +25,7 @@ size_t write_callback_stream(char *data, size_t size, size_t nmemb, void *userda
 
     JNI_CALL(env, CallVoidMethod, cd->jobj, _g.OutputStream.write_BaII, cd->jbuf, 0, total);
     if (JNI_CALL(env, ExceptionCheck)) {
-        debug("write callback stream has failed");
+        log_debug("write callback stream has failed");
 #ifdef DEBUG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -42,11 +42,11 @@ size_t write_callback_handler(char *data, size_t size, size_t nmemb, void *userd
     struct curl_data *cd = (struct curl_data *) userdata;
     JNIEnv *env = cd->env;
 
-    debug("write callback handler, total: %lu", total);
+    log_debug("write callback handler, total: %lu", total);
 
     JNI_CALL(env, SetByteArrayRegion, cd->jbuf, 0, total, (jbyte *) data);
     if (JNI_CALL(env, ExceptionCheck)) {
-        debug("SetByteArrayRegion has failed");
+        log_debug("SetByteArrayRegion has failed");
 #ifdef DEBIG
         JNI_CALL(env, ExceptionDescribe);
 #endif
@@ -55,7 +55,7 @@ size_t write_callback_handler(char *data, size_t size, size_t nmemb, void *userd
 
     JNI_CALL(env, CallVoidMethod, cd->jobj, _g.IWriteHandler.handle_BaII, cd->jbuf, 0, total);
     if (JNI_CALL(env, ExceptionCheck)) {
-        debug("write callback handler has failed");
+        log_debug("write callback handler has failed");
 #ifdef DEBIG
         JNI_CALL(env, ExceptionDescribe);
 #endif

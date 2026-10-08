@@ -1,5 +1,5 @@
 #include <jni.h>
-#include "debug.h"
+#include "logging.h"
 #include "globals.h"
 #include "macros.h"
 #include "curl/curl.h"
@@ -7,21 +7,21 @@
 #define GET_CLASS(env, clsname, clsvar) \
     clsvar = JNI_CALL(env, FindClass, clsname); \
     if (!clsvar) { \
-        debug("failed to find class: " clsname); \
+        log_debug("failed to find class: " clsname); \
         return JNI_ERR; \
     }
 
 #define SET_FIELD(env, jcls, fname, ftype, fvar) \
     fvar = JNI_CALL(env, GetFieldID, jcls, fname, ftype); \
     if (!fvar) { \
-        debug("failed to find field: " fname " " ftype); \
+        log_debug("failed to find field: " fname " " ftype); \
         return JNI_ERR; \
     }
 
 #define SET_METHOD(env, jcls, name, sig, var) \
     var = JNI_CALL(env, GetMethodID, jcls, name, sig); \
     if (!var) { \
-        debug("failed to find method: " name " " sig); \
+        log_debug("failed to find method: " name " " sig); \
         return JNI_ERR; \
     }
 
@@ -31,7 +31,7 @@ struct J_Globals _g;
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
 
-    debug("JNI_OnLoad start");
+    log_debug("JNI_OnLoad start");
 
     JNIEnv* env;
     if ((*vm)->GetEnv(vm, (void **) &env, J_VERSION) != JNI_OK) {
@@ -42,10 +42,10 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         if (code != CURLE_OK) {
             return JNI_ERR;
         }
-        debug("cURL has been initialized globally");
+        log_debug("cURL has been initialized globally");
 
         char * version = curl_version();
-        debug("cURL version: %s", version);
+        log_debug("cURL version: %s", version);
 
         jclass jcls;
         jmethodID jmeth;
@@ -89,15 +89,15 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         SET_METHOD(env, jcls, "read",  "([BII)I", _g.InputStream.read_BaII);
         SET_METHOD(env, jcls, "close", "()V",     _g.InputStream.close);
 
-        debug("JNI_OnLoad end");
+        log_debug("JNI_OnLoad end");
         return J_VERSION;
     }
 }
 
 JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
-    debug("JNI_OnUnload");
+    log_debug("JNI_OnUnload");
     curl_global_cleanup();
-    debug("cURL has been globally cleaned up");
+    log_debug("cURL has been globally cleaned up");
 }
 
 JNIEXPORT jlong JNICALL Java_org_example_Native_get_1null

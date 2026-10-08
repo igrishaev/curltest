@@ -31,6 +31,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform
   (JNIEnv *, jclass, jlong, jobject);
 
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _set_url
+ * Signature: (JLjava/lang/String;)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1url
+  (JNIEnv *, jclass, jlong, jstring);
+
 #ifdef __cplusplus
 }
 #endif

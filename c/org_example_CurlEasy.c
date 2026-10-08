@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "accum.h"
-#include "debug.h"
+#include "logging.h"
 #include "globals.h"
 #include "macros.h"
 #include "write_data.h"
@@ -84,72 +84,72 @@ vars:
 
     // TODO: pass a flag
     curl_easy_reset(curl);
-    debug("curl has been reset");
+    log_debug("curl has been reset");
 
     /* url */
     _set_url(env, curl, jurl);
-    debug("url set");
+    log_debug("url set");
 
     /* method */
     _set_method(curl, jmethod);
-    debug("method set");
+    log_debug("method set");
 
     /* follow location */
     code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, followLocation);
     if (code != CURLE_OK) goto exit;
-    debug("follow location set");
+    log_debug("follow location set");
 
     /* headers */
     if (headersPtr) {
         code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headersPtr);
         if (code != CURLE_OK) goto exit;
-        debug("headers set");
+        log_debug("headers set");
     }
 
     /* write file */
     if (writeFilePtr) {
         writeData = writeFilePtr;
         writeFunction = fwrite;
-        debug("write file is set");
+        log_debug("write file is set");
     }
 
     /* write stream */
     if (writeStreamPtr) {
         writeData = writeStreamPtr;
         writeFunction = write_callback_stream;
-        debug("write stream is set");
+        log_debug("write stream is set");
     }
 
     /* write callback */
     if (writeCallbackPtr) {
         writeData = writeCallbackPtr;
         writeFunction = write_callback_handler;
-        debug("write callback is set");
+        log_debug("write callback is set");
     }
 
     /* accumulate in memory */
     if (accumPtr) {
-        debug("accumulator is passed");
+        log_debug("accumulator is passed");
         writeData = accumPtr;
         writeFunction = accum_write_callback;
-        debug("accumulator is set");
+        log_debug("accumulator is set");
     }
 
     /* writing  */
     if (writeData) {
-        debug("setting write data...");
+        log_debug("setting write data...");
         code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeData);
         if (code != CURLE_OK) goto exit;
     }
     if (writeFunction) {
-        debug("setting write function...");
+        log_debug("setting write function...");
         code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
         if (code != CURLE_OK) goto exit;
     }
 
     /* read file */
     if (readFilePtr) {
-        debug("read file ptr: %lu", (long) readFilePtr);
+        log_debug("read file ptr: %lu", (long) readFilePtr);
         readData = readFilePtr;
 
         readFunction = read_callback_file;
@@ -158,11 +158,11 @@ vars:
         // TODO: only for windows
         code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, read_seek_file);
         if (code != CURLE_OK) goto exit;
-        debug("seek function is set");
+        log_debug("seek function is set");
 
         code = curl_easy_setopt(curl, CURLOPT_SEEKDATA, readFilePtr);
         if (code != CURLE_OK) goto exit;
-        debug("seek data is set");
+        log_debug("seek data is set");
 
         // TODO: set size?
         /* code = curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, 1248); */
@@ -170,9 +170,9 @@ vars:
 
         code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
         if (code != CURLE_OK) goto exit;
-        debug("UPLOAD is set");
+        log_debug("UPLOAD is set");
 
-        debug("read file is set");
+        log_debug("read file is set");
     }
 
     /* read stream */
@@ -180,19 +180,19 @@ vars:
 
         code = curl_easy_setopt(curl, CURLOPT_SEEKDATA, NULL);
         if (code != CURLE_OK) goto exit;
-        debug("seek data is set");
+        log_debug("seek data is set");
 
         code = curl_easy_setopt(curl, CURLOPT_SEEKFUNCTION, read_seek_cannot);
         if (code != CURLE_OK) goto exit;
-        debug("seek function is set");
+        log_debug("seek function is set");
 
         code = curl_easy_setopt(curl, CURLOPT_UPLOAD, 1);
         if (code != CURLE_OK) goto exit;
-        debug("UPLOAD is set");
+        log_debug("UPLOAD is set");
 
         readData = readStreamPtr;
         readFunction = read_callback_stream;
-        debug("read stream is set");
+        log_debug("read stream is set");
 
 
     }
@@ -201,17 +201,17 @@ vars:
     if (readData) {
         code = curl_easy_setopt(curl, CURLOPT_READDATA, readData);
         if (code != CURLE_OK) goto exit;
-        debug("read data is set");
+        log_debug("read data is set");
     }
     if (readFunction) {
         code = curl_easy_setopt(curl, CURLOPT_READFUNCTION, readFunction);
         if (code != CURLE_OK) goto exit;
-        debug("read function is set");
+        log_debug("read function is set");
     }
 
     /* post string */
     if (jreadString) {
-        debug("setting read string... ");
+        log_debug("setting read string... ");
         char * readString = JNI_CALL(env, GetStringUTFChars, jreadString, NULL);
         if (!readString) {
             code = -5; // TODO special error code
@@ -224,7 +224,7 @@ vars:
 
     /* post bytes */
     if (jreadBytes) {
-        debug("setting read bytes... ");
+        log_debug("setting read bytes... ");
         char * readBytes = JNI_CALL(env, GetPrimitiveArrayCritical, jreadBytes, NULL);
         if (!readBytes) {
             code = -5; // TODO error const
@@ -242,13 +242,13 @@ vars:
 
     /* verbose */
     if (jverbose != 0) {
-        debug("setting verbose flag: %ld", jverbose);
+        log_debug("setting verbose flag: %ld", jverbose);
         code = curl_easy_setopt(curl, CURLOPT_VERBOSE, jverbose);
         if (code != CURLE_OK) goto exit;
     }
 
     /* perform */
-    debug("running perform... ");
+    log_debug("running perform... ");
     code = curl_easy_perform(curl);
     if (code != CURLE_OK) goto exit;
 
@@ -265,5 +265,25 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1init
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
   (JNIEnv *env, jclass jcls, jlong jcurl) {
     curl_easy_cleanup((CURL *) jcurl);
+    return 0;
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1url
+  (JNIEnv *env, jclass jcls, jlong jcurl, jstring jurl) {
+
+    /* CURLcode code; */
+    /* char *url; */
+
+    /* url = JNI_CALL(env, GetStringUTFChars, jurl, NULL); */
+    /* if (!url) { */
+
+    /* } */
+
+    /* code = curl_easy_setopt(curl, CURLOPT_URL, url); */
+    /* JNI_CALL(env, ReleaseStringUTFChars, jurl, url); */
+
+    /* if (code != CURLE_OK) { */
+    /*     log_debug("failed to set url, code: %d", code); */
+    /* } */
     return 0;
 }

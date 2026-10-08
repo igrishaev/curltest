@@ -1,10 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-
 #include "accum.h"
-#include "debug.h"
+#include "logging.h"
 #include "macros.h"
-
 #include "curl/curl.h"
 
 struct accum * accum_init(size_t size, size_t factor)
@@ -16,13 +14,13 @@ struct accum * accum_init(size_t size, size_t factor)
     /* begin */
     buf = malloc(size);
     if (!buf) {
-        debug("failed to malloc(size)");
+        log_debug("failed to malloc(size)");
         goto err;
     }
 
     acc = malloc(sizeof(struct accum));
     if (!acc) {
-        debug("failed to malloc struct accum");
+        log_debug("failed to malloc struct accum");
         goto err;
     }
 
@@ -49,28 +47,28 @@ int accum_add(struct accum *acc, char *data, size_t len)
 {
     if (!acc) return 0;
     size_t rem = acc->size - acc->len;
-    debug("adding data, len: %lu, rem: %lu", len, rem);
+    log_debug("adding data, len: %lu, rem: %lu", len, rem);
     if (len > rem) {
         size_t size_new = _MAX(acc->size, len) * acc->factor;
-        debug("resizing, size new: %lu", size_new);
+        log_debug("resizing, size new: %lu", size_new);
         void *tmp = realloc(acc->buf, size_new);
         if (!tmp) {
-            debug("failed to resize");
+            log_debug("failed to resize");
             return 0;
         }
         acc->buf = tmp;
         acc->size = size_new;
-        debug("resising ok");
+        log_debug("resising ok");
     }
     memcpy(acc->buf + acc->len, data, len);
     acc->len += len;
-    debug("acc size: %lu, len: %lu", acc->size, acc->len);
+    log_debug("acc size: %lu, len: %lu", acc->size, acc->len);
     return 1;
 }
 
 size_t accum_write_callback(char *data, size_t size, size_t nmemb, void *userdata)
 {
-    debug("accumulator callback gets called");
+    log_debug("accumulator callback gets called");
     size_t len = size * nmemb;
     struct accum *acc = (struct accum *) userdata;
     if (!accum_add(acc, data, len)) return CURL_WRITEFUNC_ERROR;

@@ -40,6 +40,7 @@ public class CurlEasy implements IResource {
     native public static long curl_easy_init();
     native public static long curl_easy_cleanup(final long curlPtr);
     native public static long curl_easy_perform(final long curl, Request request);
+    native private static long _set_url(final long curlPtr, final String url);
 
     @Override
     public void close() {
