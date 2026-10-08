@@ -47,26 +47,7 @@ vars:
     if (code != CURLE_OK) goto exit;
     log_debug("follow location set");
 
-    /* write callback */
-    if (writeCallbackPtr) {
-        writeData = writeCallbackPtr;
-        writeFunction = write_callback_handler;
-        log_debug("write callback is set");
-    }
 
-    /* writing  */
-    if (writeData) {
-        log_debug("setting write data...");
-        code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, writeData);
-        if (code != CURLE_OK) goto exit;
-    }
-    if (writeFunction) {
-        log_debug("setting write function...");
-        code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
-        if (code != CURLE_OK) goto exit;
-    }
-
-    /* read file */
     if (readFilePtr) {
         log_debug("read file ptr: %lu", (long) readFilePtr);
         readData = readFilePtr;
@@ -294,6 +275,13 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1stream
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jstream) {
     CURL *curl = (CURL *) jcurl;
     return set_write_params(curl, (void *) jstream, write_callback_stream);
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1callback
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jptr) {
+    CURL *curl = (CURL *) jcurl;
+    return set_write_params(curl, (void *) jptr, write_callback_handler);
 }
 
 

@@ -113,6 +113,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1stream
 
 /*
  * Class:     org_example_CurlEasy
+ * Method:    _set_write_callback
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1write_1callback
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
  * Method:    _set_accumulator
  * Signature: (JJ)J
  */

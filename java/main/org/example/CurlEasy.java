@@ -140,6 +140,12 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_write_stream(ptr, stream.ptr()));
     }
 
+    native private static long _set_write_callback(long curl, long ptr);
+    public CurlEasy setWriteCallback(WriteCallback callback) {
+        Objects.requireNonNull(callback, "write callback cannot be null");
+        return checkClosed().checkCode(_set_write_callback(ptr, callback.ptr()));
+    }
+
     native private static long _set_accumulator(long curl, long ptr);
     public CurlEasy setAccumulator(Accumulator acc) {
         Objects.requireNonNull(acc, "the accumulator cannot be null");
