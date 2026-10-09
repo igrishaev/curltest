@@ -185,6 +185,30 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1redirect_1time_1t
 
 /*
  * Class:     org_example_CurlEasy
+ * Method:    _get_retry_after
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1retry_1after
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _get_speed_download_t
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1speed_1download_1t
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _get_speed_upload_t
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1speed_1upload_1t
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
  * Method:    _curl_easy_cleanup
  * Signature: (J)J
  */

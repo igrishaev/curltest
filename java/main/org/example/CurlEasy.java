@@ -187,6 +187,24 @@ public class CurlEasy implements IResource {
         return arena.orderJNI().getLong(0);
     }
 
+    native private static long _get_retry_after(long curl, long bb);
+    public long getRetryCount() {
+        checkClosed().checkCode(_get_retry_after(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_speed_download_t(long curl, long bb);
+    public long getSpeedDownload() {
+        checkClosed().checkCode(_get_speed_download_t(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_speed_upload_t(long curl, long bb);
+    public long getSpeedUpload() {
+        checkClosed().checkCode(_get_speed_upload_t(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {

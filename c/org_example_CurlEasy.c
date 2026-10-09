@@ -314,11 +314,22 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1redirect_1time_1t
     return _get_info_as_long(jcurl, jbb, CURLINFO_REDIRECT_TIME_T);
 }
 
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1retry_1after
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_RETRY_AFTER);
+}
 
-/* https://curl.se/libcurl/c/CURLINFO_RETRY_AFTER.html */
-/* https://curl.se/libcurl/c/CURLINFO_SIZE_DOWNLOAD_T.html */
-/* https://curl.se/libcurl/c/CURLINFO_SPEED_DOWNLOAD_T.html */
-/* https://curl.se/libcurl/c/CURLINFO_SPEED_UPLOAD_T.html */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1speed_1download_1t
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_SPEED_DOWNLOAD_T);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1speed_1upload_1t
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_SPEED_UPLOAD_T);
+}
+
+
 /* https://curl.se/libcurl/c/CURLINFO_USED_PROXY.html */
 /* https://curl.se/libcurl/c/CURLINFO_NUM_CONNECTS.html */
 /* https://curl.se/libcurl/c/CURLINFO_PRIMARY_IP.html */
