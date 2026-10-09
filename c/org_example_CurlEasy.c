@@ -10,42 +10,6 @@
 #include "curl/curl.h"
 
 
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform (
-    JNIEnv *env,
-    jclass jcls,
-    jlong jcurl,
-    jobject jreq
-)
-{
-vars:
-    int i = 0;
-    long code = 0;
-    void *writeData            = NULL;
-    void *writeFunction        = NULL;
-    void *readData             = NULL;
-    void *readFunction         = NULL;
-
-    jstring    jurl              = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.url);
-    jint       jmethod           = JNI_CALL(env, GetIntField, jreq, _g.Request.method);
-    jint       followLocation    = JNI_CALL(env, GetIntField, jreq, _g.Request.followLocation);
-    void      *headersPtr        = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.headersPtr);
-    void      *writeFilePtr      = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeFilePtr);
-    void      *writeStreamPtr    = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeStreamPtr);
-    jstring    jreadString       = (jstring) JNI_CALL(env, GetObjectField, jreq, _g.Request.readString);
-    jbyteArray jreadBytes        = (jbyteArray) JNI_CALL(env, GetObjectField, jreq, _g.Request.readBytes);
-    void      *accumPtr          = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.accumPtr);
-    jlong      jverbose          = JNI_CALL(env, GetLongField, jreq, _g.Request.verbose);
-    void      *writeCallbackPtr  = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.writeCallbackPtr);
-    void      *readFilePtr       = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readFilePtr);
-    void      *readStreamPtr     = (void *) JNI_CALL(env, GetLongField, jreq, _g.Request.readStreamPtr);
-
-    // TODO: reuse
-    CURL *curl = (CURL *) jcurl;
-
-exit:
-    return code;
-}
-
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1init
   (JNIEnv *env, jclass jcls) {
     return (jlong) curl_easy_init();

@@ -1,7 +1,5 @@
 package org.example;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -35,17 +33,6 @@ public class CurlEasy implements IResource {
         return new CurlEasy(ptr, bb, false).setErrorBuffer();
     }
 
-    // TODO delete
-    public Response perform(final Request request) {
-        final long code = curl_easy_perform(ptr, request);
-        if (code != 0) {
-            Err.error("failed with non-zero code: %s", code);
-        }
-        final Response response = new Response();
-        response.from_curl(ptr);
-        return response;
-    }
-
     @Override
     public long ptr() {
         return ptr;
@@ -54,7 +41,6 @@ public class CurlEasy implements IResource {
     // TODO: delete
     native public static long curl_easy_init();
     native public static long curl_easy_cleanup(final long curlPtr);
-    native public static long curl_easy_perform(final long curl, Request request);
 
     private CurlEasy checkClosed() {
         if (isClosed) {
@@ -200,29 +186,5 @@ public class CurlEasy implements IResource {
         if (isClosed) return;
         curl_easy_cleanup(ptr);
         isClosed = true;
-    }
-
-    public static void main(String... args) throws IOException {
-        try (CurlEasy c = CurlEasy.make();
-             Headers hh = Headers.create(new String[] {"foo: bar"});
-             FILE wf = FILE.open("aaa.txt", "wb");
-             ByteArrayOutputStream out = new ByteArrayOutputStream(32);
-             Accumulator acc = Accumulator.create(2048);
-             WriteStream ws = WriteStream.create(out)
-        ) {
-            c
-                    .resetOptions()
-                    .setUrl("https://habr.com")
-                    .setHeaders(hh)
-                    .setFollowLocation(3)
-                    .setAccumulator(acc)
-                    // .setWriteFile(wf)
-                    // .setWriteStream(ws)
-                    .setMethod(2)
-                    .setVerbose(true)
-                    .setPostData(new byte[] {1, 2, 3})
-                    .perform();
-            System.out.println(acc.getString());
-        }
     }
 }

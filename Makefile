@@ -16,7 +16,6 @@ JAVAFILES = \
 	$(SRC_PATH)/Native.java \
 	$(SRC_PATH)/CurlEasy.java \
 	$(SRC_PATH)/Err.java \
-	$(SRC_PATH)/Request.java \
 	$(SRC_PATH)/Response.java \
 	$(SRC_PATH)/IWriteHandler.java
 

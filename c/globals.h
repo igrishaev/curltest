@@ -13,20 +13,9 @@ struct J_OutputStream {
     jmethodID close;
 };
 
-struct J_Request {
-    jfieldID url;
-    jfieldID method;
-    jfieldID followLocation;
-    jfieldID headersPtr;
-    jfieldID writeFilePtr;
-    jfieldID writeStreamPtr;
-    jfieldID readString;
-    jfieldID readBytes;
-    jfieldID accumPtr;
-    jfieldID verbose;
-    jfieldID writeCallbackPtr;
-    jfieldID readFilePtr;
-    jfieldID readStreamPtr;
+struct J_InputStream {
+    jmethodID read_BaII;
+    jmethodID close;
 };
 
 struct J_Response {
@@ -37,17 +26,11 @@ struct J_Response {
     jmethodID addHeader;
 };
 
-struct J_InputStream {
-    jmethodID read_BaII;
-    jmethodID close;
-};
-
 struct J_Globals {
-    struct J_Response      Response;
-    struct J_Request       Request;
     struct J_OutputStream  OutputStream;
     struct J_InputStream   InputStream;
     struct J_IWriteHandler IWriteHandler;
+    struct J_Response      Response;
 };
 
 extern struct J_Globals _g;

@@ -25,14 +25,6 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
 
 /*
  * Class:     org_example_CurlEasy
- * Method:    curl_easy_perform
- * Signature: (JLorg/example/Request;)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1perform
-  (JNIEnv *, jclass, jlong, jobject);
-
-/*
- * Class:     org_example_CurlEasy
  * Method:    _get_CURL_ERROR_SIZE
  * Signature: ()I
  */
