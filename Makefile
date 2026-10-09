@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/Arena.java \
 	$(SRC_PATH)/Const.java \
 	$(SRC_PATH)/ReadStream.java \
 	$(SRC_PATH)/OS.java \
@@ -25,6 +26,7 @@ MODULES = \
 	$(C_PATH)/read_data.c \
 	$(C_PATH)/curl_data.c \
 	$(C_PATH)/write_data.c \
+	$(C_PATH)/org_example_Arena.c \
 	$(C_PATH)/org_example_ReadStream.c \
 	$(C_PATH)/org_example_WriteCallback.c \
 	$(C_PATH)/org_example_WriteStream.c \
