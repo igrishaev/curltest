@@ -153,6 +153,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1read_1stream
 
 /*
  * Class:     org_example_CurlEasy
+ * Method:    _get_response_code
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1response_1code
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
  * Method:    _curl_easy_cleanup
  * Signature: (J)J
  */

@@ -178,6 +178,13 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_read_stream(ptr, stream.ptr()));
     }
 
+    native private static long _get_response_code(long curl, long bb);
+    public long getResponseCode() {
+        checkClosed().checkCode(_get_response_code(ptr, 123));
+        bb.rewind();
+        return bb.getLong();
+    }
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {

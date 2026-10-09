@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "accum.h"
 #include "logging.h"
 #include "globals.h"
@@ -288,4 +289,16 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jvalue) {
     CURL *curl = (CURL *) jcurl;
     return curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, jvalue);
+}
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1response_1code
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    CURL *curl = (CURL *) jcurl;
+    long http_code;
+    CURLcode code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    if (code == CURLE_OK) {
+        memcpy((void *) jbb, &http_code, sizeof(http_code));
+    }
+    return code;
 }
