@@ -303,7 +303,6 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1connect_1time_1t
     return _get_info_as_long(jcurl, jbb, CURLINFO_CONNECT_TIME_T);
 }
 
-
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1content_1length_1download_1t
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
     return _get_info_as_long(jcurl, jbb, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T);
@@ -329,18 +328,32 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1speed_1upload_1t
     return _get_info_as_long(jcurl, jbb, CURLINFO_SPEED_UPLOAD_T);
 }
 
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1used_1proxy
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_USED_PROXY);
+}
 
-/* https://curl.se/libcurl/c/CURLINFO_USED_PROXY.html */
-/* https://curl.se/libcurl/c/CURLINFO_NUM_CONNECTS.html */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1num_1connects
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_NUM_CONNECTS);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1redirect_1count
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_REDIRECT_COUNT);
+}
+
+
+// error: proxy error, errno
+
+/* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */
+/* https://curl.se/libcurl/c/CURLINFO_LOCAL_PORT.html */
 /* https://curl.se/libcurl/c/CURLINFO_PRIMARY_IP.html */
 /* https://curl.se/libcurl/c/CURLINFO_PRIMARY_PORT.html */
-/* https://curl.se/libcurl/c/CURLINFO_PROXY_ERROR.html */
-/* https://curl.se/libcurl/c/CURLINFO_REDIRECT_COUNT.html */
 /* https://curl.se/libcurl/c/CURLINFO_EFFECTIVE_URL.html */
-/* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */
 /* https://curl.se/libcurl/c/CURLINFO_LOCAL_IP.html */
-/* https://curl.se/libcurl/c/CURLINFO_LOCAL_PORT.html */
 /* https://curl.se/libcurl/c/CURLINFO_OS_ERRNO.html */
+/* https://curl.se/libcurl/c/CURLINFO_PROXY_ERROR.html */
 /* headers */
 
 /* https://curl.se/libcurl/c/CURLOPT_AWS_SIGV4.html */

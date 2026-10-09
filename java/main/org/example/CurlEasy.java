@@ -205,6 +205,24 @@ public class CurlEasy implements IResource {
         return arena.orderJNI().getLong(0);
     }
 
+    native private static long _get_used_proxy(long curl, long bb);
+    public boolean getUsedProxy() {
+        checkClosed().checkCode(_get_used_proxy(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0) != 0;
+    }
+
+    native private static long _get_num_connects(long curl, long bb);
+    public long getNumConnects() {
+        checkClosed().checkCode(_get_num_connects(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_redirect_count(long curl, long bb);
+    public long getRedirectCount() {
+        checkClosed().checkCode(_get_redirect_count(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {
