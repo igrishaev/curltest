@@ -163,89 +163,116 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_set_read_stream(ptr, stream.ptr()));
     }
 
+    private long curlLong() {
+        return arena.orderJNI().getLong(0);
+    }
+
     native private static long _get_response_code(long curl, long bb);
     public long getResponseCode() {
         checkClosed().checkCode(_get_response_code(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_connect_time_t(long curl, long bb);
     public long getConnectTimeMs() {
         checkClosed().checkCode(_get_connect_time_t(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_content_length_download_t(long curl, long bb);
     public long getContentLengthDownload() {
         checkClosed().checkCode(_get_content_length_download_t(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_redirect_time_t(long curl, long bb);
     public long getRedirectTime() {
         checkClosed().checkCode(_get_connect_time_t(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_retry_after(long curl, long bb);
     public long getRetryCount() {
         checkClosed().checkCode(_get_retry_after(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_speed_download_t(long curl, long bb);
     public long getSpeedDownload() {
         checkClosed().checkCode(_get_speed_download_t(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_speed_upload_t(long curl, long bb);
     public long getSpeedUpload() {
         checkClosed().checkCode(_get_speed_upload_t(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_used_proxy(long curl, long bb);
     public boolean getUsedProxy() {
         checkClosed().checkCode(_get_used_proxy(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0) != 0;
+        return curlLong() != 0;
     }
 
     native private static long _get_num_connects(long curl, long bb);
     public long getNumConnects() {
         checkClosed().checkCode(_get_num_connects(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_redirect_count(long curl, long bb);
     public long getRedirectCount() {
         checkClosed().checkCode(_get_redirect_count(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_local_port(long curl, long bb);
     public long getLocalPort() {
         checkClosed().checkCode(_get_local_port(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_proxy_error(long curl, long bb);
     public long getProxyError() {
         checkClosed().checkCode(_get_proxy_error(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_primary_port(long curl, long bb);
     public long getPrimaryPort() {
         checkClosed().checkCode(_get_primary_port(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
 
     native private static long _get_os_errno(long curl, long bb);
     public long getOsErrno() {
         checkClosed().checkCode(_get_os_errno(ptr, arena.ptr()));
-        return arena.orderJNI().getLong(0);
+        return curlLong();
     }
+    
+    native private static String _get_primary_ip(long curl, long bb);
+    public String getPrimaryIP() {
+        final String result = _get_primary_ip(ptr, arena.ptr());
+        checkCode(curlLong());
+        return result;
+    }
+
+    native private static String _get_effective_url(long curl, long bb);
+    public String getEffectiveURL() {
+        final String result = _get_effective_url(ptr, arena.ptr());
+        checkCode(curlLong());
+        return result;
+    }
+
+    native private static String _get_local_ip(long curl, long bb);
+    public String getLocalIP() {
+        final String result = _get_local_ip(ptr, arena.ptr());
+        checkCode(curlLong());
+        return result;
+    }
+    
+    
 
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override

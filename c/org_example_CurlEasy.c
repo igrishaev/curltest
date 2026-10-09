@@ -363,24 +363,39 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1os_1errno
     return _get_info_as_long(jcurl, jbb, CURLINFO_OS_ERRNO);
 }
 
-/* static CURLcode _get_info_as_string(jlong jcurl, CURLINFO info) { */
-/*     CURL *curl = (CURL *) jcurl; */
-/*     char *ptr */
-/*     CURLcode code = curl_easy_getinfo(curl, info, ptr); */
-/*     if (code == CURLE_OK) { */
-/*         bb = put_long(bb, value); */
-/*     } */
-/*     return code; */
-/* } */
+static jstring _get_info_as_string(JNIEnv *env, jlong jcurl, jlong jbb, CURLINFO info) {
+    CURL *curl = (CURL *) jcurl;
+    char *bb = (char *) jbb;
+    char *ptr;
+    CURLcode code = curl_easy_getinfo(curl, info, ptr);
+    if (code == CURLE_OK) {
+        return JNI_CALL(env, NewStringUTF, ptr);
+    } else {
+        bb = put_long(bb, code);
+        return NULL;
+    }
+}
+
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1primary_1ip
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_string(env, jcurl, jbb, CURLINFO_PRIMARY_IP);
+}
+
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1effective_1url
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_string(env, jcurl, jbb, CURLINFO_EFFECTIVE_URL);
+}
+
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1local_1ip
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_string(env, jcurl, jbb, CURLINFO_LOCAL_IP);
+}
 
 
 // error: proxy error, errno
-
-/* https://curl.se/libcurl/c/CURLINFO_PRIMARY_IP.html */
-/* https://curl.se/libcurl/c/CURLINFO_EFFECTIVE_URL.html */
-/* https://curl.se/libcurl/c/CURLINFO_LOCAL_IP.html */
 /* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */
 /* headers */
+
 
 /* https://curl.se/libcurl/c/CURLOPT_AWS_SIGV4.html */
 /* https://curl.se/libcurl/c/CURLOPT_BUFFERSIZE.html */
