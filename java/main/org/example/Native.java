@@ -16,7 +16,7 @@ public class Native {
         String resourcePath = OS.getLibName();
         final URL url = cl.getResource(resourcePath);
         if (url == null) {
-            Err.error("failed to load a resource: %s", resourcePath);
+            throw Err.error("failed to load a resource: %s", resourcePath);
         }
         final File tmp = File.createTempFile("temp_", ".lib");
         final Path path = tmp.toPath();

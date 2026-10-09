@@ -27,7 +27,7 @@ public class CurlEasy implements IResource {
     public static CurlEasy make() {
         final long ptr = curl_easy_init();
         if (ptr == Native.NULL) {
-            Err.error("failed to initialize cURL");
+            throw Err.error("failed to initialize cURL");
         }
         ByteBuffer bb = ByteBuffer.allocateDirect(ERROR_SIZE);
         return new CurlEasy(ptr, bb, false).setErrorBuffer();

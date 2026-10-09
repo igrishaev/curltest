@@ -23,7 +23,7 @@ public class ReadStream implements IResource {
     public static ReadStream create(InputStream in) {
         long ptr = _allocate(in);
         if (ptr == Native.NULL) {
-            Err.error("failed to allocate read stream");
+            throw Err.error("failed to allocate read stream");
         }
         return new ReadStream(ptr, in, false);
     }
@@ -47,7 +47,7 @@ public class ReadStream implements IResource {
             throw new UncheckedIOException(e);
         }
         if (code != 0) {
-            Err.error("failed to close read stream, code: %s", code);
+            throw Err.error("failed to close read stream, code: %s", code);
         }
     }
 }

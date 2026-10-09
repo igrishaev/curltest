@@ -67,7 +67,7 @@ public class Headers implements IResource {
         final long code = _free(ptr);
         isClosed = true;
         if (code != 0) {
-            Err.error("failed to close headers, code: %s", code);
+            throw Err.error("failed to close headers, code: %s", code);
         }
     }
 

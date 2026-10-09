@@ -23,7 +23,7 @@ public class WriteStream implements IResource {
     public static WriteStream create(OutputStream out) {
         long ptr = _allocate(out);
         if (ptr == Native.NULL) {
-            Err.error("failed to allocate write stream");
+            throw Err.error("failed to allocate write stream");
         }
         return new WriteStream(ptr, out, false);
     }
@@ -47,7 +47,7 @@ public class WriteStream implements IResource {
             throw new UncheckedIOException(e);
         }
         if (code != 0) {
-            Err.error("failed to close write stream, code: %s", code);
+            throw Err.error("failed to close write stream, code: %s", code);
         }
     }
 }

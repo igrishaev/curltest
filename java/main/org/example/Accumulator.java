@@ -24,10 +24,14 @@ public class Accumulator implements IResource {
         this.isClosed = isClosed;
     }
 
+    public static Accumulator create() {
+        return create(Const.ACCUM_SIZE);
+    }
+
     public static Accumulator create(long initSize) {
         long ptr = _allocate(initSize);
         if (ptr == Native.NULL) {
-            Err.error("failed to allocate accumulator");
+            throw Err.error("failed to allocate accumulator");
         }
         return new Accumulator(ptr, false);
     }
@@ -64,7 +68,7 @@ public class Accumulator implements IResource {
         final long code = _free(ptr);
         isClosed = true;
         if (code != 0) {
-            Err.error("failed to close Accumulator, code: %s", code);
+            throw Err.error("failed to close Accumulator, code: %s", code);
         }
     }
 }

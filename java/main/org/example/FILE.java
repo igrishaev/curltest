@@ -34,7 +34,7 @@ public class FILE implements IResource {
     public static FILE open(final String path, final String mode) {
         final long fd = _fopen(path, mode);
         if (fd < 0) {
-            Err.error("fopen failed, code: %s, mode: %s, path: %s", fd, mode, path);
+            throw Err.error("fopen failed, code: %s, mode: %s, path: %s", fd, mode, path);
         }
         return new FILE(fd, path, mode, false);
     }
@@ -59,7 +59,7 @@ public class FILE implements IResource {
         final long code = _fclose(ptr);
         isClosed = true;
         if (code != 0) {
-            Err.error("fclose failed, code: %s, mode: %s, path: %s", code, mode, path);
+            throw Err.error("fclose failed, code: %s, mode: %s, path: %s", code, mode, path);
         }
     }
 

@@ -17,7 +17,7 @@ public class WriteCallback implements IResource {
     public static WriteCallback create(IWriteHandler handler) {
         long ptr = _allocate(handler);
         if (ptr == Native.NULL) {
-            Err.error("failed to allocate WriteCallback");
+            throw Err.error("failed to allocate WriteCallback");
         }
         return new WriteCallback(ptr, false);
     }
@@ -36,7 +36,7 @@ public class WriteCallback implements IResource {
         long code = _free(ptr);
         isClosed = true;
         if (code != 0) {
-            Err.error("failed to close WriteCallback, code: %s", code);
+            throw Err.error("failed to close WriteCallback, code: %s", code);
         }
     }
 }
