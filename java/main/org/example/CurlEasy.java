@@ -1,7 +1,6 @@
 package org.example;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
@@ -131,13 +130,7 @@ public class CurlEasy implements IResource {
     }
 
     public CurlEasy setPostData(String string, String charset) {
-        final byte[] buf;
-        try {
-            buf = string.getBytes(charset);
-        } catch (UnsupportedEncodingException e) {
-            throw Err.error("TODO"); // TODO
-        }
-        return setPostData(buf);
+        return setPostData(string, Charset.forName(charset)); // TODO fallback?
     }
 
     native private static long _set_verbose(long curl, long value);
@@ -272,8 +265,6 @@ public class CurlEasy implements IResource {
         return result;
     }
     
-    
-
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {
