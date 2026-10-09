@@ -166,8 +166,13 @@ public class CurlEasy implements IResource {
     native private static long _get_response_code(long curl, long bb);
     public long getResponseCode() {
         checkClosed().checkCode(_get_response_code(ptr, arena.ptr()));
-        arena.orderJNI();
-        return arena.getLong(0);
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_connect_time_t(long curl, long bb);
+    public long getConnectTimeMs() {
+        checkClosed().checkCode(_get_connect_time_t(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
     }
 
     native private static long _curl_easy_cleanup(final long curlPtr);

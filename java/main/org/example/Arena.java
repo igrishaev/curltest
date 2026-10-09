@@ -77,12 +77,14 @@ public class Arena {
         return ptr;
     }
 
-    public void putNULL() {
+    public Arena putNULL() {
         bb.putLong(NULL);
+        return this;
     }
 
-    public void putNULL(final int index) {
+    public Arena putNULL(final int index) {
         bb.putLong(index, NULL);
+        return this;
     }
 
     public int putCString(final String s) {
@@ -116,16 +118,19 @@ public class Arena {
         return StandardCharsets.UTF_8.decode(slice).toString();
     }
 
-    public void rewind() {
+    public Arena rewind() {
         bb.rewind();
+        return this;
     }
 
-    public void orderJVM() {
+    public Arena orderJVM() {
         bb.order(BO_JVM);
+        return this;
     }
 
-    public void orderJNI() {
+    public Arena orderJNI() {
         bb.order(BO_JNI);
+        return this;
     }
 
     public int getInt() {
@@ -140,40 +145,47 @@ public class Arena {
         return bb.getLong(index);
     }
 
-    public void putInt(final int i) {
+    public Arena putInt(final int i) {
         bb.putInt(i);
+        return this;
     }
 
-    public void putInt(final int index, final int i) {
+    public Arena putInt(final int index, final int i) {
         bb.putInt(index, i);
+        return this;
     }
 
-    public void putLong(final long l) {
+    public Arena putLong(final long l) {
         bb.putLong(l);
+        return this;
     }
 
-    public void putLong(final int index, final long l) {
+    public Arena putLong(final int index, final long l) {
         bb.putLong(index, l);
+        return this;
     }
 
     public int position() {
         return bb.position();
     }
 
-    public void skip(final int len) {
+    public Arena skip(final int len) {
         final int pos = bb.position();
         bb.position(pos + len);
+        return this;
     }
 
-    public void get(final byte[] ba) {
+    public Arena get(final byte[] ba) {
         bb.get(ba);
+        return this;
     }
 
     @SuppressWarnings("unused")
-    void debug(final int len) {
+    public Arena debug(final int len) {
         final byte[] ba = new byte[len];
         bb.get(0, ba);
         System.out.println(Arrays.toString(ba));
+        return this;
     }
 
     public static void main(final String... args) {

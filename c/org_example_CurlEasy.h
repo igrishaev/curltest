@@ -161,6 +161,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1response_1code
 
 /*
  * Class:     org_example_CurlEasy
+ * Method:    _get_connect_time_t
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1connect_1time_1t
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
  * Method:    _curl_easy_cleanup
  * Signature: (J)J
  */

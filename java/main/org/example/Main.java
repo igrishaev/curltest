@@ -16,7 +16,7 @@ public class Main {
         ) {
             c
                     .resetOptions()
-                    // .setUrl("https://habr.com")
+                    .setUrl("https://habr.com")
                     .setHeaders(hh)
                     .setFollowLocation(3)
                     .setAccumulator(acc)
@@ -33,6 +33,7 @@ public class Main {
             }
             // System.out.println(acc.getString());
             System.out.println(c.getResponseCode());
+            System.out.println(c.getConnectTimeMs());
         }
     }
 }

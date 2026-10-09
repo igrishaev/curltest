@@ -22,6 +22,7 @@ JAVAFILES = \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
+	$(C_PATH)/bytebuffer.c \
 	$(C_PATH)/accum.c \
 	$(C_PATH)/read_data.c \
 	$(C_PATH)/curl_data.c \

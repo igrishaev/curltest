@@ -1,20 +1,5 @@
 #include <jni.h>
-#include <string.h>
-
-static char * put_byte(char *bb, char value) {
-    memcpy(bb, &value, sizeof value);
-    return bb += sizeof value;
-}
-
-static char * put_int(char *bb, int value) {
-    memcpy(bb, &value, sizeof value);
-    return bb += sizeof value;
-}
-
-static char * put_long(char* bb, long value) {
-    memcpy(bb, &value, sizeof value);
-    return bb += sizeof value;
-}
+#include "bytebuffer.h"
 
 JNIEXPORT jint JNICALL Java_org_example_Arena__1init_1byte_1buffer
   (JNIEnv *env, jclass jcls, jobject jbb) {

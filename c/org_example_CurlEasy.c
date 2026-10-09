@@ -9,6 +9,7 @@
 #include "write_data.h"
 #include "read_data.h"
 #include "curl/curl.h"
+#include "bytebuffer.h"
 
 
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1init
@@ -283,10 +284,23 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1response_1code
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
     CURL *curl = (CURL *) jcurl;
-    long http_code;
-    CURLcode code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    char *bb = (char *) jbb;
+    long value;
+    CURLcode code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &value);
     if (code == CURLE_OK) {
-        memcpy((void *) jbb, &http_code, sizeof(http_code));
+        bb = put_long(bb, value);
+    }
+    return code;
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1connect_1time_1t
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    CURL *curl = (CURL *) jcurl;
+    char *bb = (char *) jbb;
+    curl_off_t value;
+    CURLcode code = curl_easy_getinfo(curl, CURLINFO_CONNECT_TIME_T, &value);
+    if (code == CURLE_OK) {
+        bb = put_long(bb, value);
     }
     return code;
 }
