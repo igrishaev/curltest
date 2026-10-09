@@ -9,19 +9,11 @@ extern "C" {
 #endif
 /*
  * Class:     org_example_CurlEasy
- * Method:    curl_easy_init
+ * Method:    _curl_easy_init
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1init
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1init
   (JNIEnv *, jclass);
-
-/*
- * Class:     org_example_CurlEasy
- * Method:    curl_easy_cleanup
- * Signature: (J)J
- */
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
-  (JNIEnv *, jclass, jlong);
 
 /*
  * Class:     org_example_CurlEasy
@@ -158,6 +150,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
  */
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1read_1stream
   (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _curl_easy_cleanup
+ * Signature: (J)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1cleanup
+  (JNIEnv *, jclass, jlong);
 
 #ifdef __cplusplus
 }

@@ -5,6 +5,7 @@ SRC_PATH = java/main/org/example
 C_PATH = c
 
 JAVAFILES = \
+	$(SRC_PATH)/Const.java \
 	$(SRC_PATH)/ReadStream.java \
 	$(SRC_PATH)/OS.java \
 	$(SRC_PATH)/WriteCallback.java \

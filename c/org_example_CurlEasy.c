@@ -10,12 +10,12 @@
 #include "curl/curl.h"
 
 
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1init
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1init
   (JNIEnv *env, jclass jcls) {
     return (jlong) curl_easy_init();
 }
 
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy_curl_1easy_1cleanup
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1cleanup
   (JNIEnv *env, jclass jcls, jlong jcurl) {
     curl_easy_cleanup((CURL *) jcurl);
     return 0;
