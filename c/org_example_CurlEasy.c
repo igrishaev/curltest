@@ -8,8 +8,8 @@
 #include "macros.h"
 #include "write_data.h"
 #include "read_data.h"
-#include "curl/curl.h"
 #include "bytebuffer.h"
+#include "curl/curl.h"
 
 
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1init

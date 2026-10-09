@@ -1,3 +1,4 @@
+- rename accum to collector
 - set CURLOPT_ERRORBUFFER (len CURL_ERROR_SIZE)
 - set options method
 - perform method
