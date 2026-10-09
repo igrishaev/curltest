@@ -223,6 +223,30 @@ public class CurlEasy implements IResource {
         return arena.orderJNI().getLong(0);
     }
 
+    native private static long _get_local_port(long curl, long bb);
+    public long getLocalPort() {
+        checkClosed().checkCode(_get_local_port(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_proxy_error(long curl, long bb);
+    public long getProxyError() {
+        checkClosed().checkCode(_get_proxy_error(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_primary_port(long curl, long bb);
+    public long getPrimaryPort() {
+        checkClosed().checkCode(_get_primary_port(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_os_errno(long curl, long bb);
+    public long getOsErrno() {
+        checkClosed().checkCode(_get_os_errno(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {

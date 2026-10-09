@@ -343,17 +343,43 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1redirect_1count
     return _get_info_as_long(jcurl, jbb, CURLINFO_REDIRECT_COUNT);
 }
 
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1local_1port
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_LOCAL_PORT);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1proxy_1error
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_PROXY_ERROR);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1primary_1port
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_PRIMARY_PORT);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1os_1errno
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_OS_ERRNO);
+}
+
+/* static CURLcode _get_info_as_string(jlong jcurl, CURLINFO info) { */
+/*     CURL *curl = (CURL *) jcurl; */
+/*     char *ptr */
+/*     CURLcode code = curl_easy_getinfo(curl, info, ptr); */
+/*     if (code == CURLE_OK) { */
+/*         bb = put_long(bb, value); */
+/*     } */
+/*     return code; */
+/* } */
+
 
 // error: proxy error, errno
 
-/* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */
-/* https://curl.se/libcurl/c/CURLINFO_LOCAL_PORT.html */
 /* https://curl.se/libcurl/c/CURLINFO_PRIMARY_IP.html */
-/* https://curl.se/libcurl/c/CURLINFO_PRIMARY_PORT.html */
 /* https://curl.se/libcurl/c/CURLINFO_EFFECTIVE_URL.html */
 /* https://curl.se/libcurl/c/CURLINFO_LOCAL_IP.html */
-/* https://curl.se/libcurl/c/CURLINFO_OS_ERRNO.html */
-/* https://curl.se/libcurl/c/CURLINFO_PROXY_ERROR.html */
+/* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */
 /* headers */
 
 /* https://curl.se/libcurl/c/CURLOPT_AWS_SIGV4.html */
