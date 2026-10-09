@@ -30,6 +30,7 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1url
     char *url;
     CURL *curl = (CURL *) jcurl;
 
+    // TODO: check in java
     if (!jurl) {
         log_debug("HTTP URL is NULL, setting NULL");
         code = curl_easy_setopt(curl, CURLOPT_URL, NULL);
@@ -281,26 +282,94 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1follow_1location
 }
 
 
-JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1response_1code
-  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+static CURLcode _get_info_as_long(jlong jcurl, jlong jbb, CURLINFO info) {
     CURL *curl = (CURL *) jcurl;
     char *bb = (char *) jbb;
     long value;
-    CURLcode code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &value);
+    CURLcode code = curl_easy_getinfo(curl, info, &value);
     if (code == CURLE_OK) {
         bb = put_long(bb, value);
     }
     return code;
 }
 
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1response_1code
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_RESPONSE_CODE);
+}
+
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1connect_1time_1t
   (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
-    CURL *curl = (CURL *) jcurl;
-    char *bb = (char *) jbb;
-    curl_off_t value;
-    CURLcode code = curl_easy_getinfo(curl, CURLINFO_CONNECT_TIME_T, &value);
-    if (code == CURLE_OK) {
-        bb = put_long(bb, value);
-    }
-    return code;
+    return _get_info_as_long(jcurl, jbb, CURLINFO_CONNECT_TIME_T);
 }
+
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1content_1length_1download_1t
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T);
+}
+
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1get_1redirect_1time_1t
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
+    return _get_info_as_long(jcurl, jbb, CURLINFO_REDIRECT_TIME_T);
+}
+
+
+/* https://curl.se/libcurl/c/CURLINFO_RETRY_AFTER.html */
+/* https://curl.se/libcurl/c/CURLINFO_SIZE_DOWNLOAD_T.html */
+/* https://curl.se/libcurl/c/CURLINFO_SPEED_DOWNLOAD_T.html */
+/* https://curl.se/libcurl/c/CURLINFO_SPEED_UPLOAD_T.html */
+/* https://curl.se/libcurl/c/CURLINFO_USED_PROXY.html */
+/* https://curl.se/libcurl/c/CURLINFO_NUM_CONNECTS.html */
+/* https://curl.se/libcurl/c/CURLINFO_PRIMARY_IP.html */
+/* https://curl.se/libcurl/c/CURLINFO_PRIMARY_PORT.html */
+/* https://curl.se/libcurl/c/CURLINFO_PROXY_ERROR.html */
+/* https://curl.se/libcurl/c/CURLINFO_REDIRECT_COUNT.html */
+/* https://curl.se/libcurl/c/CURLINFO_EFFECTIVE_URL.html */
+/* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */
+/* https://curl.se/libcurl/c/CURLINFO_LOCAL_IP.html */
+/* https://curl.se/libcurl/c/CURLINFO_LOCAL_PORT.html */
+/* https://curl.se/libcurl/c/CURLINFO_OS_ERRNO.html */
+/* headers */
+
+/* https://curl.se/libcurl/c/CURLOPT_AWS_SIGV4.html */
+/* https://curl.se/libcurl/c/CURLOPT_BUFFERSIZE.html */
+/* https://curl.se/libcurl/c/CURLOPT_CONNECTTIMEOUT_MS.html */
+/* https://curl.se/libcurl/c/CURLOPT_COOKIE.html */
+/* https://curl.se/libcurl/c/CURLOPT_COOKIEFILE.html */
+/* https://curl.se/libcurl/c/CURLOPT_COOKIEJAR.html */
+/* https://curl.se/libcurl/c/CURLOPT_COOKIESESSION.html */
+/* https://curl.se/libcurl/c/CURLOPT_CUSTOMREQUEST.html */
+/* https://curl.se/libcurl/c/CURLOPT_DEFAULT_PROTOCOL.html */
+/* https://curl.se/libcurl/c/CURLOPT_FAILONERROR.html */
+/* https://curl.se/libcurl/c/CURLOPT_HTTPHEADER.html */
+/* https://curl.se/libcurl/c/CURLOPT_HTTPPROXYTUNNEL.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXY.html */
+/* https://curl.se/libcurl/c/CURLOPT_HTTP_VERSION.html */
+/* https://curl.se/libcurl/c/CURLOPT_LOGIN_OPTIONS.html */
+/* https://curl.se/libcurl/c/CURLOPT_MAXCONNECTS.html */
+/* https://curl.se/libcurl/c/CURLOPT_MAXREDIRS.html */
+/* https://curl.se/libcurl/c/CURLOPT_NOBODY.html */
+/* https://curl.se/libcurl/c/CURLOPT_PASSWORD.html */
+/* https://curl.se/libcurl/c/CURLOPT_USERNAME.html */
+/* https://curl.se/libcurl/c/CURLOPT_PRE_PROXY.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXYAUTH.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXYPASSWORD.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXYPORT.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXYTYPE.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXYUSERNAME.html */
+/* https://curl.se/libcurl/c/CURLOPT_PROXYUSERPWD.html */
+/* https://curl.se/libcurl/c/CURLOPT_RANGE.html */
+/* https://curl.se/libcurl/c/CURLOPT_SERVER_RESPONSE_TIMEOUT_MS.html */
+/* https://curl.se/libcurl/c/CURLOPT_SSLCERT.html */
+/* https://curl.se/libcurl/c/CURLOPT_TCP_FASTOPEN.html */
+/* https://curl.se/libcurl/c/CURLOPT_TCP_KEEPALIVE.html */
+/* https://curl.se/libcurl/c/CURLOPT_TCP_KEEPCNT.html */
+/* https://curl.se/libcurl/c/CURLOPT_TCP_KEEPIDLE.html */
+/* https://curl.se/libcurl/c/CURLOPT_TCP_KEEPINTVL.html */
+/* https://curl.se/libcurl/c/CURLOPT_TCP_NODELAY.html */
+/* https://curl.se/libcurl/c/CURLOPT_USERAGENT.html */
+/* https://curl.se/libcurl/c/CURLOPT_TIMEOUT_MS.html */
+/* https://curl.se/libcurl/c/CURLOPT_USERAGENT.html */
+/* https://curl.se/libcurl/c/CURLOPT_USERNAME.html */
+/* https://curl.se/libcurl/c/CURLOPT_XOAUTH2_BEARER.html */

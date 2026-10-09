@@ -175,6 +175,18 @@ public class CurlEasy implements IResource {
         return arena.orderJNI().getLong(0);
     }
 
+    native private static long _get_content_length_download_t(long curl, long bb);
+    public long getContentLengthDownload() {
+        checkClosed().checkCode(_get_content_length_download_t(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
+    native private static long _get_redirect_time_t(long curl, long bb);
+    public long getRedirectTime() {
+        checkClosed().checkCode(_get_connect_time_t(ptr, arena.ptr()));
+        return arena.orderJNI().getLong(0);
+    }
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {

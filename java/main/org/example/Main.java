@@ -34,6 +34,8 @@ public class Main {
             // System.out.println(acc.getString());
             System.out.println(c.getResponseCode());
             System.out.println(c.getConnectTimeMs());
+            System.out.println(c.getContentLengthDownload());
+            System.out.println(c.getRedirectTime());
         }
     }
 }
