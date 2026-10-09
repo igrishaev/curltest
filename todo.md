@@ -1,4 +1,5 @@
 - rename accum to collector
+- CURLException
 - set CURLOPT_ERRORBUFFER (len CURL_ERROR_SIZE)
 - set options method
 - user_data module

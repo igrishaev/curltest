@@ -20,6 +20,7 @@ public class ReadStream implements IResource {
         this.isClosed = isClosed;
     }
 
+    @SuppressWarnings("unused")
     public static ReadStream create(InputStream in) {
         long ptr = _allocate(in);
         if (ptr == Native.NULL) {

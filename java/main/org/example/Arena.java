@@ -1,11 +1,5 @@
 package org.example;
 
-// auto closeable?
-// NULL value
-// refactor
-// read CString
-// review .c code
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;

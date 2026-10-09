@@ -9,10 +9,10 @@ extern "C" {
 #endif
 /*
  * Class:     org_example_Native
- * Method:    get_null
+ * Method:    _get_null
  * Signature: ()J
  */
-JNIEXPORT jlong JNICALL Java_org_example_Native_get_1null
+JNIEXPORT jlong JNICALL Java_org_example_Native__1get_1null
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus

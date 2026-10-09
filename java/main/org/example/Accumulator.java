@@ -24,6 +24,7 @@ public class Accumulator implements IResource {
         this.isClosed = isClosed;
     }
 
+    @SuppressWarnings("unused")
     public static Accumulator create() {
         return create(Const.ACCUM_SIZE);
     }

@@ -1,6 +1,5 @@
 package org.example;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Objects;
 
@@ -264,7 +263,7 @@ public class CurlEasy implements IResource {
         checkCode(curlLong());
         return result;
     }
-    
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {

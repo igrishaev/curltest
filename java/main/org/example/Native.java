@@ -44,7 +44,7 @@ public class Native {
 
     static {
         loadLib();
-        NULL = get_null();
+        NULL = _get_null();
     }
-    native private static long get_null();
+    native private static long _get_null();
 }

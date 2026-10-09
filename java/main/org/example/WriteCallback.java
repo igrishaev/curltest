@@ -14,6 +14,7 @@ public class WriteCallback implements IResource {
         this.isClosed = isClosed;
     }
 
+    @SuppressWarnings("unused")
     public static WriteCallback create(IWriteHandler handler) {
         long ptr = _allocate(handler);
         if (ptr == Native.NULL) {

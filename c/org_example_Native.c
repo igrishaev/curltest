@@ -84,7 +84,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {
     log_debug("cURL has been globally cleaned up");
 }
 
-JNIEXPORT jlong JNICALL Java_org_example_Native_get_1null
+JNIEXPORT jlong JNICALL Java_org_example_Native__1get_1null
   (JNIEnv *env, jclass jcls) {
     return (jlong) NULL;
 }
