@@ -50,10 +50,10 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1perform
 /*
  * Class:     org_example_CurlEasy
  * Method:    _set_error_buffer
- * Signature: (JLjava/nio/ByteBuffer;)J
+ * Signature: (JJ)J
  */
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
-  (JNIEnv *, jclass, jlong, jobject);
+  (JNIEnv *, jclass, jlong, jlong);
 
 /*
  * Class:     org_example_CurlEasy

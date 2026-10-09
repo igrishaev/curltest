@@ -11,10 +11,10 @@ extern "C" {
 #define org_example_Arena_TERM 0L
 /*
  * Class:     org_example_Arena
- * Method:    initByteBuffer
+ * Method:    _init_byte_buffer
  * Signature: (Ljava/nio/ByteBuffer;)I
  */
-JNIEXPORT jint JNICALL Java_org_example_Arena_initByteBuffer
+JNIEXPORT jint JNICALL Java_org_example_Arena__1init_1byte_1buffer
   (JNIEnv *, jclass, jobject);
 
 #ifdef __cplusplus

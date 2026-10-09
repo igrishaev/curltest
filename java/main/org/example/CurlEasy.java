@@ -3,7 +3,6 @@ package org.example;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class CurlEasy implements IResource {
@@ -14,13 +13,13 @@ public class CurlEasy implements IResource {
     }
 
     private final long ptr;
-    private final ByteBuffer bb;
+    private final Arena arena;
     private boolean isClosed;
     private final static int ERROR_SIZE;
 
-    private CurlEasy(long ptr, ByteBuffer bb, boolean isClosed) {
+    private CurlEasy(long ptr, Arena arena, boolean isClosed) {
         this.ptr = ptr;
-        this.bb = bb;
+        this.arena = arena;
         this.isClosed = isClosed;
     }
 
@@ -30,8 +29,8 @@ public class CurlEasy implements IResource {
         if (ptr == Native.NULL) {
             throw Err.error("failed to initialize cURL");
         }
-        ByteBuffer bb = ByteBuffer.allocateDirect(ERROR_SIZE);
-        return new CurlEasy(ptr, bb, false).setErrorBuffer();
+        Arena arena = Arena.create(ERROR_SIZE);
+        return new CurlEasy(ptr, arena, false).setErrorBuffer();
     }
 
     @Override
@@ -47,29 +46,13 @@ public class CurlEasy implements IResource {
         }
     }
 
-    private static String readCString(final ByteBuffer bb) {
-        bb.rewind();
-        if (bb.get(0) == 0) {
-            return null;
-        }
-        int len = bb.limit();
-        int pos = 0;
-        for (int i = 0; i < len; i++) {
-            if (bb.get(pos) == 0) {
-                break;
-            }
-            pos++;
-        }
-        ByteBuffer slice = bb.slice(0, pos);
-        return StandardCharsets.UTF_8.decode(slice).toString();
-    }
-
     private CurlEasy checkCode(final long code) {
         if (code == 0) {
             return this;
         } else {
             String errorDescription = _curl_easy_strerror(code);
-            String errorExplanation = readCString(bb);
+            arena.rewind();
+            String errorExplanation = arena.readCString();
             throw new RuntimeException(
                     String.format("curl code: %d, description: %s, explanation: %s",
                             code, errorDescription, errorExplanation));
@@ -93,14 +76,16 @@ public class CurlEasy implements IResource {
         return checkClosed().checkCode(_perform(ptr));
     }
 
-    native private static long _set_error_buffer(long curlPtr, ByteBuffer bb);
+    native private static long _set_error_buffer(long curl, long bb);
     private CurlEasy setErrorBuffer() {
-        return checkClosed().checkCode(_set_error_buffer(ptr, bb));
+        return checkClosed().checkCode(_set_error_buffer(ptr, arena.ptr()));
     }
 
     native private static long _curl_easy_reset(long curlPtr);
     public CurlEasy resetOptions() {
-        return checkClosed().checkCode(_curl_easy_reset(ptr));
+        return checkClosed()
+                .checkCode(_curl_easy_reset(ptr))
+                .setErrorBuffer();
     }
 
     native private static String _curl_easy_strerror(long curlCode);
@@ -180,9 +165,9 @@ public class CurlEasy implements IResource {
 
     native private static long _get_response_code(long curl, long bb);
     public long getResponseCode() {
-        checkClosed().checkCode(_get_response_code(ptr, 123));
-        bb.rewind();
-        return bb.getLong();
+        checkClosed().checkCode(_get_response_code(ptr, arena.ptr()));
+        arena.orderJNI();
+        return arena.getLong(0);
     }
 
     native private static long _curl_easy_cleanup(final long curlPtr);

@@ -6,7 +6,6 @@ package org.example;
 // read CString
 // review .c code
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -20,29 +19,18 @@ public class Arena {
     final private ByteOrder BO_JVM;
     final private ByteOrder BO_JNI;
     final private long NULL;
-
-    public long ptr() {
-        return ptr;
-    }
-
-    public void putNULL() {
-        bb.putLong(NULL);
-    }
-
-    public void putNULL(final int index) {
-        bb.putLong(index, NULL);
-    }
+    private final static byte TERM = 0;
 
     static {
         Native.loadLib();
     }
 
-    private static native int initByteBuffer(final ByteBuffer bb);
-
-    private final static byte TERM = 0;
-
-    private Arena(final int bbLen, final ByteBuffer bb, final long ptr, final ByteOrder BO_JVM,
-                  final ByteOrder BO_JNI, final long NULL) {
+    private Arena(final int bbLen,
+                  final ByteBuffer bb,
+                  final long ptr,
+                  final ByteOrder BO_JVM,
+                  final ByteOrder BO_JNI,
+                  final long NULL) {
         this.bbLen = bbLen;
         this.bb = bb;
         this.ptr = ptr;
@@ -51,19 +39,25 @@ public class Arena {
         this.NULL = NULL;
     }
 
-    public static Arena of(final int size) {
-        // TODO: check min size
+    private static native int _init_byte_buffer(final ByteBuffer bb);
+    public static Arena create() {
+        return create(Const.ARENA_MIN_SIZE);
+    }
+    public static Arena create(final int size) {
+        if (size < Const.ARENA_MIN_SIZE) {
+            throw Err.error("Arena size %s is less than %s", size, Const.ARENA_MIN_SIZE);
+        }
         final ByteBuffer bb = ByteBuffer.allocateDirect(size);
         byte lead;
 
-        // byte order for JVM
+        // detect byte order for JVM
         bb.putLong(1);
         lead = bb.get(0);
         final ByteOrder BO_JVM = (lead == 1) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
 
-        final int initStatus = initByteBuffer(bb);
-        if (initStatus != 0) {
-            throw new RuntimeException("failed to init byte buffer, code: " + initStatus);
+        final int code = _init_byte_buffer(bb);
+        if (code != 0) {
+            throw Err.error("failed to init arena, size: %s, code: %s", size, code);
         }
         bb.rewind();
 
@@ -76,14 +70,19 @@ public class Arena {
         final long NULL = bb.getLong();
         final long ptr = bb.getLong();
 
-        // TODO
-        bb.rewind();
-        bb.putLong(0);
-        bb.putLong(0);
-        bb.putLong(0);
-        bb.rewind();
-
         return new Arena(size, bb, ptr, BO_JVM, BO_JNI, NULL);
+    }
+
+    public long ptr() {
+        return ptr;
+    }
+
+    public void putNULL() {
+        bb.putLong(NULL);
+    }
+
+    public void putNULL(final int index) {
+        bb.putLong(index, NULL);
     }
 
     public int putCString(final String s) {
@@ -98,6 +97,23 @@ public class Arena {
         bb.put(index, buf);
         bb.put(index + buf.length, TERM);
         return buf.length + 1;
+    }
+
+    public String readCString() {
+        int start = bb.position();
+        if (bb.get(start) == 0) {
+            return null;
+        }
+        int len = bb.limit();
+        int end = start;
+        for (int i = start; i < len; i++) {
+            if (bb.get(end) == 0) {
+                break;
+            }
+            end++;
+        }
+        ByteBuffer slice = bb.slice(start, end);
+        return StandardCharsets.UTF_8.decode(slice).toString();
     }
 
     public void rewind() {
@@ -118,6 +134,10 @@ public class Arena {
 
     public long getLong() {
         return bb.getLong();
+    }
+
+    public long getLong(int index) {
+        return bb.getLong(index);
     }
 
     public void putInt(final int i) {
@@ -157,7 +177,7 @@ public class Arena {
     }
 
     public static void main(final String... args) {
-        final Arena a = Arena.of(64);
+        final Arena a = Arena.create();
         a.debug(64);
         System.out.println(a.BO_JVM);
         System.out.println(a.BO_JNI);

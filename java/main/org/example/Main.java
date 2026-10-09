@@ -16,17 +16,23 @@ public class Main {
         ) {
             c
                     .resetOptions()
-                    .setUrl("https://habr.com")
+                    // .setUrl("https://habr.com")
                     .setHeaders(hh)
                     .setFollowLocation(3)
                     .setAccumulator(acc)
                     // .setWriteFile(wf)
                     // .setWriteStream(ws)
                     .setMethod(1)
-                    // .setVerbose(true)
+                    .setVerbose(true);
                     // .setPostData(new byte[] {1, 2, 3})
-                    .perform();
-            System.out.println(acc.getString());
+
+            try {
+                c.perform();
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            // System.out.println(acc.getString());
+            System.out.println(c.getResponseCode());
         }
     }
 }

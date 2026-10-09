@@ -100,26 +100,14 @@ JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1perform
 
 
 JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1set_1error_1buffer
-  (JNIEnv *env, jclass jcls, jlong jcurl, jobject jbb) {
-
-    CURLcode code;
-    char *ptr;
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jbb) {
     CURL *curl = (CURL *) jcurl;
-
-    ptr = JNI_CALL(env, GetDirectBufferAddress, jbb);
-    if (!ptr) {
-        code = CURLE_OUT_OF_MEMORY;
-        log_error("JNI GetDirectBufferAddress() has failed");
-        goto exit;
-    }
-
-    code = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, ptr);
+    char *ptr = (char *) jbb;
+    log_debug("setting error buffer, curl: %lu, ptr: %lu", curl, ptr);
+    CURLcode code = curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, ptr);
     if (code != CURLE_OK) {
         log_error("curl_easy_setopt(CURLOPT_ERRORBUFFER) has failed");
-        goto exit;
     }
-
-exit:
     return code;
 }
 
