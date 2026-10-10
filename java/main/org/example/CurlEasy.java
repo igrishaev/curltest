@@ -264,6 +264,24 @@ public class CurlEasy implements IResource {
         return result;
     }
 
+    native private static long _curl_easy_nextheader(long curl, long prev);
+    public long nextHeader() {
+        return _curl_easy_nextheader(ptr, Native.NULL);
+    }
+    public long nextHeader(long prev) {
+        return _curl_easy_nextheader(ptr, prev);
+    }
+
+    native private static String _header_name(long header);
+    public String getHeaderName(long header) {
+        return _header_name(header);
+    }
+
+    native private static String _header_value(long header);
+    public String getHeaderValue(long header) {
+        return _header_value(header);
+    }
+
     native private static long _curl_easy_cleanup(final long curlPtr);
     @Override
     public void close() {

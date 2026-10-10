@@ -391,6 +391,31 @@ JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1local_1ip
     return _get_info_as_string(env, jcurl, jbb, CURLINFO_LOCAL_IP);
 }
 
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1nextheader
+  (JNIEnv *env, jclass jcls, jlong jcurl, jlong jheader) {
+    CURL *curl = (CURL *) jcurl;
+    struct curl_header *h = (struct curl_header *) jheader;
+    return (jlong) curl_easy_nextheader(curl, CURLH_HEADER, -1, h);
+}
+
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1header_1name
+  (JNIEnv *env, jclass jcls, jlong jheader) {
+    struct curl_header *h = (struct curl_header *) jheader;
+    if (!h) {
+        return NULL;
+    }
+    return JNI_CALL(env, NewStringUTF, h->name);
+}
+
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1header_1value
+  (JNIEnv *env, jclass jcls, jlong jheader) {
+    struct curl_header *h = (struct curl_header *) jheader;
+    if (!h) {
+        return NULL;
+    }
+    return JNI_CALL(env, NewStringUTF, h->value);
+}
+
 
 // error: proxy error, errno
 /* https://curl.se/libcurl/c/CURLINFO_HTTP_VERSION.html */

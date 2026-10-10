@@ -22,8 +22,8 @@ public class Main {
                     .setAccumulator(acc)
                     // .setWriteFile(wf)
                     // .setWriteStream(ws)
-                    .setMethod(1)
-                    .setVerbose(true);
+                    .setMethod(1);
+                    // .setVerbose(true);
                     // .setPostData(new byte[] {1, 2, 3})
 
             try {
@@ -36,6 +36,26 @@ public class Main {
             System.out.println(c.getConnectTimeMs());
             System.out.println(c.getContentLengthDownload());
             System.out.println(c.getRedirectTime());
+            System.out.println(c.getOsErrno());
+            // System.out.println(c.getPrimaryIP());
+
+            String name, value;
+            long header = c.nextHeader();
+            while (header != Native.NULL) {
+                name = c.getHeaderName(header);
+                value = c.getHeaderValue(header);
+                System.out.printf("header: %s, name: %s, value: %s %n", header, name, value);
+                header = c.nextHeader(header);
+            }
+
+//            long header = Native.NULL;
+//            do {
+//                String name, value;
+//                header = c.nextHeader(header);
+//                name = c.getHeaderName(header);
+//                value = c.getHeaderValue(header);
+//                System.out.printf("header: %s, name: %s, value: %s %n", header, name, value);
+//            } while (header != Native.NULL);
         }
     }
 }

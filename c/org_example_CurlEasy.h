@@ -289,6 +289,30 @@ JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1get_1local_1ip
 
 /*
  * Class:     org_example_CurlEasy
+ * Method:    _curl_easy_nextheader
+ * Signature: (JJ)J
+ */
+JNIEXPORT jlong JNICALL Java_org_example_CurlEasy__1curl_1easy_1nextheader
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _header_name
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1header_1name
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
+ * Method:    _header_value
+ * Signature: (J)Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_org_example_CurlEasy__1header_1value
+  (JNIEnv *, jclass, jlong);
+
+/*
+ * Class:     org_example_CurlEasy
  * Method:    _curl_easy_cleanup
  * Signature: (J)J
  */
