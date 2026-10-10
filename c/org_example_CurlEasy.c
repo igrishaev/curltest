@@ -287,9 +287,7 @@ static CURLcode _get_info_as_long(jlong jcurl, jlong jbb, CURLINFO info) {
     char *bb = (char *) jbb;
     long value;
     CURLcode code = curl_easy_getinfo(curl, info, &value);
-    if (code == CURLE_OK) {
-        bb = put_long(bb, value);
-    }
+    put_long(bb, value);
     return code;
 }
 
@@ -367,11 +365,11 @@ static jstring _get_info_as_string(JNIEnv *env, jlong jcurl, jlong jbb, CURLINFO
     CURL *curl = (CURL *) jcurl;
     char *bb = (char *) jbb;
     char *ptr;
-    CURLcode code = curl_easy_getinfo(curl, info, ptr);
+    CURLcode code = curl_easy_getinfo(curl, info, &ptr);
+    put_long(bb, code);
     if (code == CURLE_OK) {
         return JNI_CALL(env, NewStringUTF, ptr);
     } else {
-        bb = put_long(bb, code);
         return NULL;
     }
 }

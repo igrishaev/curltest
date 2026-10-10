@@ -37,16 +37,12 @@ public class Main {
             System.out.println(c.getContentLengthDownload());
             System.out.println(c.getRedirectTime());
             System.out.println(c.getOsErrno());
-            // System.out.println(c.getPrimaryIP());
-
-            String name, value;
-            long header = c.nextHeader();
-            while (header != Native.NULL) {
-                name = c.getHeaderName(header);
-                value = c.getHeaderValue(header);
-                System.out.printf("header: %s, name: %s, value: %s %n", header, name, value);
-                header = c.nextHeader(header);
-            }
+            System.out.println(c.getLocalIP());
+            System.out.println(c.getLocalPort());
+            System.out.println(c.getPrimaryIP());
+            System.out.println(c.getPrimaryPort());
+            System.out.println(c.getEffectiveURL());
+            System.out.println(c.getHeaders());
 
 //            long header = Native.NULL;
 //            do {

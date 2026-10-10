@@ -1,6 +1,8 @@
 package org.example;
 
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class CurlEasy implements IResource {
@@ -265,21 +267,20 @@ public class CurlEasy implements IResource {
     }
 
     native private static long _curl_easy_nextheader(long curl, long prev);
-    public long nextHeader() {
-        return _curl_easy_nextheader(ptr, Native.NULL);
-    }
-    public long nextHeader(long prev) {
-        return _curl_easy_nextheader(ptr, prev);
-    }
-
     native private static String _header_name(long header);
-    public String getHeaderName(long header) {
-        return _header_name(header);
-    }
-
     native private static String _header_value(long header);
-    public String getHeaderValue(long header) {
-        return _header_value(header);
+
+    public Map<String, String> getHeaders() {
+        final Map<String, String> result = new HashMap<>();
+        String name, value;
+        long headerPtr = _curl_easy_nextheader(ptr, Native.NULL);
+        while (headerPtr != Native.NULL) {
+            name = _header_name(headerPtr);
+            value = _header_value(headerPtr);
+            result.put(name, value);
+            headerPtr = _curl_easy_nextheader(ptr, headerPtr);
+        }
+        return result;
     }
 
     native private static long _curl_easy_cleanup(final long curlPtr);
