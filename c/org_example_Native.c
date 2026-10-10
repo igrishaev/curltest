@@ -55,14 +55,6 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         GET_CLASS(env, "org/example/IWriteHandler", jcls);
         SET_METHOD(env, jcls, "handle", "([BII)V", _g.IWriteHandler.handle_BaII);
 
-        /* Response */
-        GET_CLASS(env, "org/example/Response", jcls);
-        SET_FIELD(env, jcls, "status",        J_INT,     _g.Response.status);
-        SET_FIELD(env, jcls, "headers",       J_MAP,     _g.Response.headers);
-        SET_FIELD(env, jcls, "contentLength", J_LONG,    _g.Response.contentLength);
-        SET_FIELD(env, jcls, "effectiveUrl",  J_STRING,  _g.Response.effectiveUrl);
-        SET_METHOD(env, jcls, "addHeader", "(" J_STRING J_STRING ")V", _g.Response.addHeader);
-
         /* OutputStream */
         GET_CLASS(env, "java/io/OutputStream", jcls);
         SET_METHOD(env, jcls, "write", "([BII)V", _g.OutputStream.write_BaII);

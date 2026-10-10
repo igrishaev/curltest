@@ -25,3 +25,22 @@ CURLcode result;
 
    curl_global_cleanup();
  }
+
+
+    {
+        struct curl_header *h;
+        struct curl_header *prev = NULL;
+        jstring jname;
+        jstring jvalue;
+        do {
+            h = curl_easy_nextheader(curl, CURLH_HEADER, -1, prev);
+            if (h) {
+                log_debug("header %s: %s (%u)", h->name, h->value, (unsigned int) h->amount);
+                jname = JNI_CALL(env, NewStringUTF, h->name);
+                jvalue = JNI_CALL(env, NewStringUTF, h->value);
+                JNI_CALL(env, CallVoidMethod, jresp, _g.Response.addHeader, jname, jvalue);
+                log_debug("header set %s: %s", h->name, h->value);
+            }
+            prev = h;
+        } while(h);
+    }

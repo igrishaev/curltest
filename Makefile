@@ -18,7 +18,6 @@ JAVAFILES = \
 	$(SRC_PATH)/Native.java \
 	$(SRC_PATH)/CurlEasy.java \
 	$(SRC_PATH)/Err.java \
-	$(SRC_PATH)/Response.java \
 	$(SRC_PATH)/IWriteHandler.java
 
 MODULES = \
@@ -36,7 +35,6 @@ MODULES = \
 	$(C_PATH)/org_example_FILE.c \
 	$(C_PATH)/org_example_Native.c \
 	$(C_PATH)/org_example_CurlEasy.c \
-	$(C_PATH)/org_example_Response.c \
 
 OBJECTS = $(MODULES:.c=.o)
 
@@ -51,7 +49,7 @@ JAVA_INC = \
 CURL_HOME = /opt/homebrew/opt/curl
 
 CC = gcc
-CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib -DDEBUG
+CFLAGS = -Wall -ansi -pedantic -fPIC ${JAVA_INC} -I${CURL_HOME}/include -L${CURL_HOME}/lib # -DDEBUG
 
 LIBS = -lcurl
 

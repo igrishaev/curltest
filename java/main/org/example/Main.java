@@ -43,15 +43,6 @@ public class Main {
             System.out.println(c.getPrimaryPort());
             System.out.println(c.getEffectiveURL());
             System.out.println(c.getHeaders());
-
-//            long header = Native.NULL;
-//            do {
-//                String name, value;
-//                header = c.nextHeader(header);
-//                name = c.getHeaderName(header);
-//                value = c.getHeaderValue(header);
-//                System.out.printf("header: %s, name: %s, value: %s %n", header, name, value);
-//            } while (header != Native.NULL);
         }
     }
 }

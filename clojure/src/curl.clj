@@ -3,14 +3,12 @@
    (java.util Map)
    (org.example CurlEasy
                 IResource
-                Response
                 Headers
                 Dummy
                 FILE
-                Accumulator
-                Request
-                Request$Builder)))
+                Accumulator)))
 
+#_
 (defn ->request ^Request [opts]
 
   (let [{:keys [url
@@ -48,6 +46,7 @@
 (defn init ^CurlEasy []
   (CurlEasy/make))
 
+#_
 (defn perform [^CurlEasy curl opts]
   (.perform curl (->request opts)))
 
@@ -66,38 +65,51 @@
     (Accumulator/create 4096)
     Dummy/INSTANCE))
 
-(defn perform2 [^CurlEasy curl opts]
-  (let [{:keys [headers
+(defn ->response [^CurlEasy curl accumulate? ^Accumulator acc]
+  {:status (.getResponseCode curl)
+   :headers (.getHeaders curl)
+   :body (when accumulate?
+           (.getBytes acc))})
+
+(defn perform ^CurlEasy [^CurlEasy curl opts]
+  (let [{:keys [url
+                method
+                headers
+                follow-location
                 write-file
                 accumulate?]}
         opts]
     (with-open [h (open-headers headers)
                 f (open-write-file write-file)
                 a (open-accum accumulate?)]
-      (let [request
-            (-> opts
-                (assoc :resource-headers h
-                       :resource-write-file f
-                       :resource-accum a)
-                (->request))
+      (cond-> (.resetOptions curl)
 
-            response
-            (.perform curl request)]
+        url
+        (.setUrl url)
 
-        {:status (.-status response)
-         :headers (.-headers response)
-         :body (when accumulate?
-                 (.getBytes ^Accumulator a)
-                 #_(.getString ^Accumulator a))}
+        method
+        (.setMethod method)
 
-        #_
-        response))))
+        follow-location
+        (.setFollowLocation follow-location)
+
+        :true
+        (.setAccumulator a)
+
+        :true
+        (.setHeaders h)
+
+        :then
+        (.perform)
+
+        :finally
+        (->response accumulate? a)))))
 
 (comment
 
   (with-open [c (init)]
-    (perform2 c {:url "http://127.0.0.1:3000" #_"https://habr.com"
-                 :method 1
-                 :follow-redirects 3
-                 :headers {"foo" "bar"}
-                 :accumulate? true})))
+    (perform c {:url "https://habr.com" ;; "http://127.0.0.1:3000"
+                :method 1
+                :follow-location 3
+                :headers {"foo" "bar"}
+                :accumulate? true})))

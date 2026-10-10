@@ -21,7 +21,7 @@
 
 (def server
   (delay
-    (jetty/run-jetty app {:port 3000 :join? false})))
+    (jetty/run-jetty app {:port 3099 :join? false})))
 
 (defn -main [& args]
   (println "Starting Ring server on port 3000...")

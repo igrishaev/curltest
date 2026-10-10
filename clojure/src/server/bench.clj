@@ -10,11 +10,12 @@
    [clj-http.conn-mgr :as conn]
    [clj-http.client :as client]))
 
+(def URL "http://127.0.0.1:3099")
 
 (defn test-bb []
   (quick-bench
       (let [response
-            (bb/get "http://127.0.0.1:3000"
+            (bb/get URL
                     {:as :string})])))
 
 (defn test-clj-http []
@@ -22,7 +23,7 @@
 
     (quick-bench
         (let [response
-              (client/get "http://127.0.0.1:3000"
+              (client/get URL
                           {:connection-manager cm
                            :cache true})
               {:keys [body]}
@@ -37,7 +38,7 @@
               (new ByteArrayOutputStream)
 
               response
-              (client/get "http://127.0.0.1:3000"
+              (client/get URL
                           {:connection-manager cm
                            :as :stream
                            :cache true})
@@ -50,7 +51,7 @@
 
 (defn test-http-kit []
   (quick-bench
-      @(http/get "http://127.0.0.1:3000"
+      @(http/get URL
                  {:as :byte-array}
                  )
 
@@ -59,7 +60,7 @@
             (new ByteArrayOutputStream)
 
             response
-            @(http/get "http://127.0.0.1:3000"
+            @(http/get URL
                        {:as :stream})
 
             {:keys [^InputStream body]}
@@ -71,13 +72,13 @@
 
 (defn test-curl []
   (with-open [c (curl/init)]
-    (let [req {:url "http://127.0.0.1:3000"
+    (let [opt {:url URL
                :method 1
                :follow-redirects 3
                :headers {"foo" "bar"}
                :accumulate? true}]
       (quick-bench
-          (curl/perform2 c req))))
+          (curl/perform c opt))))
 
   #_
   (with-open [c (CurlEasy/make)]

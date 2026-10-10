@@ -9,7 +9,7 @@ public class CurlEasy implements IResource {
 
     static {
         Native.loadLib();
-        ERROR_SIZE = _get_CURL_ERROR_SIZE();
+        ERROR_SIZE = _get_CURL_ERROR_SIZE(); // TODO?
     }
 
     private final long ptr;
@@ -29,7 +29,7 @@ public class CurlEasy implements IResource {
         if (ptr == Native.NULL) {
             throw Err.error("failed to initialize cURL");
         }
-        Arena arena = Arena.create(ERROR_SIZE);
+        Arena arena = Arena.create(Const.ARENA_SIZE);
         return new CurlEasy(ptr, arena, false).setErrorBuffer();
     }
 
@@ -53,6 +53,7 @@ public class CurlEasy implements IResource {
             String errorDescription = _curl_easy_strerror(code);
             arena.rewind();
             String errorExplanation = arena.readCString();
+            // TODO: check errno?
             throw new RuntimeException(
                     String.format("curl code: %d, description: %s, explanation: %s",
                             code, errorDescription, errorExplanation));
@@ -91,31 +92,31 @@ public class CurlEasy implements IResource {
     native private static String _curl_easy_strerror(long curlCode);
 
     native private static long _curl_set_headers(long curl, long headers);
-    public CurlEasy setHeaders(Headers headers) {
+    public CurlEasy setHeaders(IResource headers) {
         final long hhPtr = (headers == null) ? Native.NULL : headers.ptr();
         return checkClosed().checkCode(_curl_set_headers(ptr, hhPtr));
     }
 
     native private static long _set_write_file(long curl, long file);
-    public CurlEasy setWriteFile(FILE file) {
+    public CurlEasy setWriteFile(IResource file) {
         Objects.requireNonNull(file, "the file object cannot be null");
         return checkClosed().checkCode(_set_write_file(ptr, file.ptr()));
     }
 
     native private static long _set_write_stream(long curl, long stream);
-    public CurlEasy setWriteStream(WriteStream stream) {
+    public CurlEasy setWriteStream(IResource stream) {
         Objects.requireNonNull(stream, "the stream object cannot be null");
         return checkClosed().checkCode(_set_write_stream(ptr, stream.ptr()));
     }
 
     native private static long _set_write_callback(long curl, long callback);
-    public CurlEasy setWriteCallback(WriteCallback callback) {
+    public CurlEasy setWriteCallback(IResource callback) {
         Objects.requireNonNull(callback, "write callback cannot be null");
         return checkClosed().checkCode(_set_write_callback(ptr, callback.ptr()));
     }
 
     native private static long _set_accumulator(long curl, long acc);
-    public CurlEasy setAccumulator(Accumulator acc) {
+    public CurlEasy setAccumulator(IResource acc) {
         Objects.requireNonNull(acc, "the accumulator cannot be null");
         return checkClosed().checkCode(_set_accumulator(ptr, acc.ptr()));
     }
@@ -141,7 +142,7 @@ public class CurlEasy implements IResource {
     }
 
     native private static long _set_read_file(long curl, long file);
-    public CurlEasy setReadFile(FILE file) {
+    public CurlEasy setReadFile(IResource file) {
         Objects.requireNonNull(file, "read file cannot be null");
         return checkClosed().checkCode(_set_read_file(ptr, file.ptr()));
     }
