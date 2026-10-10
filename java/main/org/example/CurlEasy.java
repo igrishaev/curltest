@@ -271,6 +271,7 @@ public class CurlEasy implements IResource {
     native private static String _header_value(long header);
 
     public Map<String, String> getHeaders() {
+        checkClosed();
         final Map<String, String> result = new HashMap<>();
         String name, value;
         long headerPtr = _curl_easy_nextheader(ptr, Native.NULL);
